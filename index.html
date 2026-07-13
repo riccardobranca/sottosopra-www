@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Sottosopra Festival 2026 — Castelfranco Veneto</title>
+  <meta name="description" content="8ª edizione: 30 e 31 luglio, 1 e 2 agosto 2026 nei Giardini del Castello di Castelfranco Veneto. Il nuovo sito sta arrivando: intanto i biglietti sono su DICE." />
+  <link rel="canonical" href="https://sottosopra.com/" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <meta name="theme-color" content="#ffffff" />
+  <link rel="preload" href="fonts/SoSo26.woff2" as="font" type="font/woff2" crossorigin />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Sottosopra Festival" />
+  <meta property="og:locale" content="it_IT" />
+  <meta property="og:title" content="Sottosopra Festival 2026 — Castelfranco Veneto" />
+  <meta property="og:description" content="30 e 31 luglio, 1 e 2 agosto 2026 · Giardini del Castello, Castelfranco Veneto. Biglietti su DICE." />
+  <meta property="og:url" content="https://sottosopra.com/" />
+  <meta property="og:image" content="https://sottosopra.com/media/og.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Festival",
+    "name": "Sottosopra Festival 2026",
+    "startDate": "2026-07-30",
+    "endDate": "2026-08-02",
+    "eventStatus": "https://schema.org/EventScheduled",
+    "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+    "location": {
+      "@type": "Place",
+      "name": "Giardini Sud-Ovest del Castello",
+      "address": { "@type": "PostalAddress", "addressLocality": "Castelfranco Veneto", "postalCode": "31033", "addressRegion": "TV", "addressCountry": "IT" }
+    },
+    "organizer": { "@type": "Organization", "name": "Sottosopra APS", "email": "info@sottosopra.com", "url": "https://sottosopra.com" },
+    "image": "https://sottosopra.com/media/og.jpg",
+    "offers": { "@type": "Offer", "url": "https://tickets.sottosopra.com/sito/", "availability": "https://schema.org/InStock", "priceCurrency": "EUR" }
+  }
+  </script>
+  <!-- Umami (statistiche cookieless): attivare quando esiste il website-id del sito
+  <script defer src="https://cloud.umami.is/script.js" data-website-id="INSERIRE-ID" data-domains="sottosopra.com"></script>
+  -->
+  <style>
+    /* ── Token (dal DESIGN.md del sito) ─────────────────── */
+    :root {
+      --bg: #ffffff; --fg: #000000; --muted: #6b6b6b; --line: #e4e4e4;
+      --font-display: "SoSo26", system-ui, sans-serif;
+      --font-body: "InterVariable", system-ui, sans-serif;
+    }
+    @font-face {
+      font-family: "SoSo26";
+      src: url("fonts/SoSo26.woff2") format("woff2");
+      font-weight: 400; font-style: normal; font-display: swap;
+    }
+    @font-face {
+      font-family: "InterVariable";
+      src: url("fonts/inter.woff2") format("woff2-variations");
+      font-weight: 100 900; font-style: normal; font-display: swap;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      background: var(--bg); color: var(--fg);
+      font-family: var(--font-body); font-size: 1.0625rem; line-height: 1.6;
+      min-height: 100svh; display: flex; flex-direction: column;
+    }
+    /* grana da stampa */
+    .grain { position: fixed; inset: 0; width: 100%; height: 100%; opacity: 0.05; pointer-events: none; z-index: 999; }
+
+    main { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: clamp(24px, 5vh, 64px) clamp(20px, 4vw, 56px); }
+    .wrap { width: 100%; }
+
+    /* ── Titoloni giustificati (modello poster del grafico) ── */
+    .just {
+      font-family: var(--font-display);
+      font-feature-settings: "ss07", "ss08", "liga", "calt";
+      font-weight: 400; text-transform: uppercase;
+      line-height: 1; letter-spacing: -0.012em;
+      text-align: justify; text-align-last: justify;
+      width: 100%; display: block;
+    }
+    .just .ln { display: flex; justify-content: space-between; align-items: baseline; line-height: 1; }
+    .just .ln .wd { white-space: nowrap; }
+    .just-xl { font-size: clamp(2.4rem, 11.6vw, 10rem); }
+    /* su schermi larghi il titolo si compatta: CTA e contatti nel primo viewport */
+    @media (min-width: 1000px) { .just-xl { font-size: clamp(4rem, 8vw, 8rem); } }
+    .just + .just-gap { margin-top: 1em; }
+
+    /* riga di lettere distribuite (wordmark capovolto) */
+    .spread {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-family: var(--font-display);
+      font-feature-settings: "ss07", "ss08", "liga", "calt";
+      text-transform: uppercase; line-height: 1.45;
+    }
+    .spread .sp { flex: 0 0 0.6em; }
+    .flip { transform: rotate(180deg); }
+
+    .meta {
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
+      font-size: clamp(0.95rem, 1.6vw, 1.35rem); font-weight: 700; line-height: 1.45;
+    }
+    .meta .r { text-align: right; }
+    .hero-intro { margin-top: clamp(20px, 3.5vh, 36px); }
+    .hero-claim { margin-top: clamp(18px, 2.4vw, 30px); font-size: clamp(1.15rem, 2.6vw, 2.2rem); line-height: 1; }
+
+    /* ── Azioni ── */
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: clamp(26px, 4.5vh, 48px); }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      font-family: var(--font-body); font-weight: 600; font-size: 0.8125rem;
+      letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap;
+      padding: 15px 28px; min-height: 48px; border: 1.5px solid var(--fg);
+      text-decoration: none; transition: opacity 0.2s ease;
+    }
+    .btn.solid { background: var(--fg); color: var(--bg); }
+    .btn.solid:hover, .btn.solid:focus-visible { opacity: 0.82; }
+    .contacts { display: flex; flex-wrap: wrap; gap: 10px 28px; margin-top: clamp(22px, 3.5vh, 36px); }
+    .contacts a {
+      color: var(--fg); text-decoration: none; font-weight: 600; font-size: 0.9375rem;
+      padding: 6px 0; min-height: 32px; display: inline-flex; align-items: center;
+    }
+    .contacts a:hover, .contacts a:focus-visible { text-decoration: underline; text-underline-offset: 3px; }
+    @media (max-width: 640px) {
+      .actions .btn { width: 100%; }
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--line);
+      padding: clamp(20px, 3.5vh, 32px) clamp(20px, 4vw, 56px);
+      display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px;
+    }
+    footer .logo { height: 18px; width: auto; display: block; }
+    footer .legal { color: var(--muted); font-size: 0.8125rem; line-height: 1.7; }
+    footer .legal a { color: var(--fg); }
+    footer .legal a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+    }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  </style>
+</head>
+<body>
+  <svg class="grain" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" stitchTiles="stitch" /></filter>
+    <rect width="100%" height="100%" filter="url(#n)" />
+  </svg>
+
+  <main>
+    <div class="wrap">
+      <h1>
+        <span class="just just-xl">Il nuovo sito è in costruzione.</span>
+        <span class="just just-xl just-gap">Il festival no</span>
+      </h1>
+
+      <div class="hero-intro">
+        <div class="meta">
+          <span>30 e 31 luglio,<br />1 e 2 agosto 2026</span>
+          <span class="r">Castelfranco Veneto,<br />Giardini Sud-Ovest del Castello</span>
+        </div>
+        <p class="spread flip hero-claim" aria-label="Sempre Sottosopra"><span aria-hidden="true">S</span><span aria-hidden="true">E</span><span aria-hidden="true">M</span><span aria-hidden="true">P</span><span aria-hidden="true">R</span><span aria-hidden="true">E</span><span class="sp" aria-hidden="true"></span><span aria-hidden="true">S</span><span aria-hidden="true">O</span><span aria-hidden="true">T</span><span aria-hidden="true">T</span><span aria-hidden="true">O</span><span aria-hidden="true">S</span><span aria-hidden="true">O</span><span aria-hidden="true">P</span><span aria-hidden="true">R</span><span aria-hidden="true">A</span></p>
+      </div>
+
+      <div class="actions">
+        <a class="btn solid" href="https://tickets.sottosopra.com/sito/" data-umami-event="dice-click" data-umami-event-canale="sito-costruzione">Compra i biglietti&nbsp;↗</a>
+      </div>
+      <div class="contacts">
+        <a href="https://instagram.com/sottosoprafestival" target="_blank" rel="noopener">Instagram ↗<span class="sr-only"> (si apre in una nuova scheda)</span></a>
+        <a href="mailto:info@sottosopra.com">info@sottosopra.com →</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <img class="logo" src="brand/logo-black.png" alt="Sottosopra" />
+    <p class="legal">
+      © 2026 Sottosopra APS · C.F. 92045630263 · P.IVA 05002480266<br />
+      Via Verdi 3, 31033 Castelfranco Veneto (TV) · <a href="privacy-policy/">Privacy</a>
+    </p>
+  </footer>
+
+  <!-- GIUSTIFICAZIONE MANIFESTO — stesso motore del sito (modello poster del grafico) -->
+  <script>
+    (function () {
+      function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+      function build(el) {
+        try {
+          var text = el.getAttribute("data-text");
+          if (text === null) {
+            text = el.textContent.replace(/[^\S ]+/g, " ").trim();
+            el.setAttribute("data-text", text);
+            el.setAttribute("aria-label", text);
+          }
+          el.innerHTML = text.split(" ").map(function (w) { return '<span class="w">' + esc(w) + "</span>"; }).join(" ");
+          var ws = [].slice.call(el.children), lines = [], cur = [], top = null;
+          ws.forEach(function (s) {
+            var t = s.offsetTop;
+            if (top === null) top = t;
+            if (t - top > 2) { lines.push(cur); cur = []; top = t; }
+            cur.push(s.textContent);
+          });
+          if (cur.length) lines.push(cur);
+          el.innerHTML = lines.map(function (lw) {
+            var parts = lw.join(" ").split(/\s+/);
+            if (parts.length > 1) {
+              return '<span class="ln">' + parts.map(function (w) { return '<span class="wd">' + esc(w) + "</span>"; }).join("") + "</span>";
+            }
+            var inner = "";
+            for (var k = 0; k < parts[0].length; k++) inner += "<span>" + esc(parts[0][k]) + "</span>";
+            return '<span class="ln">' + inner + "</span>";
+          }).join("");
+        } catch (e) {
+          var d = el.getAttribute("data-text");
+          if (d) el.textContent = d;
+        }
+      }
+      function run() { [].forEach.call(document.querySelectorAll(".just"), build); }
+      function ready() { run(); if (document.fonts && document.fonts.ready) { document.fonts.ready.then(run); } }
+      if (document.readyState !== "loading") ready();
+      else addEventListener("DOMContentLoaded", ready);
+      var tm;
+      addEventListener("resize", function () { clearTimeout(tm); tm = setTimeout(run, 150); });
+    })();
+  </script>
+</body>
+</html>
