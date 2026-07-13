@@ -1,0 +1,25 @@
+# BOTTONE GO-LIVE — da GitHub: Actions → "Pubblica su sottosopra.com" → Run workflow
+# Scegli cosa mettere live: il sito completo o la pagina "in costruzione" (rollback).
+name: Pubblica su sottosopra.com
+on:
+  workflow_dispatch:
+    inputs:
+      contenuto:
+        description: "Cosa mettere live"
+        required: true
+        type: choice
+        options:
+          - sito-completo
+          - costruzione
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.contenuto }}
+          fetch-depth: 0
+      - name: Pubblica il contenuto scelto su main (= live)
+        run: git push origin HEAD:main --force

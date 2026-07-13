@@ -1,0 +1,122 @@
+<!DOCTYPE html><html lang="it"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><meta name="description" content="Cookie policy di Sottosopra: sito cookieless, solo cookie tecnici."><title>Cookie Policy — Sottosopra Festival 2026</title><link rel="canonical" href="https://sottosopra.com/cookie/"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><meta name="theme-color" content="#ffffff"><link rel="preload" href="/_astro/SoSo26.CWTJfH5P.woff2" as="font" type="font/woff2" crossorigin><meta property="og:type" content="website"><meta property="og:site_name" content="Sottosopra Festival"><meta property="og:locale" content="it_IT"><meta property="og:title" content="Cookie Policy — Sottosopra Festival 2026"><meta property="og:description" content="Cookie policy di Sottosopra: sito cookieless, solo cookie tecnici."><meta property="og:url" content="https://sottosopra.com/cookie/"><meta property="og:image" content="https://sottosopra.com/media/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><link rel="stylesheet" href="/_astro/Base.BWpuJKJX.css">
+<style>.legal[data-astro-cid-m6bnwj4q] .prose[data-astro-cid-m6bnwj4q]{margin-top:8px}
+</style></head> <body> <!-- grana da stampa, senza colore --> <svg class="grain" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"> <filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" stitchTiles="stitch"></feTurbulence></filter> <rect width="100%" height="100%" filter="url(#n)"></rect> </svg> <a class="skip" href="#main" data-astro-cid-3ef6ksr2>Salta al contenuto</a> <header class="hdr" data-astro-cid-3ef6ksr2> <a class="hdr-logo" href="/" aria-label="Sottosopra — home" data-astro-cid-3ef6ksr2> <img class="logo" src="/_astro/logo-black.qG5k8nDz.png" width="1921" height="215" alt="Sottosopra" data-astro-cid-3ef6ksr2> </a> <div class="hdr-right" data-astro-cid-3ef6ksr2> <nav class="hdr-nav" aria-label="Navigazione principale" data-astro-cid-3ef6ksr2> <a href="/programma/" data-astro-cid-3ef6ksr2>Programma</a><a href="/info/" data-astro-cid-3ef6ksr2>Dove siamo</a><a href="/about/" data-astro-cid-3ef6ksr2>Chi siamo</a><a href="/faq/" data-astro-cid-3ef6ksr2>Domande frequenti</a> </nav> <a class="hdr-cta" href="https://dice.fm/event/v3nam7?utm_source=sito&amp;utm_medium=header&amp;utm_campaign=fullpass" target="_blank" rel="noopener" data-astro-cid-3ef6ksr2>Biglietti<span class="sr-only" data-astro-cid-3ef6ksr2> (si apre in una nuova scheda)</span></a> <button class="hdr-burger" id="burger" aria-label="Apri il menu" aria-expanded="false" aria-controls="drawer" data-astro-cid-3ef6ksr2> <span data-astro-cid-3ef6ksr2></span><span data-astro-cid-3ef6ksr2></span> </button> </div> </header> <div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Menu" hidden data-astro-cid-3ef6ksr2> <nav aria-label="Menu" data-astro-cid-3ef6ksr2> <a href="/programma/" data-astro-cid-3ef6ksr2>Programma</a><a href="/info/" data-astro-cid-3ef6ksr2>Dove siamo</a><a href="/about/" data-astro-cid-3ef6ksr2>Chi siamo</a><a href="/faq/" data-astro-cid-3ef6ksr2>Domande frequenti</a> <a class="drawer-buy" href="https://dice.fm/event/v3nam7?utm_source=sito&amp;utm_medium=header&amp;utm_campaign=fullpass" target="_blank" rel="noopener" data-astro-cid-3ef6ksr2>Biglietti su DICE ↗<span class="sr-only" data-astro-cid-3ef6ksr2> (si apre in una nuova scheda)</span></a> <button class="drawer-flip" type="button" onclick="window.__flip && window.__flip()" data-astro-cid-3ef6ksr2>Capovolgi ◐</button> </nav> </div>  <script>
+  (function () {
+    var burger = document.getElementById('burger');
+    var drawer = document.getElementById('drawer');
+    if (!burger || !drawer) return;
+    var toInert = function () {
+      return [document.getElementById('main'), document.querySelector('footer'), document.querySelector('.sticky-bar'), document.getElementById('flipBtn')].filter(Boolean);
+    };
+    function setOpen(open) {
+      drawer.hidden = !open;
+      burger.setAttribute('aria-expanded', String(open));
+      burger.setAttribute('aria-label', open ? 'Chiudi il menu' : 'Apri il menu');
+      document.body.style.overflow = open ? 'hidden' : '';
+      document.body.classList.toggle('drawer-open', open);
+      toInert().forEach(function (el) { el.inert = open; });
+      if (open) {
+        var first = drawer.querySelector('a, button');
+        if (first) first.focus();
+      } else {
+        burger.focus();
+      }
+    }
+    burger.addEventListener('click', function () { setOpen(drawer.hidden); });
+    drawer.addEventListener('click', function (e) {
+      if (e.target.closest('a')) setOpen(false);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (drawer.hidden) return;
+      if (e.key === 'Escape') { setOpen(false); return; }
+      if (e.key === 'Tab') {
+        var items = drawer.querySelectorAll('a, button');
+        var first = items[0], last = items[items.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    });
+    var mq = window.matchMedia('(min-width: 769px)');
+    mq.addEventListener('change', function () { if (!drawer.hidden) setOpen(false); });
+  })();
+</script> <main id="main">  <section class="screen screen--auto legal" data-astro-cid-m6bnwj4q> <h1 class="just just-m reveal in" style="margin-bottom:24px" data-astro-cid-m6bnwj4q>
+Cookie Policy
+</h1> <p class="draft-note reveal in" data-astro-cid-m6bnwj4q> <b data-astro-cid-m6bnwj4q>Bozza.</b> Testo definitivo a cura di Sottosopra APS. Questo sito è progettato <b data-astro-cid-m6bnwj4q>cookieless</b>:
+      nessun banner di consenso perché non usa cookie di profilazione né di terze parti.
+</p> <div class="prose reveal in" data-astro-cid-m6bnwj4q> <h2 data-astro-cid-m6bnwj4q>Cosa usiamo</h2> <p data-astro-cid-m6bnwj4q>Il sito utilizza <b data-astro-cid-m6bnwj4q>solo cookie tecnici</b> necessari al suo funzionamento e strumenti di statistica
+<b data-astro-cid-m6bnwj4q>cookieless</b> (Umami, server UE) che non installano cookie, non tracciano le persone da un sito all’altro e non profilano.
+        Per questo, ai sensi delle Linee guida del Garante, <b data-astro-cid-m6bnwj4q>non è richiesto un banner di consenso preventivo</b>.</p> <h2 data-astro-cid-m6bnwj4q>Servizi di terze parti</h2> <ul data-astro-cid-m6bnwj4q> <li data-astro-cid-m6bnwj4q><b data-astro-cid-m6bnwj4q>DICE</b> — l'acquisto biglietti avviene sul sito di DICE, con le sue policy (titolare autonomo).</li> <li data-astro-cid-m6bnwj4q><b data-astro-cid-m6bnwj4q>Brevo</b> — newsletter (attivata solo con la tua iscrizione).</li> <li data-astro-cid-m6bnwj4q><b data-astro-cid-m6bnwj4q>Cloudflare Turnstile</b> — anti-spam dei form, senza cookie di tracciamento.</li> </ul> <h2 data-astro-cid-m6bnwj4q>Gestione</h2> <p data-astro-cid-m6bnwj4q>Non essendoci cookie di profilazione, non è necessaria alcuna scelta. Puoi comunque gestire i cookie tecnici dalle impostazioni del tuo browser.</p> <p style="margin-top:2em" data-astro-cid-m6bnwj4q><a href="/privacy/" data-astro-cid-m6bnwj4q>Privacy Policy →</a> · Contatti: <a href="mailto:info@sottosopra.com" data-astro-cid-m6bnwj4q>info@sottosopra.com</a></p> </div> </section>  </main> <footer class="ftr" data-astro-cid-sz7xmlte> <div class="ftr-top" data-astro-cid-sz7xmlte> <p class="ftr-claim just just-m" data-astro-cid-sz7xmlte>Cambia il punto di vista</p> <div class="ftr-cols" data-astro-cid-sz7xmlte> <nav class="ftr-nav" aria-label="Navigazione footer" data-astro-cid-sz7xmlte> <span class="label ftr-h" data-astro-cid-sz7xmlte>Naviga</span> <a href="/programma/" data-astro-cid-sz7xmlte>Programma</a><a href="/info/" data-astro-cid-sz7xmlte>Dove siamo</a><a href="/about/" data-astro-cid-sz7xmlte>Chi siamo</a><a href="/faq/" data-astro-cid-sz7xmlte>Domande frequenti</a> <a href="/about/#edizioni" data-astro-cid-sz7xmlte>Edizioni passate</a> </nav> <div class="ftr-contact" data-astro-cid-sz7xmlte> <span class="label ftr-h" data-astro-cid-sz7xmlte>Contatti</span> <a href="mailto:info@sottosopra.com" data-astro-cid-sz7xmlte>info@sottosopra.com</a> <a href="https://instagram.com/sottosoprafestival" target="_blank" rel="noopener" data-astro-cid-sz7xmlte>Instagram<span class="sr-only" data-astro-cid-sz7xmlte> (si apre in una nuova scheda)</span></a> <a class="ftr-buy" href="https://dice.fm/event/v3nam7?utm_source=sito&amp;utm_medium=footer&amp;utm_campaign=fullpass" target="_blank" rel="noopener" data-astro-cid-sz7xmlte>Biglietti su DICE ↗<span class="sr-only" data-astro-cid-sz7xmlte> (si apre in una nuova scheda)</span></a> </div> </div> </div> <div class="ftr-bottom" data-astro-cid-sz7xmlte> <img class="logo" src="/_astro/logo-black.qG5k8nDz.png" width="1921" height="215" alt="Sottosopra" data-astro-cid-sz7xmlte> <p class="ftr-legal" data-astro-cid-sz7xmlte>
+© 2026 Sottosopra APS · C.F. 92045630263 · P.IVA 05002480266<br data-astro-cid-sz7xmlte>
+Via Verdi 3, 31033 Castelfranco Veneto (TV)<br data-astro-cid-sz7xmlte> <a href="/privacy/" data-astro-cid-sz7xmlte>Privacy</a> · <a href="/cookie/" data-astro-cid-sz7xmlte>Cookie</a><br data-astro-cid-sz7xmlte> <button class="ftr-flip" id="flipBtn" type="button" aria-pressed="false" onclick="window.__flip && window.__flip()" data-astro-cid-sz7xmlte>Capovolgi il sito <kbd aria-hidden="true" data-astro-cid-sz7xmlte>S</kbd></button> </p> </div> </footer> <nav class="sticky-bar" id="stickyCta" aria-label="Azioni rapide" data-astro-cid-qff7fdmd> <a class="sb-buy" href="https://dice.fm/event/v3nam7?utm_source=sito&amp;utm_medium=sticky&amp;utm_campaign=fullpass" target="_blank" rel="noopener" data-astro-cid-qff7fdmd>Biglietti <span aria-hidden="true" data-astro-cid-qff7fdmd>↗</span><span class="sr-only" data-astro-cid-qff7fdmd> (si apre in una nuova scheda)</span></a> <a class="sb-prog" href="/programma/" data-astro-cid-qff7fdmd>Programma</a> </nav> <!-- GIUSTIFICAZIONE MANIFESTO — modello dei poster del grafico
+         (reference: idee/grafico_titoloni/, export InDesign):
+         · a-capo = wrapping naturale (greedy, come InDesign)
+         · riga con PIÙ parole → lettere a tracciatura naturale,
+           lo spazio va tutto nei GAP TRA LE PAROLE (anche ampi)
+         · riga con UNA parola → LETTERE distribuite edge-to-edge
+         Cross-browser (anche Safari). Re-run su resize/font. --> <script>
+      (function () {
+        function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+        function build(el) {
+          try {
+            var text = el.getAttribute("data-text");
+            if (text === null) {
+              /* collassa il whitespace MA preserva i NBSP (legano "parola —") */
+              text = el.textContent.replace(/[^\S ]+/g, " ").trim();
+              el.setAttribute("data-text", text);
+              el.setAttribute("aria-label", text);
+            }
+            /* 1) parole intere → il browser decide gli a-capo */
+            el.innerHTML = text.split(" ").map(function (w) { return '<span class="w">' + esc(w) + "</span>"; }).join(" ");
+            var ws = [].slice.call(el.children), lines = [], cur = [], top = null;
+            ws.forEach(function (s) {
+              var t = s.offsetTop;
+              if (top === null) top = t;
+              if (t - top > 2) { lines.push(cur); cur = []; top = t; }
+              cur.push(s.textContent);
+            });
+            if (cur.length) lines.push(cur);
+            /* 2) rendi ogni riga come nei poster.
+               I NBSP legano le parole solo per il WRAP: in resa tornano parole. */
+            el.innerHTML = lines.map(function (lw) {
+              var parts = lw.join(" ").split(/\s+/); /* splitta anche i NBSP in resa */
+              if (parts.length > 1) {
+                return '<span class="ln">' + parts.map(function (w) { return '<span class="wd">' + esc(w) + "</span>"; }).join("") + "</span>";
+              }
+              var inner = "";
+              for (var k = 0; k < parts[0].length; k++) inner += "<span>" + esc(parts[0][k]) + "</span>";
+              return '<span class="ln">' + inner + "</span>";
+            }).join("");
+          } catch (e) {
+            var d = el.getAttribute("data-text");
+            if (d) el.textContent = d;
+          }
+        }
+        function run() { [].forEach.call(document.querySelectorAll(".just"), build); }
+        function ready() { run(); if (document.fonts && document.fonts.ready) { document.fonts.ready.then(run); } }
+        if (document.readyState !== "loading") ready();
+        else addEventListener("DOMContentLoaded", ready);
+        var tm;
+        addEventListener("resize", function () { clearTimeout(tm); tm = setTimeout(run, 150); });
+      })();
+    </script> <!-- GESTO SOTTOSOPRA: inverte la palette. Bottone (focusabile) + tasto S.
+         La scorciatoia ignora gli elementi interattivi focusati. Nessuna animazione extra. --> <script>
+      (function () {
+        function flip() {
+          var html = document.documentElement;
+          var dark = html.getAttribute("data-theme") === "dark";
+          html.setAttribute("data-theme", dark ? "light" : "dark");
+          var btn = document.getElementById("flipBtn");
+          if (btn) btn.setAttribute("aria-pressed", String(!dark));
+        }
+        window.__flip = flip;
+        var btn = document.getElementById("flipBtn");
+        if (btn) btn.addEventListener("click", flip);
+        document.addEventListener("keydown", function (e) {
+          if (e.key !== "s" && e.key !== "S") return;
+          if (e.metaKey || e.ctrlKey || e.altKey) return;
+          var t = e.target;
+          if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT|BUTTON|A|SUMMARY)$/.test(t.tagName))) return;
+          flip();
+        });
+      })();
+    </script> </body> </html>
