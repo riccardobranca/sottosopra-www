@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sottosopra — Tornata 8 · 10 direzioni fresh (v49–v58)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+@font-face{ font-family:"SoSo26"; src:url("/fonts/SoSo26.woff") format("woff"); font-display:swap; }
+:root{ --bg:#fff; --fg:#000; --muted:#6b6b6b; --line:#e4e4e4; --bg-elev:#f4f4f4;
+  --display:"SoSo26","Arial Narrow",system-ui,sans-serif; --body:"Inter",system-ui,sans-serif; }
+[data-theme="dark"]{ --bg:#000; --fg:#fff; --muted:#9a9a9a; --line:#262626; --bg-elev:#141414; }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{ background:var(--bg); color:var(--fg); font-family:var(--body); font-size:16px; line-height:1.55;
+  -webkit-font-smoothing:antialiased; transition:background .35s ease,color .35s ease; }
+.display{ font-family:var(--display); font-feature-settings:"ss07","ss08","liga","calt"; text-transform:uppercase; line-height:.95; }
+a{ color:inherit; }
+:focus-visible{ outline:2px solid var(--fg); outline-offset:3px; }
+.wrap{ max-width:1180px; margin:0 auto; padding:clamp(24px,5vw,72px) clamp(20px,5vw,48px) 96px; }
+header.top{ display:flex; justify-content:space-between; align-items:baseline; gap:24px; flex-wrap:wrap;
+  border-bottom:1px solid var(--fg); padding-bottom:18px; }
+h1.display{ font-size:clamp(2.6rem,9vw,6.5rem); letter-spacing:-.02em; }
+.sub{ font-size:.8125rem; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); font-weight:500; }
+.flip{ font-size:.8125rem; letter-spacing:.16em; text-transform:uppercase; font-weight:600; cursor:pointer;
+  background:none; border:1px solid var(--fg); padding:8px 14px; color:inherit; }
+.intro{ margin:28px 0 8px; max-width:62ch; font-size:1.0625rem; color:var(--muted); }
+.intro b{ color:var(--fg); font-weight:600; }
+.grid{ margin-top:40px; display:grid; gap:1px; background:var(--line);
+  grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr)); border:1px solid var(--line); }
+.card{ background:var(--bg); padding:26px 24px 22px; display:flex; flex-direction:column; gap:10px;
+  text-decoration:none; min-height:230px; transition:background .2s ease,color .2s ease; }
+.card:hover,.card:focus-visible{ background:var(--fg); color:var(--bg); outline:none; }
+.card .id{ display:flex; justify-content:space-between; align-items:baseline; font-size:.75rem;
+  letter-spacing:.16em; text-transform:uppercase; font-weight:600; color:var(--muted); }
+.card:hover .id,.card:focus-visible .id{ color:var(--bg); }
+.card .name{ font-size:clamp(1.5rem,2.2vw,2rem); letter-spacing:-.01em; }
+.card .concept{ font-size:.95rem; line-height:1.45; }
+.card .sig{ margin-top:auto; padding-top:12px; font-size:.8125rem; color:var(--muted); border-top:1px solid var(--line); }
+.card:hover .sig,.card:focus-visible .sig{ color:var(--bg); border-color:rgba(255,255,255,.25); }
+[data-theme="dark"] .card:hover .sig,[data-theme="dark"] .card:focus-visible .sig{ border-color:rgba(0,0,0,.25); }
+.card .sig b{ color:var(--fg); font-weight:600; }
+.card:hover .sig b,.card:focus-visible .sig b{ color:var(--bg); }
+.foot{ margin-top:48px; font-size:.8125rem; color:var(--muted); border-top:1px solid var(--line); padding-top:18px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="sub">Sottosopra.com · Esplorazione estetica</div>
+      <h1 class="display">Tornata 8 — Respiro fresh</h1>
+    </div>
+    <button class="flip" id="flip" aria-label="Capovolgi la palette">↑↓ Capovolgi</button>
+  </header>
+
+  <p class="intro"><b>10 direzioni nuove (v49–v58)</b>, nate da ricerca design fresh dentro i vincoli d'identità:
+  bianco/nero invertibile, SoSo26 + Inter, conversion-first. Ognuna ha <b>un'idea organizzante diversa</b> e
+  <b>una sola interazione-firma</b>. Tutte distinte dalle direzioni Tornata 7 e dalle 13 tecniche già esplorate.
+  Clicca una card per aprire il prototipo. (Premi <b>S</b> dentro ogni prototipo per capovolgere la palette.)</p>
+
+  <div class="grid">
+    <a class="card" href="/prototypes/v49.html">
+      <div class="id"><span>v49</span><span>Foto</span></div>
+      <div class="name display">Finestre</div>
+      <div class="concept">La foto della folla vive <em>solo dentro</em> le lettere SoSo26: tipo e immagine sono gli stessi pixel.</div>
+      <div class="sig"><b>Firma:</b> background-clip:text + parallax della foto dentro i glifi allo scroll.</div>
+    </a>
+    <a class="card" href="/prototypes/v50.html">
+      <div class="id"><span>v50</span><span>Foto</span></div>
+      <div class="name display">Differenza</div>
+      <div class="concept">L'inversione come fisica: il testo si ribalta nero↔bianco da solo su qualsiasi cosa attraversa.</div>
+      <div class="sig"><b>Firma:</b> mix-blend-mode:difference + cursore-inverti desktop / riga-inverti mobile.</div>
+    </a>
+    <a class="card" href="/prototypes/v51.html">
+      <div class="id"><span>v51</span><span>Scroll</span></div>
+      <div class="name display">Giorni Perno</div>
+      <div class="concept">Lo scroll è regista: ogni giornata prende lo schermo come numero gigante, poi confluiscono nella date-bar.</div>
+      <div class="sig"><b>Firma:</b> stage pinnato (sticky) + scrub GSAP, i 4 numeri diventano la nav.</div>
+    </a>
+    <a class="card" href="/prototypes/v52.html">
+      <div class="id"><span>v52</span><span>Tipografia</span></div>
+      <div class="name display">Indice A–Z</div>
+      <div class="concept">Niente foto-hero: l'indice fitto del programma <em>è</em> l'hero. Densità editoriale come dichiarazione.</div>
+      <div class="sig"><b>Firma:</b> ledger a regole 1px, sub-head sticky per giorno, thumbnail al hover.</div>
+    </a>
+    <a class="card" href="/prototypes/v53.html">
+      <div class="id"><span>v53</span><span>Texture</span></div>
+      <div class="name display">Risografia</div>
+      <div class="concept">Tutto come un volantino fotocopiato: halftone + grana fondono foto e tipo in una superficie stampata.</div>
+      <div class="sig"><b>Firma:</b> halftone CSS (puntini) + grana feTurbulence, pannelli-volantino.</div>
+    </a>
+    <a class="card" href="/prototypes/v54.html">
+      <div class="id"><span>v54</span><span>Griglia</span></div>
+      <div class="name display">Fuori Margine</div>
+      <div class="concept">Griglia svizzera rigorosa dove <em>un solo</em> elemento per sezione sfora: l'eccezione che "scappa".</div>
+      <div class="sig"><b>Firma:</b> named-line grid breakout + reveal a righe mascherate sui titoli.</div>
+    </a>
+    <a class="card" href="/prototypes/v55.html">
+      <div class="id"><span>v55</span><span>Tipografia</span></div>
+      <div class="name display">Nastro Perpetuo</div>
+      <div class="concept">Un arco SVG di testo curva nell'hero come atmosfera di brand; sotto, un ledger date piatto fa la conversione.</div>
+      <div class="sig"><b>Firma:</b> textPath con startOffset scroll-scrubbed; il nastro è ambiente, non hero.</div>
+    </a>
+    <a class="card" href="/prototypes/v56.html">
+      <div class="id"><span>v56</span><span>Motion</span></div>
+      <div class="name display">Peso Crescente</div>
+      <div class="concept">Il peso del font è l'indicatore di scroll: i titoli crescono da filiformi a neri mentre leggi.</div>
+      <div class="sig"><b>Firma:</b> font-variation-settings 'wght' su animation-timeline:view() (no JS).</div>
+    </a>
+    <a class="card" href="/prototypes/v57.html">
+      <div class="id"><span>v57</span><span>Inversione</span></div>
+      <div class="name display">Blocchi Invertiti</div>
+      <div class="concept">La pagina è una sequenza di blocchi bianco/nero alternati: l'invertibilità diventa il ritmo dello scroll.</div>
+      <div class="sig"><b>Firma:</b> token per-sezione + wipe a "veneziane" SVG all'ingresso.</div>
+    </a>
+    <a class="card" href="/prototypes/v58.html">
+      <div class="id"><span>v58</span><span>Griglia</span></div>
+      <div class="name display">Quattro Colonne</div>
+      <div class="concept">Le 4 giornate sono 4 colonne subgrid allineate in uno slab-calendario; il giovedì gratis è la colonna invertita.</div>
+      <div class="sig"><b>Firma:</b> CSS subgrid (baseline condivise) + inversione per-cella al hover.</div>
+    </a>
+  </div>
+
+  <p class="foot">Identità verificata: tutte B/N pure (zero colori), SoSo26 + Inter, date + CTA Biglietti nel primo viewport mobile,
+  sticky bottom action-bar mobile, link DICE con UTM, prefers-reduced-motion rispettato, skip-link + focus-trap drawer.
+  Prossimo passo: scegliere la/le direzione/i → rifinitura 100% → build Astro.</p>
+</div>
+<script>
+  document.getElementById('flip').addEventListener('click',()=>{
+    const r=document.documentElement;
+    r.setAttribute('data-theme', r.getAttribute('data-theme')==='dark'?'':'dark');
+  });
+  addEventListener('keydown',e=>{ if((e.key==='s'||e.key==='S') && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)){
+    const r=document.documentElement; r.setAttribute('data-theme', r.getAttribute('data-theme')==='dark'?'':'dark'); }});
+</script>
+</body>
+</html>

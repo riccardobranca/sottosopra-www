@@ -1,0 +1,952 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SOTTOSOPRA — Dentro le Lettere</title>
+<meta name="description" content="Sottosopra Festival 2026 · 8ª edizione · Castelfranco Veneto · 31 luglio – 2 agosto. Cambia il punto di vista." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23000'/%3E%3Ctext x='16' y='23' font-family='Arial' font-size='20' fill='%23fff' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   SOTTOSOPRA — v23 · "DENTRO LE LETTERE"
+   La parola è una finestra: dentro le lettere scorre la folla.
+   background-clip:text knockout su nero. Testo VERO (accessibile/SEO).
+   Stato statico = già forte: foto dentro le lettere, claim, date.
+   Motion = enhancement: Ken Burns interno (CSS) + mask-reveal (GSAP).
+   ============================================================ */
+
+@font-face {
+  font-family: "SoSo26";
+  src: url("/fonts/SoSo26.woff") format("woff");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+:root {
+  --bg: #000000;
+  --fg: #ffffff;
+  --muted: #8d8d8d;
+  --muted-2: #5a5a5a;
+  --line: #232323;
+  --line-strong: #ffffff;
+  --bg-elev: #0d0d0d;
+
+  --step: 8px;
+  --maxw: 1320px;
+  --gutter: clamp(20px, 5vw, 72px);
+
+  /* photo treatment: pure B/N, crisp blacks */
+  --photo-filter: grayscale(1) contrast(1.12) brightness(1.04);
+  --ease: cubic-bezier(.22,.61,.36,1);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+
+.display {
+  font-family: "SoSo26", "Inter", sans-serif;
+  font-feature-settings: "ss07","ss08","liga","calt";
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
+
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ============================================================
+   KNOCKOUT CLIP-TEXT — il cuore del concept
+   Foto dentro le lettere. Fallback: color var(--fg).
+   ============================================================ */
+.knockout {
+  --img: none;
+  position: relative;
+  display: inline-block;
+  color: var(--fg);                 /* fallback if clip unsupported */
+  background-image: var(--img);
+  background-size: cover;
+  background-position: 50% 38%;
+  background-repeat: no-repeat;
+  /* B/N treatment of the photo lives in the texture itself (via ::before below
+     for filter) — here we keep the clip crisp. */
+}
+/* feature-query: only enable clip where supported */
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .knockout {
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+}
+
+/* the photo texture needs grayscale; we can't filter a background directly,
+   so for the BIG knockouts we use a real <img> masked by text (mask approach
+   guarantees the B/N filter). The hero uses the dedicated technique below. */
+
+/* ---------- HERO ---------- */
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 0 clamp(28px, 5vh, 60px);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* faint full-bleed ghost of the crowd behind everything, very dim,
+   so the page never looks empty and the letters feel cut from the scene */
+.hero__ghost {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: url("/media/crowd-night-wide.jpg") center 40% / cover no-repeat;
+  filter: grayscale(1) contrast(1.18) brightness(.18);
+  opacity: 0.28;
+}
+.hero__ghost::after {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(120% 90% at 50% 64%, transparent 0%, rgba(0,0,0,.5) 55%, #000 100%),
+    linear-gradient(180deg, #000 0%, rgba(0,0,0,.35) 30%, rgba(0,0,0,.55) 72%, #000 100%);
+}
+
+.hero__inner { position: relative; z-index: 2; width: 100%; }
+
+/* The wordmark: real text "SOTTOSOPRA" with the crowd photo clipped inside.
+   Implemented as an <img> photo layer + text mask so grayscale filter applies. */
+.hero__wordmark {
+  position: relative;
+  margin: 0;
+  /* grid-breaking: let it kiss the edges */
+  padding: 0 var(--gutter);
+  font-size: clamp(3.4rem, 19.5vw, 19rem);
+  line-height: 0.82;
+  letter-spacing: -0.02em;
+}
+
+/* photo-in-text via CSS mask of a real <img>:
+   .mask-photo holds the B/N image; mask-image = the text rendered to SVG?
+   Simpler & robust: background-clip on a element whose background is the image,
+   and we pre-treat contrast through a duplicated dim layer. Grayscale handled
+   by using a CSS filter on a wrapper that ONLY contains the clipped text. */
+.clip-photo {
+  display: inline-block;
+  background-image: var(--img);
+  background-size: cover;
+  background-position: var(--bgpos, 50% 38%);
+  background-repeat: no-repeat;
+  color: var(--fg);
+  /* grayscale of a background isn't directly filterable; we bake B/N by
+     desaturating via a blended overlay is impossible on clip. Instead we
+     accept the source is already shot at night (near-monochrome) and push
+     contrast through the text-shadow-free crisp clip. For guaranteed B/N we
+     ALSO apply filter on the whole clip element which DOES affect its
+     background paint. */
+  filter: var(--photo-filter);
+}
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .clip-photo {
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+}
+
+/* Hero word: animate background-position = "scroll inside the letters" */
+.hero__word {
+  --img: url("/media/crowd-night-wide.jpg");
+  display: block;
+  background-size: 160% auto;
+  /* the night photo is dark — open it up so it GLOWS inside the letters */
+  filter: grayscale(1) contrast(1.16) brightness(1.55);
+  animation: kenburns-inside 26s ease-in-out infinite alternate;
+}
+@keyframes kenburns-inside {
+  0%   { background-position: 18% 30%; background-size: 152% auto; }
+  50%  { background-position: 70% 52%; background-size: 178% auto; }
+  100% { background-position: 40% 38%; background-size: 160% auto; }
+}
+
+/* hero meta row */
+.hero__meta {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(16px, 4vw, 48px);
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: clamp(18px, 3vh, 34px) var(--gutter) 0;
+}
+.hero__claim {
+  font-size: clamp(1rem, 1.4vw, 1.25rem);
+  max-width: 30ch;
+  color: var(--fg);
+}
+.hero__claim strong { font-weight: 600; }
+.hero__claim span { color: var(--muted); display:block; margin-top: 4px; }
+
+.hero__dates {
+  text-align: right;
+}
+.hero__dates .d {
+  font-family: "SoSo26", sans-serif;
+  font-feature-settings: "ss07","ss08","liga","calt";
+  font-size: clamp(1.4rem, 3.4vw, 2.6rem);
+  line-height: 1;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+.hero__dates .place {
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+/* scroll hint */
+.scrollhint {
+  position: absolute;
+  left: 50%; bottom: 14px; transform: translateX(-50%);
+  z-index: 3;
+  font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--muted-2);
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+.scrollhint .bar {
+  width: 1px; height: 34px;
+  background: linear-gradient(var(--muted), transparent);
+  animation: drip 2.4s var(--ease) infinite;
+}
+@keyframes drip { 0%{transform:scaleY(0);transform-origin:top} 40%{transform:scaleY(1);transform-origin:top} 60%{transform:scaleY(1);transform-origin:bottom} 100%{transform:scaleY(0);transform-origin:bottom} }
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.site-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px var(--gutter);
+  mix-blend-mode: difference;     /* logo/nav stays readable on photo */
+  pointer-events: none;
+}
+.site-header > * { pointer-events: auto; }
+.site-header__logo img { height: 26px; width: auto; filter: invert(0); }
+.nav {
+  display: flex; align-items: center; gap: clamp(14px, 2.2vw, 30px);
+  font-size: 0.82rem; font-weight: 500; letter-spacing: 0.04em;
+}
+.nav a { color: #fff; opacity: 0.85; transition: opacity .2s; }
+.nav a:hover { opacity: 1; }
+.nav .ticket {
+  border: 1px solid #fff;
+  padding: 9px 18px;
+  border-radius: 2px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  transition: background .2s, color .2s;
+}
+.nav .ticket:hover { background: #fff; color: #000; opacity: 1; }
+.nav__links { display: flex; gap: clamp(14px, 2vw, 26px); }
+
+@media (max-width: 760px){
+  .nav__links { display: none; }
+}
+
+/* ============================================================
+   SECTION SCAFFOLD
+   ============================================================ */
+section { position: relative; }
+.sec { padding: clamp(72px, 12vh, 150px) 0; }
+.sec--tight { padding: clamp(54px, 8vh, 110px) 0; }
+
+.divider { height: 1px; background: var(--line); }
+
+/* big knockout section title (PROGRAMMA / ARCHIVIO ...) */
+.section-knockout {
+  margin: 0;
+  padding: 0 var(--gutter);
+  font-size: clamp(2.6rem, 13vw, 12.5rem);
+  line-height: 0.84;
+  letter-spacing: -0.02em;
+  overflow: hidden;            /* for mask-reveal */
+}
+.section-knockout .line { display: block; overflow: hidden; }
+.section-knockout .line > span { display: inline-block; will-change: transform; }
+
+.knock-prog { --img: url("/media/garden-day.jpg"); background-size: 150% auto; }
+.knock-arch { --img: url("/media/archive-2017.jpg"); background-size: 150% auto; }
+
+/* slow internal drift on the section knockouts too */
+.knock-prog { animation: drift-a 30s ease-in-out infinite alternate; }
+.knock-arch { animation: drift-b 34s ease-in-out infinite alternate; }
+@keyframes drift-a { 0%{background-position: 30% 60%} 100%{background-position: 64% 44%} }
+@keyframes drift-b { 0%{background-position: 60% 50%} 100%{background-position: 36% 56%} }
+
+/* ============================================================
+   LINEUP
+   ============================================================ */
+.lineup-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 20px; flex-wrap: wrap; margin-bottom: clamp(20px, 4vh, 44px);
+}
+.lineup-head h2 {
+  margin: 0;
+  font-family: "SoSo26", sans-serif;
+  font-feature-settings: "ss07","ss08","liga","calt";
+  font-weight: 700; text-transform: uppercase;
+  font-size: clamp(1.6rem, 3.5vw, 3rem);
+  letter-spacing: -0.01em;
+}
+.lineup {
+  border-top: 1px solid var(--line);
+}
+.lineup__row {
+  display: flex; align-items: center; gap: 18px;
+  padding: clamp(14px, 2.4vh, 26px) 0;
+  border-bottom: 1px solid var(--line);
+}
+.lineup__row .num {
+  font-size: 0.72rem; color: var(--muted-2); width: 34px; flex: none;
+  font-variant-numeric: tabular-nums; letter-spacing: 0.1em;
+}
+.lineup__row .name {
+  font-family: "SoSo26", sans-serif;
+  font-feature-settings: "ss07","ss08","liga","calt";
+  font-weight: 700; text-transform: uppercase;
+  font-size: clamp(1.5rem, 4.6vw, 3.6rem);
+  line-height: 1; letter-spacing: -0.01em;
+  transition: transform .35s var(--ease), opacity .35s var(--ease);
+}
+.lineup__row .meta {
+  margin-left: auto; text-align: right; color: var(--muted);
+  font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase;
+  flex: none;
+}
+@media (hover:hover){
+  .lineup__row:hover .name { transform: translateX(14px); }
+  .lineup:hover .lineup__row:not(:hover) .name { opacity: 0.45; }
+}
+
+/* ============================================================
+   PROGRAMMA / DATE
+   ============================================================ */
+.prog-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(14px, 2.4vw, 28px);
+  margin-top: clamp(28px, 5vh, 56px);
+}
+.day-card {
+  border: 1px solid var(--line);
+  padding: clamp(20px, 3vw, 34px);
+  display: flex; flex-direction: column; gap: 16px;
+  min-height: 230px;
+  transition: border-color .25s, transform .25s var(--ease);
+}
+.day-card:hover { border-color: var(--line-strong); transform: translateY(-4px); }
+.day-card .dow {
+  font-family: "SoSo26", sans-serif;
+  font-feature-settings: "ss07","ss08","liga","calt";
+  font-weight: 700; text-transform: uppercase;
+  font-size: clamp(2.2rem, 5vw, 4rem); line-height: 0.9; letter-spacing:-0.02em;
+}
+.day-card .date { color: var(--muted); font-size: 0.86rem; letter-spacing: 0.12em; text-transform: uppercase; }
+.day-card ul { list-style: none; margin: auto 0 0; padding: 0; font-size: 0.92rem; color: var(--fg); }
+.day-card li { padding: 5px 0; border-top: 1px solid var(--line); }
+.day-card li:first-child { border-top: 0; }
+.day-card .tag { font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted-2); }
+
+@media (max-width: 860px){ .prog-grid { grid-template-columns: 1fr; } }
+
+/* ============================================================
+   ARCHIVIO — small knockout photo tiles
+   ============================================================ */
+.archive {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(12px, 1.6vw, 20px);
+  margin-top: clamp(28px, 5vh, 56px);
+}
+.arch-tile {
+  position: relative; aspect-ratio: 3/4; overflow: hidden;
+  border: 1px solid var(--line);
+}
+.arch-tile img {
+  width: 100%; height: 100%; object-fit: cover;
+  filter: var(--photo-filter) brightness(.62);
+  transform: scale(1.02);
+  transition: transform .6s var(--ease), filter .4s;
+}
+.arch-tile:hover img { transform: scale(1.08); filter: grayscale(1) contrast(1.15) brightness(.85); }
+.arch-tile .yr {
+  position: absolute; left: 14px; bottom: 10px; z-index: 2;
+  font-family: "SoSo26", sans-serif;
+  font-feature-settings: "ss07","ss08","liga","calt";
+  font-weight: 700; font-size: clamp(1.6rem, 3vw, 2.6rem); line-height: 1;
+  text-shadow: 0 2px 18px rgba(0,0,0,.7);
+}
+@media (max-width: 720px){ .archive { grid-template-columns: repeat(2, 1fr); } }
+
+/* ============================================================
+   EXPERIENCES strip
+   ============================================================ */
+.exp {
+  display: flex; flex-wrap: wrap; gap: 10px 12px;
+  margin-top: clamp(20px, 4vh, 40px);
+}
+.exp .pill {
+  border: 1px solid var(--line);
+  padding: 10px 20px; border-radius: 999px;
+  font-size: 0.9rem; letter-spacing: 0.02em;
+  transition: background .2s, color .2s, border-color .2s;
+}
+.exp .pill:hover { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+
+/* ============================================================
+   MANIFESTO / prosa
+   ============================================================ */
+.manifesto {
+  font-size: clamp(1.4rem, 3vw, 2.6rem);
+  line-height: 1.28;
+  font-weight: 400;
+  max-width: 22ch;
+}
+.manifesto em { font-style: normal; color: var(--muted); }
+.prose { max-width: 56ch; color: var(--muted); font-size: 1.05rem; }
+.prose strong { color: var(--fg); font-weight: 600; }
+
+.two-col {
+  display: grid; grid-template-columns: 1.1fr 0.9fr; gap: clamp(28px, 6vw, 80px);
+  align-items: start;
+}
+@media (max-width: 860px){ .two-col { grid-template-columns: 1fr; gap: 32px; } }
+
+/* ============================================================
+   CTA / NEWSLETTER / VOLONTARI
+   ============================================================ */
+.cta-band {
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.cta-band .wrap {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+}
+.cta-cell {
+  padding: clamp(40px, 7vh, 90px) clamp(8px, 2vw, 40px);
+}
+.cta-cell + .cta-cell { border-left: 1px solid var(--line); }
+.cta-cell h3 {
+  font-family: "SoSo26", sans-serif;
+  font-feature-settings: "ss07","ss08","liga","calt";
+  font-weight: 700; text-transform: uppercase;
+  font-size: clamp(1.8rem, 4vw, 3.2rem); margin: 0 0 14px; line-height: 0.92;
+}
+.cta-cell p { color: var(--muted); margin: 0 0 22px; max-width: 38ch; }
+@media (max-width: 760px){
+  .cta-band .wrap { grid-template-columns: 1fr; }
+  .cta-cell + .cta-cell { border-left: 0; border-top: 1px solid var(--line); }
+}
+
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  border: 1px solid var(--fg);
+  padding: 13px 26px; border-radius: 2px;
+  font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+  font-size: 0.82rem;
+  transition: background .2s, color .2s, gap .2s;
+}
+.btn:hover { background: var(--fg); color: var(--bg); gap: 16px; }
+.btn--solid { background: var(--fg); color: var(--bg); }
+.btn--solid:hover { background: transparent; color: var(--fg); }
+
+.nl-form { display: flex; gap: 10px; max-width: 420px; flex-wrap: wrap; }
+.nl-form input {
+  flex: 1 1 200px; background: transparent; border: 1px solid var(--line);
+  color: var(--fg); padding: 13px 16px; border-radius: 2px; font: inherit;
+}
+.nl-form input::placeholder { color: var(--muted-2); }
+.nl-form input:focus { outline: none; border-color: var(--fg); }
+
+/* ============================================================
+   MARQUEE (firma grafica B/N)
+   ============================================================ */
+.marquee {
+  overflow: hidden; white-space: nowrap;
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  padding: 18px 0;
+}
+.marquee__track {
+  display: inline-flex; gap: 0; will-change: transform;
+  animation: marquee 28s linear infinite;
+}
+.marquee__track span {
+  font-family: "SoSo26", sans-serif;
+  font-feature-settings: "ss07","ss08","liga","calt";
+  font-weight: 700; text-transform: uppercase;
+  font-size: clamp(1.6rem, 4vw, 3.4rem);
+  letter-spacing: 0.04em; padding: 0 0.6em; color: var(--fg);
+}
+.marquee__track .dot { color: var(--muted-2); }
+@keyframes marquee { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.site-footer {
+  padding: clamp(48px, 9vh, 110px) 0 50px;
+}
+.footer-grid {
+  display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 40px;
+  border-bottom: 1px solid var(--line); padding-bottom: 40px; margin-bottom: 26px;
+}
+.footer-grid h4 { font-size: 0.74rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted-2); margin: 0 0 16px; }
+.footer-grid ul { list-style: none; margin: 0; padding: 0; }
+.footer-grid li { padding: 5px 0; }
+.footer-grid a { color: var(--fg); opacity: 0.85; transition: opacity .2s; }
+.footer-grid a:hover { opacity: 1; }
+.footer-logo img { height: 30px; width: auto; margin-bottom: 18px; }
+.footer-logo p { color: var(--muted); max-width: 30ch; font-size: 0.95rem; margin: 0; }
+.footer-bottom {
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 14px;
+  color: var(--muted-2); font-size: 0.78rem; letter-spacing: 0.04em;
+}
+.footer-bottom a { color: var(--muted); }
+@media (max-width: 760px){ .footer-grid { grid-template-columns: 1fr; gap: 28px; } }
+
+/* sponsor strip */
+.sponsors {
+  display: flex; flex-wrap: wrap; align-items: center; gap: clamp(20px, 5vw, 64px);
+  margin-top: clamp(20px, 4vh, 40px);
+}
+.sponsors .s {
+  font-family: "SoSo26", sans-serif;
+  font-feature-settings: "ss07","ss08","liga","calt";
+  font-weight: 700; text-transform: uppercase;
+  font-size: clamp(1.1rem, 2.4vw, 1.7rem);
+  color: var(--muted); opacity: .7; transition: opacity .2s, color .2s;
+  letter-spacing: 0.02em;
+}
+.sponsors .s:hover { opacity: 1; color: var(--fg); }
+.sponsors-label { font-size: 0.72rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--muted-2); margin-bottom: 18px; }
+
+/* ============================================================
+   MOTION REVEAL helper (state before GSAP / no-JS = visible)
+   We only HIDE via JS when GSAP is available, then reveal.
+   So default (no JS) = fully visible. CRITICAL for static state.
+   ============================================================ */
+.js-split .reveal-line > span { transform: translateY(110%); }
+
+/* reduced motion: kill all the animations */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .hero__word, .knock-prog, .knock-arch { animation: none !important; }
+  .marquee__track { animation: none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================ HEADER ============================ -->
+<header class="site-header">
+  <a class="site-header__logo" href="#top" aria-label="Sottosopra — home">
+    <img src="/brand/sottosopra-logo-white.png" alt="Sottosopra" />
+  </a>
+  <nav class="nav" aria-label="Principale">
+    <span class="nav__links">
+      <a href="#programma">Programma</a>
+      <a href="#info">Info</a>
+      <a href="#about">About</a>
+      <a href="#news">News</a>
+    </span>
+    <a class="ticket" href="https://dice.fm/?utm_source=sito&utm_medium=header" target="_blank" rel="noopener">Biglietti</a>
+  </nav>
+</header>
+
+<main id="top">
+
+  <!-- ============================ HERO ============================ -->
+  <section class="hero" aria-label="Sottosopra 2026">
+    <div class="hero__ghost" aria-hidden="true"></div>
+
+    <div class="hero__inner">
+      <h1 class="display hero__wordmark">
+        <!-- real, readable text — photo clipped inside -->
+        <span class="clip-photo hero__word">Sottosopra</span>
+      </h1>
+    </div>
+
+    <div class="hero__meta">
+      <p class="hero__claim">
+        <strong>Sempre Sottosopra.</strong>
+        <span>Ottava edizione · Festival culturale · Cambia il punto di vista.</span>
+      </p>
+      <div class="hero__dates">
+        <div class="d">31.07 — 02.08 / 2026</div>
+        <div class="place">Giardini del Castello · Castelfranco Veneto</div>
+      </div>
+    </div>
+
+    <div class="scrollhint" aria-hidden="true">
+      <span>Scorri</span>
+      <span class="bar"></span>
+    </div>
+  </section>
+
+  <!-- ============================ MARQUEE ============================ -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track">
+      <span>Sempre Sottosopra</span><span class="dot">·</span>
+      <span>Cambia il punto di vista</span><span class="dot">·</span>
+      <span>31 Lug — 2 Ago 2026</span><span class="dot">·</span>
+      <span>Sempre Sottosopra</span><span class="dot">·</span>
+      <span>Cambia il punto di vista</span><span class="dot">·</span>
+      <span>31 Lug — 2 Ago 2026</span><span class="dot">·</span>
+    </div>
+  </div>
+
+  <!-- ============================ LINEUP ============================ -->
+  <section class="sec" id="lineup" aria-label="Lineup">
+    <div class="wrap">
+      <div class="lineup-head">
+        <h2>Lineup 2026</h2>
+        <span class="eyebrow">8 nomi · 3 serate · 1 giardino</span>
+      </div>
+      <div class="lineup">
+        <div class="lineup__row"><span class="num">01</span><span class="name">Generic Animal</span><span class="meta">Ven 31</span></div>
+        <div class="lineup__row"><span class="num">02</span><span class="name">Ex-Otago</span><span class="meta">Ven 31</span></div>
+        <div class="lineup__row"><span class="num">03</span><span class="name">Vendredi sur Mer</span><span class="meta">Sab 01</span></div>
+        <div class="lineup__row"><span class="num">04</span><span class="name">Alberto Ferrari</span><span class="meta">Sab 01</span></div>
+        <div class="lineup__row"><span class="num">05</span><span class="name">Auroro Borealo</span><span class="meta">Sab 01</span></div>
+        <div class="lineup__row"><span class="num">06</span><span class="name">Popa</span><span class="meta">Dom 02</span></div>
+        <div class="lineup__row"><span class="num">07</span><span class="name">Krano</span><span class="meta">Dom 02</span></div>
+        <div class="lineup__row"><span class="num">08</span><span class="name">Jesse The Faccio</span><span class="meta">Dom 02</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ PROGRAMMA (knockout: garden-day) ============================ -->
+  <section class="sec--tight" id="programma" aria-labelledby="prog-title">
+    <h2 class="display section-knockout clip-photo knock-prog reveal-headline" id="prog-title">
+      <span class="line reveal-line"><span>Programma</span></span>
+    </h2>
+    <div class="wrap">
+      <div class="prog-grid">
+        <article class="day-card">
+          <span class="tag">Warm-up · Venerdì</span>
+          <span class="dow">Ven</span>
+          <span class="date">31 Luglio 2026</span>
+          <ul>
+            <li>Generic Animal</li>
+            <li>Ex-Otago</li>
+            <li>DJ set · after</li>
+          </ul>
+        </article>
+        <article class="day-card">
+          <span class="tag">Festival · Sabato</span>
+          <span class="dow">Sab</span>
+          <span class="date">1 Agosto 2026</span>
+          <ul>
+            <li>Vendredi sur Mer</li>
+            <li>Alberto Ferrari</li>
+            <li>Auroro Borealo</li>
+          </ul>
+        </article>
+        <article class="day-card">
+          <span class="tag">Festival · Domenica</span>
+          <span class="dow">Dom</span>
+          <span class="date">2 Agosto 2026</span>
+          <ul>
+            <li>Brunch domenicale</li>
+            <li>Popa · Krano</li>
+            <li>Jesse The Faccio</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="exp" aria-label="Esperienze">
+        <span class="pill">Workshop</span>
+        <span class="pill">Talk</span>
+        <span class="pill">Presentazioni libri</span>
+        <span class="pill">Brunch domenicale</span>
+        <span class="pill">Arte &amp; installazioni</span>
+        <span class="pill">Food &amp; cantine</span>
+      </div>
+
+      <p style="margin-top:32px">
+        <a class="btn btn--solid" href="https://dice.fm/?utm_source=sito&utm_medium=programma" target="_blank" rel="noopener">Full Pass su DICE →</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================ MANIFESTO / ABOUT ============================ -->
+  <section class="sec" id="about" aria-labelledby="about-title">
+    <div class="wrap two-col">
+      <div>
+        <span class="eyebrow" id="about-title">Il manifesto</span>
+        <p class="manifesto" style="margin-top:18px">
+          Otto edizioni che mettono il punto di vista <em>a testa in giù.</em>
+        </p>
+      </div>
+      <div>
+        <p class="prose">
+          Sottosopra è un festival culturale interdisciplinare nei
+          <strong>Giardini del Castello di Castelfranco Veneto</strong>:
+          musica, workshop, talk, arte e cibo, costruiti da circa ottanta
+          volontarɜ. Dal 2017 cambiamo il punto di vista — e ogni anno
+          il festival resta, fedele a sé stesso, <strong>sempre sottosopra</strong>.
+        </p>
+        <p style="margin-top:24px">
+          <a class="btn" href="#archivio">Scopri la storia →</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ ARCHIVIO (knockout: archive-2017) ============================ -->
+  <section class="sec--tight" id="archivio" aria-labelledby="arch-title">
+    <h2 class="display section-knockout clip-photo knock-arch reveal-headline" id="arch-title">
+      <span class="line reveal-line"><span>Archivio</span></span>
+    </h2>
+    <div class="wrap">
+      <div class="archive">
+        <a class="arch-tile" href="#"><img src="/media/archive-2017.jpg" alt="Edizione 2017" loading="lazy" /><span class="yr">2017</span></a>
+        <a class="arch-tile" href="#"><img src="/media/archive-2019.jpg" alt="Edizione 2019" loading="lazy" /><span class="yr">2019</span></a>
+        <a class="arch-tile" href="#"><img src="/media/archive-2022.jpg" alt="Edizione 2022" loading="lazy" /><span class="yr">2022</span></a>
+        <a class="arch-tile" href="#"><img src="/media/archive-innesta.jpg" alt="Innesta" loading="lazy" /><span class="yr">Innesta</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ INFO ============================ -->
+  <section class="sec--tight" id="info" aria-labelledby="info-title">
+    <div class="wrap two-col">
+      <div>
+        <span class="eyebrow" id="info-title">Vieni al festival</span>
+        <p class="manifesto" style="margin-top:18px">Tre serate.<br>Un giardino.</p>
+      </div>
+      <div class="prose">
+        <p style="margin:0 0 16px"><strong>Dove</strong> — Giardini del Castello, Castelfranco Veneto (TV).</p>
+        <p style="margin:0 0 16px"><strong>Quando</strong> — Venerdì 31 luglio · Sabato 1 · Domenica 2 agosto 2026.</p>
+        <p style="margin:0 0 16px"><strong>Come arrivare</strong> — treno (stazione di Castelfranco a 10 min a piedi), auto con parcheggi nelle vicinanze, bici.</p>
+        <p style="margin:0"><strong>Accessibilità</strong> — area accessibile, ingressi dedicati. Scrivici a <a href="mailto:info@sottosopra.com" style="color:var(--fg)">info@sottosopra.com</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ CTA BAND: Volontari + Newsletter ============================ -->
+  <section class="cta-band" aria-label="Partecipa">
+    <div class="wrap">
+      <div class="cta-cell">
+        <h3>Entra in<br>Sottosopra</h3>
+        <p>Ottanta persone fanno il festival. Diventa volontariɜ: monta, accoglie, racconta, smonta — e vivi il festival da dentro.</p>
+        <a class="btn" href="mailto:info@sottosopra.com?subject=Volontariato%20Sottosopra%202026">Iscriviti come volontariɜ →</a>
+      </div>
+      <div class="cta-cell">
+        <h3>Resta<br>aggiornatɜ</h3>
+        <p>Date, lineup, programma: le notizie del festival prima di tutti, dritte nella casella.</p>
+        <form class="nl-form" onsubmit="return false">
+          <input type="email" name="email" placeholder="la-tua@email.it" aria-label="La tua email" required />
+          <button class="btn btn--solid" type="submit">Iscriviti</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ NEWS ============================ -->
+  <section class="sec--tight" id="news" aria-labelledby="news-title">
+    <div class="wrap">
+      <div class="lineup-head">
+        <h2 id="news-title">News</h2>
+        <a class="eyebrow" href="#" style="color:var(--fg)">Tutte le news →</a>
+      </div>
+      <div class="prog-grid">
+        <article class="day-card">
+          <span class="tag">29 Ago 2025</span>
+          <span class="date" style="font-size:1.15rem;color:var(--fg);letter-spacing:0;text-transform:none">Il festival raccontato attraverso i sensi</span>
+          <ul><li>Tre giorni di musica, mani sporche di argilla e brunch sul prato.</li></ul>
+        </article>
+        <article class="day-card">
+          <span class="tag">12 Lug 2025</span>
+          <span class="date" style="font-size:1.15rem;color:var(--fg);letter-spacing:0;text-transform:none">Annunciata la lineup 2026</span>
+          <ul><li>Otto nomi per tre serate sotto il castello.</li></ul>
+        </article>
+        <article class="day-card">
+          <span class="tag">02 Giu 2025</span>
+          <span class="date" style="font-size:1.15rem;color:var(--fg);letter-spacing:0;text-transform:none">Cercasi volontarɜ per l'ottava edizione</span>
+          <ul><li>Aperte le iscrizioni al team che costruisce Sottosopra.</li></ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============================ FOOTER ============================ -->
+<footer class="site-footer">
+  <div class="wrap">
+    <p class="sponsors-label">Con il sostegno di</p>
+    <div class="sponsors" aria-label="Sponsor">
+      <span class="s">Azimut</span>
+      <span class="s">Ceccato</span>
+      <span class="s">Prodeco</span>
+      <span class="s">CNA</span>
+      <span class="s">Banca Terre Venete</span>
+    </div>
+
+    <div class="footer-grid" style="margin-top:clamp(40px,7vh,80px)">
+      <div class="footer-logo">
+        <img src="/brand/sottosopra-logo-white.png" alt="Sottosopra" />
+        <p>Festival culturale interdisciplinare. Castelfranco Veneto. Dal 2017.</p>
+      </div>
+      <div>
+        <h4>Naviga</h4>
+        <ul>
+          <li><a href="#programma">Programma</a></li>
+          <li><a href="#info">Info</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#news">News</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contatti</h4>
+        <ul>
+          <li><a href="mailto:info@sottosopra.com">info@sottosopra.com</a></li>
+          <li><a href="https://instagram.com/sottosoprafestival" target="_blank" rel="noopener">IG @sottosoprafestival</a></li>
+          <li><a href="https://dice.fm/?utm_source=sito&utm_medium=footer" target="_blank" rel="noopener">Biglietti su DICE</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© 2026 APS Sottosopra · Castelfranco Veneto</span>
+      <span><a href="#">Privacy</a> · <a href="#">Cookie</a></span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================================
+     ENHANCEMENT LAYER (GSAP) — optional.
+     Page is fully valid & visible WITHOUT this script.
+     ============================================================ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+(function () {
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var hasGSAP = (typeof window.gsap !== "undefined" && typeof window.ScrollTrigger !== "undefined");
+
+  if (!hasGSAP || reduce) return; // static state stays as-is — already strong
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  // mark that JS-driven split is active, so we can safely hide-then-reveal.
+  // We add it RIGHT before setting initial state to avoid any flash on no-JS.
+  document.documentElement.classList.add("js-split");
+
+  // ---- SplitText-style mask reveal for the knockout headlines ----
+  // (lightweight, no plugin needed: each .reveal-line > span rises from 110%)
+  gsap.utils.toArray(".reveal-headline").forEach(function (h) {
+    var inner = h.querySelector(".reveal-line > span");
+    if (!inner) return;
+    gsap.set(inner, { yPercent: 110 });
+    gsap.to(inner, {
+      yPercent: 0,
+      duration: 1.1,
+      ease: "power4.out",
+      scrollTrigger: {
+        trigger: h,
+        start: "top 82%",
+        once: true
+      }
+    });
+  });
+
+  // ---- subtle scroll-coupled drift of the photo INSIDE the hero word ----
+  // background-position-y nudged by scroll for an extra "scorre dentro" feel.
+  var heroWord = document.querySelector(".hero__word");
+  if (heroWord) {
+    gsap.to(heroWord, {
+      backgroundPositionY: "70%",
+      ease: "none",
+      scrollTrigger: {
+        trigger: ".hero",
+        start: "top top",
+        end: "bottom top",
+        scrub: 0.6
+      }
+    });
+  }
+
+  // ---- lineup rows: gentle stagger-in ----
+  gsap.utils.toArray(".lineup__row").forEach(function (row, i) {
+    gsap.from(row, {
+      opacity: 0,
+      y: 24,
+      duration: 0.6,
+      ease: "power2.out",
+      scrollTrigger: { trigger: row, start: "top 92%", once: true }
+    });
+  });
+
+  // ---- day cards & archive tiles soft rise ----
+  gsap.utils.toArray(".day-card, .arch-tile").forEach(function (el) {
+    gsap.from(el, {
+      opacity: 0,
+      y: 30,
+      duration: 0.7,
+      ease: "power3.out",
+      scrollTrigger: { trigger: el, start: "top 90%", once: true }
+    });
+  });
+
+  ScrollTrigger.refresh();
+})();
+</script>
+</body>
+</html>

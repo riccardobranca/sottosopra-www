@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sottosopra 2026 — Peso Crescente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Inter as a VARIABLE font (wght 100..900) so font-variation-settings:'wght' animates -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+<style>
+@font-face{
+  font-family:"SoSo26";
+  src:url("/fonts/SoSo26.woff") format("woff");
+  font-display:swap;
+}
+:root{
+  --bg:#FFFFFF; --fg:#000000; --muted:#6B6B6B; --line:#E4E4E4; --bg-elev:#F4F4F4;
+  --display:"SoSo26","Arial Narrow",system-ui,sans-serif;
+  --body:"Inter",system-ui,-apple-system,sans-serif;
+  --gut:clamp(1.25rem,5vw,5rem);
+}
+[data-theme="dark"]{
+  --bg:#000000; --fg:#FFFFFF; --muted:#9A9A9A; --line:#262626; --bg-elev:#141414;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{ -webkit-text-size-adjust:100%; scroll-behavior:smooth; }
+body{ background:var(--bg); color:var(--fg); font-family:var(--body);
+  font-size:17px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  transition:background .35s ease, color .35s ease; overflow-x:hidden; }
+.display{ font-family:var(--display); font-feature-settings:"ss07","ss08","liga","calt";
+  line-height:.9; letter-spacing:-.01em; text-transform:uppercase; }
+.eyebrow{ font-size:.8125rem; letter-spacing:.2em; text-transform:uppercase; font-weight:500; color:var(--muted); }
+a{ color:inherit; text-decoration:none; }
+button{ font:inherit; color:inherit; background:none; border:none; cursor:pointer; }
+img{ display:block; max-width:100%; filter:grayscale(1) contrast(1.08); }
+:focus-visible{ outline:2px solid var(--fg); outline-offset:3px; }
+
+.skip{ position:absolute; left:-9999px; top:0; z-index:200; background:var(--fg); color:var(--bg);
+  padding:.75rem 1rem; font-weight:600; }
+.skip:focus{ left:.5rem; top:.5rem; }
+
+/* ---------- HEADER ---------- */
+.hdr{ position:sticky; top:0; z-index:90; background:var(--bg);
+  border-bottom:1px solid var(--line); transition:background .35s ease,border-color .35s ease; }
+.hdr-in{ display:flex; align-items:center; justify-content:space-between;
+  gap:1rem; padding:.85rem var(--gut); }
+.brand{ display:flex; align-items:center; gap:.6rem; }
+.brand .mark{ font-family:var(--display); font-feature-settings:"ss07","ss08","liga","calt";
+  font-size:1.35rem; text-transform:uppercase; letter-spacing:.01em; line-height:1; }
+.nav-d{ display:none; gap:1.75rem; }
+.nav-d a{ font-size:.9rem; font-weight:500; letter-spacing:.02em; padding:.4rem 0;
+  border-bottom:1.5px solid transparent; transition:border-color .2s ease; }
+.nav-d a:hover{ border-bottom-color:var(--fg); }
+.hdr-right{ display:flex; align-items:center; gap:.6rem; }
+.btn-tix{ display:inline-flex; align-items:center; gap:.5em; background:var(--fg); color:var(--bg);
+  font-weight:700; font-size:.9rem; letter-spacing:.01em; padding:.7rem 1.1rem; min-height:44px;
+  border:1.5px solid var(--fg); transition:background .2s,color .2s; white-space:nowrap; }
+.btn-tix:hover{ background:var(--bg); color:var(--fg); }
+.burger{ display:inline-flex; flex-direction:column; gap:5px; width:44px; height:44px;
+  align-items:center; justify-content:center; border:1.5px solid var(--line); }
+.burger span{ display:block; width:22px; height:2px; background:var(--fg); transition:transform .25s,opacity .25s; }
+@media(min-width:880px){ .nav-d{ display:flex; } .burger{ display:none; } }
+
+/* ---------- DRAWER ---------- */
+.drawer{ position:fixed; inset:0; z-index:120; background:var(--bg); transform:translateY(-100%);
+  transition:transform .4s cubic-bezier(.7,0,.2,1); display:flex; flex-direction:column;
+  padding:1rem var(--gut) calc(2rem + env(safe-area-inset-bottom)); }
+.drawer.open{ transform:translateY(0); }
+.drawer-top{ display:flex; justify-content:space-between; align-items:center; padding-block:.6rem; }
+.drawer-close{ font-size:2rem; line-height:1; width:44px; height:44px; }
+.drawer nav{ display:flex; flex-direction:column; gap:.2rem; margin-top:2.5rem; }
+.drawer nav a{ font-family:var(--display); font-feature-settings:"ss07","ss08","liga","calt";
+  text-transform:uppercase; font-size:clamp(2.5rem,11vw,4rem); line-height:1.02; padding:.2rem 0;
+  border-bottom:1px solid var(--line); }
+.drawer .flipper{ margin-top:auto; display:flex; align-items:center; gap:.6rem; font-size:.95rem;
+  font-weight:600; padding-top:1.5rem; }
+
+/* ---------- WEIGHT-AS-SCROLL ENGINE ---------- */
+/* Default static weights (fallback for no scroll-driven animation support) */
+.wght{ font-variation-settings:"wght" 760; }
+.wght-lite{ font-variation-settings:"wght" 280; }
+
+@keyframes growWeight{ from{ font-variation-settings:"wght" 120; } to{ font-variation-settings:"wght" 880; } }
+@keyframes growWeightMid{ from{ font-variation-settings:"wght" 200; } to{ font-variation-settings:"wght" 600; } }
+
+@media (prefers-reduced-motion:no-preference){
+  @supports (animation-timeline:view()){
+    .wght{
+      font-variation-settings:"wght" 120;
+      animation:growWeight linear both;
+      animation-timeline:view();
+      animation-range:entry 4% cover 38%;
+    }
+    .wght-mid{
+      font-variation-settings:"wght" 200;
+      animation:growWeightMid linear both;
+      animation-timeline:view();
+      animation-range:entry 0% cover 45%;
+    }
+  }
+}
+
+/* ---------- HERO ---------- */
+.hero{ padding:clamp(2.5rem,7vw,5.5rem) var(--gut) clamp(2rem,5vw,3.5rem); position:relative; }
+.hero-eyebrow{ display:flex; flex-wrap:wrap; gap:.4rem 1.2rem; align-items:baseline; margin-bottom:clamp(1.5rem,4vw,2.5rem); }
+.hero-eyebrow .dot{ color:var(--fg); }
+.datespan{ font-family:var(--display); font-feature-settings:"ss07","ss08","liga","calt";
+  text-transform:uppercase; display:flex; align-items:baseline; flex-wrap:wrap; gap:0 clamp(.4rem,2vw,1.4rem);
+  font-size:clamp(4rem,21vw,17rem); line-height:.82; letter-spacing:-.02em; font-weight:900; }
+.datespan .sep{ font-size:.55em; color:var(--muted); align-self:center; }
+.hero h1{ font-family:var(--display); font-feature-settings:"ss07","ss08","liga","calt";
+  text-transform:uppercase; font-size:clamp(2.1rem,8vw,6.2rem); line-height:.9; letter-spacing:-.015em;
+  margin-top:clamp(.8rem,2vw,1.2rem); font-weight:900; max-width:13ch; }
+.hero-meta{ display:flex; flex-wrap:wrap; gap:.5rem 1rem; align-items:baseline; margin-top:clamp(1.2rem,3vw,1.8rem); }
+.hero-meta .eyebrow{ color:var(--fg); }
+.hero-meta .sub{ font-size:.85rem; color:var(--muted); letter-spacing:.02em; }
+.hero-cta{ margin-top:clamp(1.4rem,3.5vw,2.2rem); display:flex; flex-wrap:wrap; gap:.75rem; }
+.cta-solid{ display:inline-flex; align-items:center; gap:.6em; background:var(--fg); color:var(--bg);
+  font-weight:800; font-size:1.05rem; padding:1rem 1.6rem; min-height:52px; border:1.5px solid var(--fg);
+  transition:background .2s,color .2s,gap .2s; }
+.cta-solid:hover{ background:var(--bg); color:var(--fg); gap:.95em; }
+.cta-ghost{ display:inline-flex; align-items:center; gap:.5em; border:1.5px solid var(--fg);
+  font-weight:600; font-size:1.05rem; padding:1rem 1.5rem; min-height:52px; transition:background .2s,color .2s; }
+.cta-ghost:hover{ background:var(--fg); color:var(--bg); }
+.weightnote{ position:absolute; right:var(--gut); top:clamp(2.5rem,7vw,5.5rem);
+  writing-mode:vertical-rl; font-size:.7rem; letter-spacing:.25em; text-transform:uppercase;
+  color:var(--muted); display:none; }
+@media(min-width:1100px){ .weightnote{ display:block; } }
+
+/* ---------- SECTION SCAFFOLD ---------- */
+.sec{ padding:clamp(3.5rem,9vw,7rem) var(--gut); border-top:1px solid var(--line); position:relative; }
+.sec-head{ display:flex; align-items:baseline; justify-content:space-between; gap:1rem;
+  flex-wrap:wrap; margin-bottom:clamp(1.5rem,4vw,2.5rem); }
+.sec-title{ font-family:var(--display); font-feature-settings:"ss07","ss08","liga","calt";
+  text-transform:uppercase; font-size:clamp(2.4rem,7vw,5.5rem); line-height:.88; letter-spacing:-.015em; }
+.sec-num{ font-size:.8125rem; letter-spacing:.2em; color:var(--muted); font-weight:500; }
+.sec-link{ font-size:.9rem; font-weight:600; border-bottom:1.5px solid var(--fg); padding-bottom:.15rem; }
+
+/* ---------- DATE LEDGER ---------- */
+.ledger{ border-top:1px solid var(--line); }
+.drow{ display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:1rem 1.4rem;
+  padding:clamp(1.1rem,3vw,1.8rem) 0; border-bottom:1px solid var(--line); position:relative; }
+.drow .dnum{ font-family:var(--display); font-feature-settings:"ss07","ss08","liga","calt";
+  font-size:clamp(2.6rem,10vw,5.5rem); line-height:.8; font-weight:900; letter-spacing:-.02em; min-width:1.6ch; }
+.drow .dmid{ min-width:0; }
+.drow .dday{ font-weight:600; font-size:clamp(.95rem,2.5vw,1.15rem); letter-spacing:.02em; }
+.drow .dhead{ color:var(--muted); font-size:.9rem; margin-top:.15rem;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.drow .dhead .star{ color:var(--fg); font-weight:700; }
+.drow.free .dfree{ display:inline-block; font-size:.7rem; letter-spacing:.18em; font-weight:700;
+  border:1.5px solid var(--fg); padding:.2rem .5rem; margin-top:.4rem; text-transform:uppercase; }
+.drow .dcta{ display:inline-flex; align-items:center; gap:.45em; border:1.5px solid var(--fg);
+  font-weight:700; font-size:.85rem; padding:.6rem .95rem; min-height:44px; white-space:nowrap;
+  transition:background .2s,color .2s; }
+.drow .dcta:hover{ background:var(--fg); color:var(--bg); }
+.drow.head{ background:var(--bg-elev); margin:0 calc(var(--gut)*-1); padding-inline:var(--gut); }
+.drow.head .dnum{ font-size:clamp(3rem,12vw,6.5rem); }
+@media(max-width:560px){
+  .drow{ grid-template-columns:auto 1fr; }
+  .drow .dcta{ grid-column:1/-1; justify-self:start; margin-top:.2rem; }
+}
+
+/* ---------- LINEUP (weight cascade) ---------- */
+.lineup{ display:flex; flex-direction:column; }
+.lu-day{ margin-top:clamp(1.6rem,4vw,2.6rem); }
+.lu-day:first-child{ margin-top:0; }
+.lu-daylabel{ font-size:.8125rem; letter-spacing:.2em; text-transform:uppercase; color:var(--muted);
+  font-weight:600; padding-bottom:.6rem; border-bottom:1px solid var(--line); margin-bottom:.4rem; }
+.lu-name{ display:flex; align-items:baseline; justify-content:space-between; gap:1rem;
+  padding:clamp(.55rem,1.6vw,.85rem) 0; border-bottom:1px solid var(--line); }
+.lu-name .nm{ font-size:clamp(1.4rem,5.5vw,2.8rem); line-height:1; letter-spacing:-.01em; }
+.lu-name .role{ font-size:.78rem; letter-spacing:.16em; text-transform:uppercase; color:var(--muted);
+  white-space:nowrap; }
+.lu-name.star .nm{ font-style:normal; }
+.lu-name.star .role{ color:var(--fg); font-weight:600; }
+
+/* ---------- EXPERIENCES ---------- */
+.exp{ font-family:var(--display); font-feature-settings:"ss07","ss08","liga","calt";
+  text-transform:uppercase; font-size:clamp(1.6rem,5.5vw,3.4rem); line-height:1.02; letter-spacing:-.01em; }
+.exp .x{ color:var(--muted); }
+
+/* ---------- PARTECIPA ---------- */
+.part{ display:grid; gap:clamp(1.5rem,4vw,2.5rem); grid-template-columns:1fr; }
+@media(min-width:780px){ .part{ grid-template-columns:1fr 1fr; } }
+.pcard{ border:1px solid var(--line); padding:clamp(1.4rem,4vw,2.2rem); display:flex; flex-direction:column; }
+.pcard h3{ font-family:var(--display); font-feature-settings:"ss07","ss08","liga","calt";
+  text-transform:uppercase; font-size:clamp(1.6rem,5vw,2.6rem); line-height:.95; margin-bottom:.6rem; }
+.pcard p{ color:var(--muted); font-size:.95rem; margin-bottom:1.2rem; max-width:32ch; }
+.pcard .grow{ flex:1; }
+.field{ display:flex; gap:.5rem; flex-wrap:wrap; }
+.field input[type=email]{ flex:1; min-width:0; font-size:16px; font-family:var(--body);
+  padding:.85rem 1rem; min-height:48px; background:var(--bg); color:var(--fg);
+  border:1.5px solid var(--fg); }
+.field button{ font-weight:700; font-size:.95rem; padding:.85rem 1.2rem; min-height:48px;
+  border:1.5px solid var(--fg); transition:background .2s,color .2s; }
+.field button:hover{ background:var(--fg); color:var(--bg); }
+.consent{ display:flex; gap:.55rem; align-items:flex-start; margin-top:.9rem; font-size:.8rem; color:var(--muted); }
+.consent input{ width:18px; height:18px; margin-top:.15rem; accent-color:var(--fg); flex:none; }
+.consent a{ border-bottom:1px solid var(--muted); }
+.pcard .glink{ font-weight:600; border:1.5px solid var(--fg); align-self:flex-start;
+  padding:.8rem 1.3rem; min-height:48px; display:inline-flex; align-items:center; gap:.5em;
+  transition:background .2s,color .2s; }
+.pcard .glink:hover{ background:var(--fg); color:var(--bg); }
+
+/* ---------- ABOUT (photo-as-texture) ---------- */
+.about{ position:relative; overflow:hidden; }
+.about .ghost{ position:absolute; inset:0; z-index:0; pointer-events:none; }
+.about .ghost img{ width:100%; height:100%; object-fit:cover; opacity:.1; }
+[data-theme="dark"] .about .ghost img{ opacity:.16; mix-blend-mode:screen; }
+.about > *{ position:relative; z-index:1; }
+.about p{ max-width:46ch; font-size:clamp(1.05rem,2.5vw,1.35rem); line-height:1.5; }
+.about .tag{ font-family:var(--display); font-feature-settings:"ss07","ss08","liga","calt";
+  text-transform:uppercase; font-size:clamp(1.2rem,3.5vw,2rem); margin-top:1.4rem; }
+
+/* ---------- SPONSOR ---------- */
+.spon-grp{ margin-top:1.6rem; }
+.spon-grp:first-child{ margin-top:0; }
+.spon-lbl{ font-size:.75rem; letter-spacing:.2em; text-transform:uppercase; color:var(--muted);
+  font-weight:600; margin-bottom:.6rem; }
+.spon-row{ display:flex; flex-wrap:wrap; gap:.7rem 1.4rem; align-items:center; }
+.spon-row .s{ font-weight:600; letter-spacing:.01em; }
+.spon-row.main .s{ font-size:clamp(1.4rem,4vw,2.2rem); font-weight:800; }
+.spon-row.part .s{ font-size:clamp(1rem,2.5vw,1.3rem); }
+.spon-row.supp .s{ font-size:.95rem; color:var(--muted); }
+.spon-foot{ margin-top:2rem; font-size:.95rem; color:var(--muted); }
+.spon-foot a{ color:var(--fg); border-bottom:1px solid var(--fg); }
+
+/* ---------- FOOTER ---------- */
+.ftr{ border-top:1px solid var(--line); padding:clamp(2.5rem,6vw,4rem) var(--gut)
+  calc(2.5rem + env(safe-area-inset-bottom)); }
+.ftr-grid{ display:grid; gap:2rem; grid-template-columns:1fr; }
+@media(min-width:720px){ .ftr-grid{ grid-template-columns:1.4fr 1fr 1fr; } }
+.ftr-mark{ font-family:var(--display); font-feature-settings:"ss07","ss08","liga","calt";
+  text-transform:uppercase; font-size:clamp(2.2rem,6vw,3.5rem); line-height:.9; }
+.ftr h4{ font-size:.75rem; letter-spacing:.2em; text-transform:uppercase; color:var(--muted);
+  font-weight:600; margin-bottom:.8rem; }
+.ftr ul{ list-style:none; display:flex; flex-direction:column; gap:.5rem; }
+.ftr ul a:hover{ border-bottom:1px solid var(--fg); }
+.ftr-cta{ display:inline-flex; align-items:center; gap:.5em; background:var(--fg); color:var(--bg);
+  font-weight:700; padding:.8rem 1.2rem; min-height:48px; margin-top:1rem; border:1.5px solid var(--fg);
+  transition:background .2s,color .2s; }
+.ftr-cta:hover{ background:var(--bg); color:var(--fg); }
+.ftr-legal{ margin-top:2.5rem; padding-top:1.5rem; border-top:1px solid var(--line);
+  display:flex; flex-wrap:wrap; gap:.5rem 1.5rem; justify-content:space-between; align-items:baseline; }
+.ftr-legal .leg{ font-size:.75rem; color:var(--muted); line-height:1.5; }
+.ftr-legal .lks{ display:flex; gap:1.2rem; font-size:.8rem; }
+.ftr-legal .lks a:hover{ border-bottom:1px solid var(--fg); }
+
+/* ---------- STICKY MOBILE BAR ---------- */
+.sticky{ position:fixed; left:0; right:0; bottom:0; z-index:100; display:flex; gap:1px;
+  background:var(--line); padding-bottom:env(safe-area-inset-bottom);
+  border-top:1px solid var(--line); transition:transform .3s ease; }
+.sticky.hide{ transform:translateY(110%); }
+.sticky a{ flex:1; display:flex; align-items:center; justify-content:center; gap:.4em;
+  min-height:54px; font-weight:700; font-size:.95rem; background:var(--bg); }
+.sticky a.primary{ flex:2; background:var(--fg); color:var(--bg); }
+@media(min-width:880px){ .sticky{ display:none; } }
+body{ padding-bottom:0; }
+@media(max-width:879px){ body{ padding-bottom:56px; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Salta al contenuto</a>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-in">
+    <a class="brand" href="/" aria-label="Sottosopra home">
+      <span class="mark">Sottosopra</span>
+    </a>
+    <nav class="nav-d" aria-label="Principale">
+      <a href="/programma">Programma</a>
+      <a href="/info">Info</a>
+      <a href="/about">About</a>
+      <a href="/news">News</a>
+    </nav>
+    <div class="hdr-right">
+      <a class="btn-tix" href="https://dice.fm/bundles/sottosopra-2026?utm_source=sito&utm_medium=header" target="_blank" rel="noopener">Biglietti <span aria-hidden="true">→</span></a>
+      <button class="burger" id="burger" aria-label="Apri menu" aria-expanded="false" aria-controls="drawer">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- DRAWER -->
+<div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Menu di navigazione" hidden>
+  <div class="drawer-top">
+    <span class="mark display" style="font-size:1.35rem">Sottosopra</span>
+    <button class="drawer-close" id="drawerClose" aria-label="Chiudi menu">×</button>
+  </div>
+  <nav aria-label="Mobile">
+    <a href="/programma">Programma</a>
+    <a href="/info">Info</a>
+    <a href="/about">About</a>
+    <a href="/news">News</a>
+    <a href="https://dice.fm/bundles/sottosopra-2026?utm_source=sito&utm_medium=header" target="_blank" rel="noopener">Biglietti →</a>
+  </nav>
+  <button class="flipper" id="flipDrawer"><span aria-hidden="true">⇅</span> Capovolgi il sito</button>
+</div>
+
+<main id="main">
+
+<!-- HERO -->
+<section class="hero">
+  <p class="weightnote">Più scendi, più pesa</p>
+  <div class="hero-eyebrow">
+    <span class="eyebrow">8ª edizione</span>
+    <span class="dot" aria-hidden="true">·</span>
+    <span class="eyebrow">Giardini del Castello, Castelfranco Veneto</span>
+  </div>
+  <div class="datespan" aria-label="30 e 31 luglio, 1 e 2 agosto 2026">
+    <span>30</span><span class="sep" aria-hidden="true">·</span><span>31</span><span class="sep" aria-hidden="true">·</span><span>01</span><span class="sep" aria-hidden="true">·</span><span>02</span>
+  </div>
+  <h1 class="display">Sempre<br>Sottosopra</h1>
+  <div class="hero-meta">
+    <span class="eyebrow">Gio 30 LUG → Dom 2 AGO 2026</span>
+    <span class="sub">Giovedì 30 a ingresso libero</span>
+  </div>
+  <div class="hero-cta">
+    <a class="cta-solid" href="https://dice.fm/bundles/sottosopra-2026?utm_source=sito&utm_medium=home" target="_blank" rel="noopener">Biglietti <span aria-hidden="true">→</span></a>
+    <a class="cta-ghost" href="/programma">Programma</a>
+  </div>
+</section>
+
+<!-- DATE LEDGER -->
+<section class="sec" aria-labelledby="t-date">
+  <div class="sec-head">
+    <h2 class="sec-title display wght" id="t-date">Quattro<br>giornate</h2>
+    <span class="sec-num">01 — Date</span>
+  </div>
+  <div class="ledger">
+    <div class="drow free">
+      <div class="dnum display">30</div>
+      <div class="dmid">
+        <div class="dday">Giovedì 30 luglio</div>
+        <div class="dhead">Talk · Adrian Fartade</div>
+        <span class="dfree">Ingresso libero</span>
+      </div>
+      <a class="dcta" href="https://dice.fm/event/sottosopra-GIO30-free?utm_source=sito&utm_medium=home&day=30" target="_blank" rel="noopener">Free <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="drow head">
+      <div class="dnum display">31</div>
+      <div class="dmid">
+        <div class="dday">Venerdì 31 luglio</div>
+        <div class="dhead"><span class="star">★ Generic Animal</span> · Degheio · Krano</div>
+      </div>
+      <a class="dcta" href="https://dice.fm/event/sottosopra-VEN31?utm_source=sito&utm_medium=home&day=31" target="_blank" rel="noopener">Biglietti <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="drow head">
+      <div class="dnum display">01</div>
+      <div class="dmid">
+        <div class="dday">Sabato 1 agosto</div>
+        <div class="dhead"><span class="star">★ Vendredi sur Mer</span> · Popa · Faccianuvola</div>
+      </div>
+      <a class="dcta" href="https://dice.fm/event/sottosopra-SAB01?utm_source=sito&utm_medium=home&day=01" target="_blank" rel="noopener">Biglietti <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="drow head">
+      <div class="dnum display">02</div>
+      <div class="dmid">
+        <div class="dday">Domenica 2 agosto</div>
+        <div class="dhead"><span class="star">★ Ex-Otago</span> · Auroro Borealo · Jesse the Faccio</div>
+      </div>
+      <a class="dcta" href="https://dice.fm/event/sottosopra-DOM02?utm_source=sito&utm_medium=home&day=02" target="_blank" rel="noopener">Biglietti <span aria-hidden="true">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- LINEUP (weight cascade) -->
+<section class="sec" aria-labelledby="t-lineup">
+  <div class="sec-head">
+    <h2 class="sec-title display wght" id="t-lineup">Line-up</h2>
+    <a class="sec-link" href="/programma">Tutto il programma →</a>
+  </div>
+  <div class="lineup">
+    <div class="lu-day">
+      <div class="lu-daylabel">Venerdì 31 luglio</div>
+      <div class="lu-name star"><span class="nm display wght">Generic Animal</span><span class="role wght-mid">Headliner</span></div>
+      <div class="lu-name"><span class="nm display wght">Degheio</span><span class="role wght-mid">Live</span></div>
+      <div class="lu-name"><span class="nm display wght">Krano</span><span class="role wght-mid">Live</span></div>
+      <div class="lu-name"><span class="nm display wght">Cavalli Mongoli</span><span class="role wght-mid">Live</span></div>
+    </div>
+    <div class="lu-day">
+      <div class="lu-daylabel">Sabato 1 agosto</div>
+      <div class="lu-name star"><span class="nm display wght">Vendredi sur Mer</span><span class="role wght-mid">Headliner</span></div>
+      <div class="lu-name"><span class="nm display wght">Popa</span><span class="role wght-mid">Live</span></div>
+      <div class="lu-name"><span class="nm display wght">Faccianuvola</span><span class="role wght-mid">Live</span></div>
+    </div>
+    <div class="lu-day">
+      <div class="lu-daylabel">Domenica 2 agosto</div>
+      <div class="lu-name star"><span class="nm display wght">Ex-Otago</span><span class="role wght-mid">Headliner</span></div>
+      <div class="lu-name"><span class="nm display wght">Auroro Borealo</span><span class="role wght-mid">Live</span></div>
+      <div class="lu-name"><span class="nm display wght">Jesse the Faccio</span><span class="role wght-mid">Live</span></div>
+      <div class="lu-name"><span class="nm display wght">Elasi</span><span class="role wght-mid">Soft clubbing dj set</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCES -->
+<section class="sec" aria-labelledby="t-exp">
+  <span class="sec-num">02 — Oltre la musica</span>
+  <p class="exp" id="t-exp">Non solo concerti.<br>Talk <span class="x">·</span> workshop <span class="x">·</span> libri <span class="x">·</span> sport <span class="x">·</span> food.</p>
+</section>
+
+<!-- PARTECIPA -->
+<section class="sec" aria-labelledby="t-part">
+  <div class="sec-head">
+    <h2 class="sec-title display wght" id="t-part">Partecipa</h2>
+    <span class="sec-num">03 — Insieme</span>
+  </div>
+  <div class="part">
+    <div class="pcard">
+      <h3 class="display">Volontari*</h3>
+      <p>Lo facciamo in ottanta — manchi solo tu. Entra nel team che costruisce il festival.</p>
+      <div class="grow"></div>
+      <a class="glink" href="/volontari">Unisciti <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="pcard">
+      <h3 class="display">Newsletter</h3>
+      <p>Date, line-up e biglietti prima di tutti. Niente spam.</p>
+      <form class="nl" onsubmit="return false">
+        <div class="field">
+          <label for="nlmail" style="position:absolute;left:-9999px">Email</label>
+          <input id="nlmail" type="email" placeholder="la-tua@email.it" autocomplete="email" required>
+          <button type="submit">Iscrivimi</button>
+        </div>
+        <label class="consent"><input type="checkbox" required> Acconsento al trattamento dei dati per la newsletter. <a href="/privacy">Privacy</a></label>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT (photo-as-texture) -->
+<section class="sec about" aria-labelledby="t-about">
+  <div class="ghost" aria-hidden="true"><img src="/media/crowd-night-wide.jpg" alt=""></div>
+  <div class="sec-head">
+    <h2 class="sec-title display wght" id="t-about">Cambia il<br>punto di vista</h2>
+    <span class="sec-num">04 — Chi siamo</span>
+  </div>
+  <p class="wght-mid">Otto edizioni di festival culturale interdisciplinare nei Giardini del Castello di Castelfranco Veneto. Musica, parole, arte, corpo e comunità — fatto da un'associazione di volontari*.</p>
+  <p class="tag display">Sempre Sottosopra.</p>
+</section>
+
+<!-- SPONSOR -->
+<section class="sec" aria-labelledby="t-spon">
+  <div class="sec-head">
+    <h2 class="sec-title display wght" id="t-spon">Partner</h2>
+    <span class="sec-num">05 — Lo rendono possibile</span>
+  </div>
+  <div class="spon-grp">
+    <div class="spon-lbl">Main partner</div>
+    <div class="spon-row main"><span class="s">Azimut</span></div>
+  </div>
+  <div class="spon-grp">
+    <div class="spon-lbl">Partner</div>
+    <div class="spon-row part"><span class="s">Banca Terre Venete</span><span class="s">Ceccato Motors</span></div>
+  </div>
+  <div class="spon-grp">
+    <div class="spon-lbl">Supporter</div>
+    <div class="spon-row supp"><span class="s">Prodeco Pharma</span><span class="s">CNA</span><span class="s">Merieux NutriSciences</span><span class="s">Vudafieri</span><span class="s">Adriatica Strade</span></div>
+  </div>
+  <p class="spon-foot">Lo rendono possibile. Vuoi sostenere l'edizione 2026? <a href="mailto:info@sottosopra.com">info@sottosopra.com</a></p>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="ftr">
+  <div class="ftr-grid">
+    <div>
+      <div class="ftr-mark display">Sottosopra<br>2026</div>
+      <a class="ftr-cta" href="https://dice.fm/bundles/sottosopra-2026?utm_source=sito&utm_medium=footer" target="_blank" rel="noopener">Biglietti <span aria-hidden="true">↗</span></a>
+    </div>
+    <div>
+      <h4>Naviga</h4>
+      <ul>
+        <li><a href="/programma">Programma</a></li>
+        <li><a href="/info">Info</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/news">News</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Contatti</h4>
+      <ul>
+        <li><a href="mailto:info@sottosopra.com">info@sottosopra.com</a></li>
+        <li><a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a></li>
+        <li><a href="https://facebook.com" target="_blank" rel="noopener">Facebook</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="ftr-legal">
+    <p class="leg">SOTTOSOPRA APS · C.F. 92045630263 · P.IVA 05002480266 · Via Verdi 3, 31033 Castelfranco Veneto (TV) · info@sottosopra.com</p>
+    <div class="lks"><a href="/privacy">Privacy</a><a href="/cookie">Cookie</a></div>
+  </div>
+</footer>
+
+<!-- STICKY MOBILE BAR -->
+<div class="sticky" id="sticky">
+  <a class="primary" href="https://dice.fm/bundles/sottosopra-2026?utm_source=sito&utm_medium=sticky" target="_blank" rel="noopener">Biglietti <span aria-hidden="true">→</span></a>
+  <a href="/programma">Programma</a>
+</div>
+
+<script>
+(function(){
+  var root=document.documentElement;
+  // Palette inversion: S key (desktop) + drawer voice
+  function flip(){ root.dataset.theme = root.dataset.theme==='dark' ? '' : 'dark'; }
+  document.addEventListener('keydown',function(e){
+    if(e.target.matches('input,textarea')) return;
+    if(e.key==='s'||e.key==='S'){ flip(); }
+  });
+  var flipD=document.getElementById('flipDrawer');
+  if(flipD) flipD.addEventListener('click',function(){ flip(); });
+
+  // Drawer
+  var burger=document.getElementById('burger');
+  var drawer=document.getElementById('drawer');
+  var closeBtn=document.getElementById('drawerClose');
+  var sticky=document.getElementById('sticky');
+  var lastFocus=null;
+  function openD(){
+    drawer.hidden=false;
+    requestAnimationFrame(function(){ drawer.classList.add('open'); });
+    burger.setAttribute('aria-expanded','true');
+    sticky.classList.add('hide');
+    lastFocus=document.activeElement;
+    closeBtn.focus();
+    document.addEventListener('keydown',trap);
+  }
+  function closeD(){
+    drawer.classList.remove('open');
+    burger.setAttribute('aria-expanded','false');
+    sticky.classList.remove('hide');
+    document.removeEventListener('keydown',trap);
+    setTimeout(function(){ drawer.hidden=true; },400);
+    if(lastFocus) lastFocus.focus();
+  }
+  function trap(e){
+    if(e.key==='Escape'){ closeD(); return; }
+    if(e.key!=='Tab') return;
+    var f=drawer.querySelectorAll('a[href],button');
+    if(!f.length) return;
+    var first=f[0], last=f[f.length-1];
+    if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+    else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+  }
+  burger.addEventListener('click',openD);
+  closeBtn.addEventListener('click',closeD);
+  drawer.querySelectorAll('nav a').forEach(function(a){ a.addEventListener('click',closeD); });
+
+  // Fallback weight engine for browsers WITHOUT animation-timeline:view()
+  var supports = CSS && CSS.supports && CSS.supports('animation-timeline','view()');
+  var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  if(!supports && !reduce){
+    var els=[].slice.call(document.querySelectorAll('.wght, .wght-mid'));
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        var r=en.boundingClientRect, vh=window.innerHeight;
+        // progress 0..1 as element travels from bottom to ~mid viewport
+        var p=Math.min(1,Math.max(0,(vh - r.top)/(vh*0.75)));
+        var mid=en.target.classList.contains('wght-mid');
+        var lo=mid?200:120, hi=mid?600:880;
+        en.target.style.fontVariationSettings='"wght" '+Math.round(lo+(hi-lo)*p);
+      });
+    },{threshold:Array.from({length:21},function(_,i){return i/20;})});
+    function onScroll(){
+      els.forEach(function(el){
+        var r=el.getBoundingClientRect(), vh=window.innerHeight;
+        if(r.top>vh||r.bottom<0) return;
+        var p=Math.min(1,Math.max(0,(vh - r.top)/(vh*0.75)));
+        var mid=el.classList.contains('wght-mid');
+        var lo=mid?200:120, hi=mid?600:880;
+        el.style.fontVariationSettings='"wght" '+Math.round(lo+(hi-lo)*p);
+      });
+    }
+    window.addEventListener('scroll',onScroll,{passive:true});
+    window.addEventListener('resize',onScroll);
+    onScroll();
+  }
+})();
+</script>
+</body>
+</html>

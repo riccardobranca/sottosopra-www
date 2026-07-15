@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sottosopra Festival 2026 — Castelfranco Veneto</title>
+<meta name="description" content="Sottosopra Festival 2026 · 30 luglio – 2 agosto · Giardini Sud-Ovest del Castello, Castelfranco Veneto. Musica, talk, workshop, arte. Biglietti su DICE.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+@font-face{font-family:"SoSo26";src:url("/fonts/SoSo26.woff") format("woff");font-weight:400 900;font-display:swap}
+:root{--bg:#fff; --fg:#000; --muted:#6b6b6b; --line:#e4e4e4;
+  --display:"SoSo26","Arial Narrow",sans-serif; --body:"Inter",system-ui,sans-serif;
+  --ss:"ss07","ss08","liga","calt"}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%; scroll-behavior:smooth}
+body{background:var(--bg); color:var(--fg); font-family:var(--body); font-size:16px; line-height:1.5;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden}
+a{color:inherit; text-decoration:none}
+img{display:block; max-width:100%}
+.skip{position:absolute; left:-999px; top:0; background:var(--fg); color:var(--bg); padding:10px 16px; z-index:200}
+.skip:focus{left:8px; top:8px}
+:focus-visible{outline:2px solid var(--fg); outline-offset:3px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important; animation:none!important}}
+
+/* ===== FIRMA GIUSTIFICAZIONE (spec §2) ===== */
+.just{font-family:var(--display); font-feature-settings:var(--ss); font-weight:900; text-transform:uppercase;
+  text-align:justify; text-align-last:justify; /* fallback no-JS */ }
+.just .ln{display:flex; justify-content:space-between; align-items:baseline}
+.just .ln .sp{flex:0 0 .3em}      /* spazio tra parole */
+.brandword{display:flex; justify-content:space-between; font-family:var(--display);
+  font-feature-settings:var(--ss); transform:rotate(180deg)}  /* wordmark capovolto */
+
+/* ===== layout poster ===== */
+.wrap{max-width:1160px; margin:0 auto; padding:0 20px}
+.eyebrow{font-size:.72rem; font-weight:500; text-transform:uppercase; letter-spacing:.18em; color:var(--muted)}
+.rule{height:1px; background:var(--fg); border:0}
+.rule-thin{height:1px; background:var(--line); border:0}
+
+/* ===== BOTTONI (spec §8) ===== */
+.btn-solid{display:inline-flex; align-items:center; justify-content:center; gap:.4em;
+  background:var(--fg); color:var(--bg); border:1.5px solid var(--fg);
+  padding:14px 20px; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+  min-height:48px; font-size:.9rem; transition:opacity .2s ease}
+.btn-solid:hover{opacity:.85}
+.btn-ghost{display:inline-flex; align-items:center; justify-content:center; gap:.4em;
+  background:var(--bg); color:var(--fg); border:1.5px solid var(--fg);
+  padding:14px 20px; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+  min-height:48px; font-size:.9rem; transition:background .2s ease,color .2s ease}
+.btn-ghost:hover{background:var(--fg); color:var(--bg)}
+
+/* ===== HEADER (spec §3) ===== */
+.hdr{position:sticky; top:0; z-index:100; background:var(--bg);
+  border-bottom:1px solid var(--line);
+  display:flex; align-items:center; gap:16px; padding:12px 20px}
+.hdr-logo{display:flex; align-items:center; flex:0 0 auto}
+.hdr-logo img{height:20px; width:auto}
+.hdr-nav{display:flex; gap:24px; margin-left:auto; font-size:.9rem; font-weight:500}
+.hdr-nav a{padding:6px 2px; position:relative}
+.hdr-nav a:hover{text-decoration:underline; text-underline-offset:4px}
+.hdr-cta{display:inline-flex; align-items:center; justify-content:center;
+  background:var(--fg); color:var(--bg); border:1.5px solid var(--fg);
+  padding:9px 18px; min-height:44px; font-weight:700; font-size:.82rem;
+  text-transform:uppercase; letter-spacing:.06em; transition:opacity .2s ease}
+.hdr-cta:hover{opacity:.85}
+.hdr-burger{display:none; background:none; border:1.5px solid var(--fg);
+  width:44px; height:44px; font-size:1.2rem; cursor:pointer; line-height:1}
+/* drawer mobile */
+.drawer{display:none; position:fixed; inset:0; z-index:150; background:var(--bg);
+  flex-direction:column; padding:80px 28px 40px}
+.drawer.open{display:flex}
+.drawer-close{position:absolute; top:16px; right:18px; background:none;
+  border:1.5px solid var(--fg); width:44px; height:44px; font-size:1.3rem; cursor:pointer; line-height:1}
+.drawer a{font-family:var(--display); font-feature-settings:var(--ss); font-weight:900;
+  text-transform:uppercase; font-size:2.4rem; line-height:1.2; padding:6px 0; border-bottom:1px solid var(--line)}
+
+/* ===== HERO (poster manifesto pieno) ===== */
+.hero{padding:34px 20px 26px; max-width:1160px; margin:0 auto}
+.hero-q{font-size:clamp(2.2rem, 11vw, 4.5rem); line-height:1.05; letter-spacing:-.01em; width:100%}
+.intro{margin-top:20px; border-top:1px solid var(--fg); padding-top:12px}
+.meta{display:flex; justify-content:space-between; align-items:baseline; gap:16px;
+  font-family:var(--body); font-size:.8rem; font-weight:500; text-transform:uppercase; letter-spacing:.06em}
+.meta .meta-r{text-align:right; color:var(--muted)}
+.brandword{font-size:.8rem; letter-spacing:0; margin-top:10px; width:100%; color:var(--fg)}
+.hero-cta{margin-top:24px}
+.hero-cta .btn-solid{width:100%; max-width:420px; font-size:1rem}
+.hero-cta .free-note{display:block; margin-top:10px; font-size:.78rem; color:var(--muted)}
+
+/* ===== GIORNATE (blocchi poster) ===== */
+.days{padding:8px 20px 8px; max-width:1160px; margin:0 auto}
+.days-head{display:flex; justify-content:space-between; align-items:baseline;
+  border-top:2px solid var(--fg); padding-top:14px; margin-top:18px}
+.days-head h2{font-family:var(--display); font-feature-settings:var(--ss); font-weight:900;
+  text-transform:uppercase; font-size:clamp(1.4rem,5vw,2.2rem); line-height:1}
+.day{display:grid; grid-template-columns:1fr auto; gap:14px 20px; align-items:start;
+  padding:26px 0; border-bottom:1px solid var(--line)}
+.day:first-of-type{border-top:1px solid var(--line)}
+.day-idx{grid-column:1 / -1; font-size:.7rem; font-weight:500; text-transform:uppercase;
+  letter-spacing:.18em; color:var(--muted); display:flex; justify-content:space-between}
+.day-date{font-family:var(--display); font-feature-settings:var(--ss); font-weight:900;
+  text-transform:uppercase; font-size:clamp(2.4rem,13vw,4.6rem); line-height:.9; letter-spacing:-.01em}
+.day-month{display:block; font-size:.5em; letter-spacing:.04em; margin-top:.18em; color:var(--fg)}
+.day-line{grid-column:1 / -1; display:flex; flex-wrap:wrap; gap:6px 14px; align-items:baseline}
+.day-head-act{font-size:1.05rem; font-weight:700}
+.day-rest{font-size:.92rem; color:var(--muted)}
+.day-buy{align-self:end; min-width:150px}
+.day-free{grid-column:1 / -1; font-weight:700; text-transform:uppercase;
+  letter-spacing:.06em; font-size:.85rem; border:1.5px solid var(--fg); padding:12px 16px;
+  display:inline-flex; align-self:start; width:auto}
+.fullpass{display:flex; justify-content:space-between; align-items:center; gap:16px;
+  flex-wrap:wrap; padding:22px 0 6px}
+.fullpass .fp-label{font-family:var(--display); font-feature-settings:var(--ss); font-weight:900;
+  text-transform:uppercase; font-size:clamp(1.4rem,6vw,2.4rem); line-height:1}
+
+/* ===== LINEUP teaser ===== */
+.lineup{padding:48px 20px; max-width:1160px; margin:0 auto}
+.sec-label{font-size:.72rem; font-weight:500; text-transform:uppercase; letter-spacing:.18em;
+  color:var(--muted); margin-bottom:18px}
+.lineup ul{list-style:none}
+.lineup li{display:flex; justify-content:space-between; align-items:baseline; gap:16px;
+  border-bottom:1px solid var(--line); padding:14px 0}
+.lineup li:first-child{border-top:1px solid var(--fg)}
+.lineup .name{font-family:var(--display); font-feature-settings:var(--ss); font-weight:900;
+  text-transform:uppercase; font-size:clamp(1.5rem,7vw,2.6rem); line-height:1}
+.lineup .name.head::after{content:"★"; font-family:var(--body); font-size:.5em;
+  vertical-align:super; margin-left:.35em}
+.lineup .when{font-size:.78rem; font-weight:500; text-transform:uppercase;
+  letter-spacing:.08em; color:var(--muted); white-space:nowrap; text-align:right}
+.lineup-more{margin-top:22px; display:inline-block; font-weight:700;
+  text-transform:uppercase; letter-spacing:.06em; font-size:.85rem; border-bottom:1.5px solid var(--fg); padding-bottom:3px}
+
+/* ===== MANIFESTO breve ===== */
+.manifesto{padding:56px 20px; max-width:1160px; margin:0 auto}
+.manifesto p{font-family:var(--display); font-feature-settings:var(--ss); font-weight:900;
+  text-transform:uppercase; font-size:clamp(1.8rem,8vw,3.6rem); line-height:1.04;
+  max-width:18ch; letter-spacing:-.01em}
+.manifesto .m-sub{font-family:var(--body); font-weight:400; text-transform:none;
+  font-size:1rem; line-height:1.55; color:var(--fg); max-width:46ch; margin-top:20px; letter-spacing:0}
+.manifesto-more{margin-top:18px; display:inline-block; font-weight:700;
+  text-transform:uppercase; letter-spacing:.06em; font-size:.85rem; border-bottom:1.5px solid var(--fg); padding-bottom:3px}
+
+/* ===== ESPERIENZE riga ===== */
+.experiences{border-top:1px solid var(--fg); border-bottom:1px solid var(--fg);
+  padding:30px 20px; max-width:1160px; margin:0 auto}
+.experiences p{font-family:var(--display); font-feature-settings:var(--ss); font-weight:900;
+  text-transform:uppercase; font-size:clamp(1.2rem,5vw,2rem); line-height:1.1}
+.experiences .x-dim{color:var(--muted)}
+
+/* ===== PARTECIPA ===== */
+.participate{padding:56px 20px; max-width:1160px; margin:0 auto}
+.part-grid{display:grid; grid-template-columns:1fr; gap:32px}
+.part-card h3{font-family:var(--display); font-feature-settings:var(--ss); font-weight:900;
+  text-transform:uppercase; font-size:clamp(1.6rem,6vw,2.4rem); line-height:1; margin-bottom:10px}
+.part-card p{font-size:.95rem; color:var(--muted); max-width:42ch; margin-bottom:18px}
+.nl-form{display:flex; flex-direction:column; gap:12px; max-width:420px}
+.nl-form input[type=email]{font-family:var(--body); font-size:16px; padding:13px 14px;
+  border:1.5px solid var(--fg); background:var(--bg); color:var(--fg); min-height:48px}
+.nl-form input[type=email]::placeholder{color:var(--muted)}
+.nl-consent{display:flex; gap:10px; align-items:flex-start; font-size:.8rem;
+  color:var(--muted); line-height:1.4}
+.nl-consent input{margin-top:2px; width:18px; height:18px; flex:0 0 auto}
+.nl-consent a{text-decoration:underline; text-underline-offset:2px}
+.nl-form button{align-self:flex-start}
+
+/* ===== SPONSOR ===== */
+.sponsors{border-top:1px solid var(--line); padding:48px 20px 40px; max-width:1160px; margin:0 auto}
+.sponsors .sp-head{font-size:.72rem; font-weight:500; text-transform:uppercase;
+  letter-spacing:.18em; color:var(--muted); margin-bottom:18px}
+.sp-tiers{display:flex; flex-wrap:wrap; gap:14px 28px; align-items:center; margin-bottom:22px}
+.sp-tiers span{font-family:var(--display); font-feature-settings:var(--ss); font-weight:900;
+  text-transform:uppercase; font-size:1.1rem; color:var(--muted)}
+.sp-cta{font-size:.95rem}
+.sp-cta a{font-weight:700; text-decoration:underline; text-underline-offset:3px}
+
+/* ===== FOOTER (spec §4) ===== */
+.ftr{border-top:2px solid var(--fg); padding:48px 20px calc(40px + env(safe-area-inset-bottom));
+  max-width:1160px; margin:0 auto}
+.ftr-cta{margin-bottom:30px}
+.ftr-cta .btn-solid{font-size:1rem}
+.ftr-nav{display:flex; flex-wrap:wrap; gap:14px 24px; font-weight:500; font-size:.95rem; margin-bottom:24px}
+.ftr-nav a:hover{text-decoration:underline; text-underline-offset:4px}
+.ftr-legal{font-size:.78rem; color:var(--muted); line-height:1.7; margin-bottom:26px}
+.ftr-legal a{text-decoration:underline; text-underline-offset:2px}
+.ftr-logo img{height:22px; width:auto}
+
+/* ===== STICKY BOTTOM CTA (spec §5) — solo mobile ===== */
+.sticky-bar{position:fixed; left:0; right:0; bottom:0; z-index:90;
+  display:flex; gap:8px; padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+  background:var(--bg); border-top:1px solid var(--line)}
+.sb-buy{flex:1 1 auto; display:inline-flex; align-items:center; justify-content:center;
+  background:var(--fg); color:var(--bg); border:1.5px solid var(--fg);
+  min-height:48px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; font-size:.9rem}
+.sb-prog{flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center;
+  background:var(--bg); color:var(--fg); border:1.5px solid var(--fg);
+  min-height:48px; padding:0 18px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; font-size:.9rem}
+@media(min-width:769px){.sticky-bar{display:none}}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:768px){
+  body{padding-bottom:72px} /* spazio per sticky bar */
+  .hdr-nav{display:none}
+  .hdr-burger{display:inline-flex; order:3}
+  .hdr-cta{margin-left:auto; order:2}
+  .day{grid-template-columns:1fr; gap:12px}
+  .day-buy{justify-self:start; width:100%; max-width:300px}
+}
+@media(min-width:769px){
+  .part-grid{grid-template-columns:1fr 1fr; gap:48px}
+  .hero{padding:56px 20px 40px}
+  .hero-q{font-size:clamp(3rem,8vw,6rem)}
+}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#main">Salta al contenuto</a>
+
+<!-- ===== HEADER ===== -->
+<header class="hdr">
+  <a class="hdr-logo" href="/" aria-label="Sottosopra — home"><img src="/brand/sottosopra-logo-black.png" alt="Sottosopra" height="20"></a>
+  <nav class="hdr-nav" aria-label="Principale">
+    <a href="/programma">Programma</a><a href="/info">Info</a><a href="/about">About</a><a href="/news">News</a>
+  </nav>
+  <a class="hdr-cta" href="https://dice.fm/event/v3nam7?utm_source=sito&utm_medium=header" target="_blank" rel="noopener">Biglietti</a>
+  <button class="hdr-burger" aria-label="Apri menu" aria-expanded="false" aria-controls="drawer">☰</button>
+</header>
+
+<!-- drawer mobile -->
+<div class="drawer" id="drawer" aria-hidden="true">
+  <button class="drawer-close" aria-label="Chiudi menu">✕</button>
+  <a href="/programma">Programma</a>
+  <a href="/info">Info</a>
+  <a href="/about">About</a>
+  <a href="/news">News</a>
+</div>
+
+<main id="main">
+
+  <!-- ===== HERO — poster manifesto pieno ===== -->
+  <section class="hero" aria-labelledby="hero-q">
+    <h1 class="just hero-q" id="hero-q" aria-label="Hai sentito che torna Sottosopra?">HAI SENTITO CHE TORNA SOTTOSOPRA?</h1>
+    <div class="intro">
+      <div class="meta">
+        <span>30 luglio – 2 agosto 2026</span>
+        <span class="meta-r">Giardini del Castello · Castelfranco Veneto</span>
+      </div>
+      <div class="brandword" aria-hidden="true"><span>S</span><span>O</span><span>T</span><span>T</span><span>O</span><span>S</span><span>O</span><span>P</span><span>R</span><span>A</span></div>
+    </div>
+    <div class="hero-cta">
+      <a class="btn-solid" href="https://dice.fm/event/v3nam7?utm_source=sito&utm_medium=home" target="_blank" rel="noopener">Biglietti su DICE ↗</a>
+      <span class="free-note">Giovedì 30 luglio · ingresso libero — il festival apre con un talk.</span>
+    </div>
+  </section>
+
+  <!-- ===== GIORNATE — blocchi poster ===== -->
+  <section class="days" aria-labelledby="days-h">
+    <div class="days-head">
+      <h2 id="days-h">Quattro serate</h2>
+      <span class="eyebrow">8ª edizione</span>
+    </div>
+
+    <article class="day">
+      <span class="day-idx"><span>01 / 04</span><span>Giovedì · gratis</span></span>
+      <p class="day-date">30<span class="day-month">Luglio</span></p>
+      <div class="day-line"><span class="day-head-act">Talk · Adrian Fartade</span><span class="day-rest">apertura di stagione</span></div>
+      <span class="day-free">Ingresso libero</span>
+    </article>
+
+    <article class="day">
+      <span class="day-idx"><span>02 / 04</span><span>Venerdì</span></span>
+      <p class="day-date">31<span class="day-month">Luglio</span></p>
+      <div class="day-line"><span class="day-head-act">Generic Animal</span><span class="day-rest">Degheio · Krano · Cavalli Mongoli</span></div>
+      <a class="btn-solid day-buy" href="https://dice.fm/event/536ewl?utm_source=sito&utm_medium=home&utm_campaign=venerdi" target="_blank" rel="noopener">Biglietti ↗</a>
+    </article>
+
+    <article class="day">
+      <span class="day-idx"><span>03 / 04</span><span>Sabato</span></span>
+      <p class="day-date">01<span class="day-month">Agosto</span></p>
+      <div class="day-line"><span class="day-head-act">Vendredi sur Mer</span><span class="day-rest">Popa · Faccianuvola</span></div>
+      <a class="btn-solid day-buy" href="https://dice.fm/event/xeombl?utm_source=sito&utm_medium=home&utm_campaign=sabato" target="_blank" rel="noopener">Biglietti ↗</a>
+    </article>
+
+    <article class="day">
+      <span class="day-idx"><span>04 / 04</span><span>Domenica</span></span>
+      <p class="day-date">02<span class="day-month">Agosto</span></p>
+      <div class="day-line"><span class="day-head-act">Ex-Otago</span><span class="day-rest">Auroro Borealo · Jesse the Faccio</span></div>
+      <a class="btn-solid day-buy" href="https://dice.fm/event/3ox2ml?utm_source=sito&utm_medium=home&utm_campaign=domenica" target="_blank" rel="noopener">Biglietti ↗</a>
+    </article>
+
+    <div class="fullpass">
+      <span class="fp-label">Full Pass</span>
+      <a class="btn-ghost" href="https://dice.fm/event/v3nam7?utm_source=sito&utm_medium=home&utm_campaign=fullpass" target="_blank" rel="noopener">Tutte le serate ↗</a>
+    </div>
+  </section>
+
+  <!-- ===== LINEUP teaser ===== -->
+  <section class="lineup" aria-labelledby="lineup-h">
+    <p class="sec-label" id="lineup-h">Line-up · in aggiornamento</p>
+    <ul>
+      <li><span class="name head">Generic Animal</span><span class="when">Ven 31 lug</span></li>
+      <li><span class="name head">Vendredi sur Mer</span><span class="when">Sab 1 ago</span></li>
+      <li><span class="name head">Ex-Otago</span><span class="when">Dom 2 ago</span></li>
+      <li><span class="name">Auroro Borealo</span><span class="when">Dom 2 ago</span></li>
+      <li><span class="name">Degheio</span><span class="when">Ven 31 lug</span></li>
+      <li><span class="name">Popa</span><span class="when">Sab 1 ago</span></li>
+    </ul>
+    <a class="lineup-more" href="/programma">Tutto il programma →</a>
+  </section>
+
+  <!-- ===== MANIFESTO breve ===== -->
+  <section class="manifesto" aria-labelledby="manifesto-h">
+    <p id="manifesto-h">Cambia il punto di vista</p>
+    <p class="m-sub">Otto edizioni di musica, talk, workshop e arte nei Giardini del Castello. Un festival che mette tutto sottosopra — e lo fa insieme, in ottanta volontari*.</p>
+    <a class="manifesto-more" href="/about">Chi siamo →</a>
+  </section>
+
+  <!-- ===== ESPERIENZE riga ===== -->
+  <section class="experiences" aria-label="Esperienze">
+    <p>Non solo concerti. <span class="x-dim">Talk · workshop · libri · sport · arte · food.</span></p>
+  </section>
+
+  <!-- ===== PARTECIPA ===== -->
+  <section class="participate" aria-labelledby="part-h">
+    <p class="sec-label" id="part-h">Partecipa</p>
+    <div class="part-grid">
+
+      <div class="part-card">
+        <h3>Diventa volontari*</h3>
+        <p>Il festival lo facciamo in ottanta — manchi solo tu. Entra nel team che costruisce Sottosopra.</p>
+        <a class="btn-ghost" href="/about#volontari">Unisciti</a>
+      </div>
+
+      <div class="part-card">
+        <h3>Newsletter</h3>
+        <p>Date, line-up e biglietti prima di tutti. Niente spam.</p>
+        <form class="nl-form" action="#" method="post" novalidate>
+          <label for="nl-email" class="sr-only" style="position:absolute;left:-9999px">Email</label>
+          <input id="nl-email" type="email" name="email" placeholder="La tua email" required autocomplete="email">
+          <label class="nl-consent">
+            <input type="checkbox" name="consent" required>
+            <span>Acconsento a ricevere la newsletter di Sottosopra. Vedi la <a href="/privacy">privacy policy</a>.</span>
+          </label>
+          <button class="btn-ghost" type="submit">Iscriviti</button>
+        </form>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===== SPONSOR ===== -->
+  <section class="sponsors" aria-labelledby="sp-h">
+    <p class="sp-head" id="sp-h">Lo rendono possibile</p>
+    <div class="sp-tiers" aria-hidden="true">
+      <span>Main partner</span><span>Partner</span><span>Supporter</span>
+    </div>
+    <p class="sp-cta">Vuoi sostenere l'edizione 2026? Scrivi a <a href="mailto:info@sottosopra.com">info@sottosopra.com</a></p>
+  </section>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="ftr">
+  <div class="ftr-cta">
+    <a class="btn-solid" href="https://dice.fm/event/v3nam7?utm_source=sito&utm_medium=footer" target="_blank" rel="noopener">Biglietti su DICE ↗</a>
+  </div>
+  <nav class="ftr-nav" aria-label="Footer">
+    <a href="/programma">Programma</a><a href="/info">Info</a><a href="/about">About</a><a href="/news">News</a>
+    <a href="https://instagram.com/sottosoprafestival" target="_blank" rel="noopener">Instagram</a>
+    <a href="mailto:info@sottosopra.com">info@sottosopra.com</a>
+  </nav>
+  <p class="ftr-legal">SOTTOSOPRA APS · C.F. 92045630263 · P.IVA 05002480266 · Via Verdi 3, 31033 Castelfranco Veneto (TV)<br>
+    <a href="/privacy">Privacy</a> · <a href="/cookie">Cookie</a></p>
+  <div class="ftr-logo"><img src="/brand/sottosopra-logo-black.png" alt="Sottosopra" height="22"></div>
+</footer>
+
+<!-- ===== STICKY BOTTOM CTA — solo mobile ===== -->
+<div class="sticky-bar" aria-label="Azioni rapide">
+  <a class="sb-buy" href="https://dice.fm/event/v3nam7?utm_source=sito&utm_medium=sticky" target="_blank" rel="noopener">Biglietti ↗</a>
+  <a class="sb-prog" href="/programma">Programma</a>
+</div>
+
+<!-- ===== JS FIRMA GIUSTIFICAZIONE (spec §2, VERBATIM) ===== -->
+<script>
+(function(){
+  function esc(c){ return c==='&'?'&amp;':c==='<'?'&lt;':c; }
+  function build(el){
+    try{
+      var text = el.getAttribute('data-text');
+      if(text===null){ text = el.textContent.replace(/\s+/g,' ').trim(); el.setAttribute('data-text', text); }
+      el.innerHTML = text.split(' ').map(function(w){ return '<span class="w">'+w+'</span>'; }).join(' ');
+      var ws = [].slice.call(el.children), lines=[], cur=[], top=null;
+      ws.forEach(function(s){ var t=s.offsetTop; if(top===null)top=t; if(t-top>2){lines.push(cur);cur=[];top=t;} cur.push(s.textContent); });
+      if(cur.length) lines.push(cur);
+      el.innerHTML = lines.map(function(lw){
+        var line = lw.join(' '), inner='';
+        for(var k=0;k<line.length;k++){ var c=line[k]; inner += (c===' ') ? '<span class="sp"></span>' : '<span>'+esc(c)+'</span>'; }
+        return '<span class="ln">'+inner+'</span>';
+      }).join('');
+    }catch(e){ var d=el.getAttribute('data-text'); if(d) el.textContent=d; }
+  }
+  function run(){ [].forEach.call(document.querySelectorAll('.just'), build); }
+  function ready(){ run(); if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(run); } }
+  if(document.readyState!=='loading') ready(); else addEventListener('DOMContentLoaded', ready);
+  var tm; addEventListener('resize', function(){ clearTimeout(tm); tm=setTimeout(run,150); });
+})();
+</script>
+
+<!-- ===== JS drawer mobile ===== -->
+<script>
+(function(){
+  var burger=document.querySelector('.hdr-burger');
+  var drawer=document.getElementById('drawer');
+  var closeBtn=document.querySelector('.drawer-close');
+  if(!burger||!drawer) return;
+  function open(){ drawer.classList.add('open'); drawer.setAttribute('aria-hidden','false'); burger.setAttribute('aria-expanded','true'); }
+  function close(){ drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); burger.setAttribute('aria-expanded','false'); burger.focus(); }
+  burger.addEventListener('click', open);
+  if(closeBtn) closeBtn.addEventListener('click', close);
+  drawer.addEventListener('click', function(e){ if(e.target.tagName==='A') close(); });
+  addEventListener('keydown', function(e){ if(e.key==='Escape' && drawer.classList.contains('open')) close(); });
+})();
+</script>
+
+</body>
+</html>

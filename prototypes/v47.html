@@ -1,0 +1,1199 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SOTTOSOPRA 2026 — SEMPRE SOTTOSOPRA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+@font-face{
+  font-family:"SoSo26";
+  src:url("/fonts/SoSo26.woff") format("woff");
+  font-weight:400 900;
+  font-display:swap;
+}
+
+:root{
+  --black:#000;
+  --muted:#6B6B6B;
+  --line:#E4E4E4;
+  --elev:#F4F4F4;
+  --white:#fff;
+
+  --bg:var(--white);
+  --fg:var(--black);
+
+  --gut:clamp(20px,6vw,88px);
+  --hair:1px;
+  --rule:2px;
+
+  /* SECTION rhythm — the air between chapters is far larger than the air inside them */
+  --chapter:clamp(88px,15vh,180px);   /* between chapters */
+  --group:clamp(20px,3vh,34px);        /* between groups inside a chapter */
+  --tight:clamp(8px,1.4vh,16px);       /* between tightly-bound elements */
+
+  --display:"SoSo26","Arial Narrow",system-ui,sans-serif;
+  --ss:"ss07","ss08","liga","calt";
+  --body:"Inter",system-ui,-apple-system,sans-serif;
+
+  --np-h:48px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--fg);
+  font-family:var(--body);
+  font-size:17px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  padding-bottom:var(--np-h); /* desktop: room under fixed now-playing */
+}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+
+.disp{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;line-height:.9;letter-spacing:-.01em;text-transform:uppercase;
+}
+.eyebrow{
+  font-family:var(--body);font-size:.72rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.2em;
+}
+.tag{
+  font-family:var(--body);font-size:.7rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.16em;color:var(--muted);
+}
+
+/* focus visible everywhere */
+a:focus-visible,button:focus-visible,input:focus-visible,[tabindex]:focus-visible{
+  outline:2px solid var(--fg);outline-offset:3px;
+}
+
+/* skip link */
+.skip{
+  position:absolute;left:-9999px;top:0;z-index:500;
+  background:var(--fg);color:var(--bg);
+  padding:12px 18px;font-size:.85rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;
+}
+.skip:focus{left:0}
+
+/* shared shell so chapters share margins and breathe coherently */
+.shell{max-width:1320px;margin:0 auto;padding-left:var(--gut);padding-right:var(--gut)}
+
+/* ===================== HEADER ===================== */
+.site-head{
+  position:sticky;top:0;z-index:200;
+  background:var(--bg);
+  border-bottom:var(--rule) solid var(--fg);
+}
+.head-row{display:flex;align-items:stretch;height:58px}
+.head-logo{
+  display:flex;align-items:center;
+  padding:0 clamp(18px,4vw,32px);
+  border-right:var(--hair) solid var(--line);
+  flex:0 0 auto;
+}
+.head-logo img{height:17px;width:auto}
+
+.head-nav{display:flex;align-items:center;flex:1 1 auto}
+.head-nav a{
+  padding:0 clamp(15px,1.8vw,26px);
+  height:100%;display:flex;align-items:center;
+  font-size:.8rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.1em;
+  border-right:var(--hair) solid var(--line);
+  transition:background .2s ease,color .2s ease;
+}
+.head-nav a:hover{background:var(--fg);color:var(--bg)}
+.head-spacer{flex:1 1 auto}
+
+.btn-tickets{
+  flex:0 0 auto;
+  display:flex;align-items:center;gap:10px;
+  padding:0 clamp(20px,2.6vw,36px);
+  background:var(--fg);color:var(--bg);
+  font-size:.82rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.1em;
+  transition:opacity .2s ease;
+}
+.btn-tickets:hover{opacity:.78}
+.btn-tickets .arr{font-family:var(--display);font-feature-settings:var(--ss);font-weight:900;font-size:1rem}
+
+/* burger — mobile only */
+.head-burger{
+  display:none;flex:0 0 auto;width:58px;
+  align-items:center;justify-content:center;
+  background:var(--bg);color:var(--fg);border:none;
+  border-left:var(--hair) solid var(--line);
+}
+.head-burger svg{width:22px;height:22px;display:block}
+.head-burger .ic-close{display:none}
+
+/* mobile full-screen drawer */
+.drawer{
+  position:fixed;inset:0;z-index:190;
+  background:var(--bg);
+  display:flex;flex-direction:column;
+  padding:84px var(--gut) calc(40px + env(safe-area-inset-bottom));
+  transform:translateY(-100%);
+  transition:transform .35s cubic-bezier(.4,0,.2,1);
+  visibility:hidden;overflow-y:auto;
+}
+.drawer.open{transform:translateY(0);visibility:visible}
+.drawer a.dnav{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;font-size:clamp(2.6rem,13vw,4rem);
+  line-height:1.05;text-transform:uppercase;
+  padding:10px 0;border-bottom:var(--hair) solid var(--line);
+}
+.drawer .dnav:first-child{border-top:var(--hair) solid var(--line)}
+.drawer .dflip{
+  margin-top:18px;align-self:flex-start;
+  display:inline-flex;align-items:center;gap:10px;
+  border:var(--rule) solid var(--fg);
+  padding:11px 18px;min-height:48px;
+  font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+  background:none;color:var(--fg);
+}
+.drawer .dmeta{
+  margin-top:auto;padding-top:32px;
+  font-size:.82rem;color:var(--muted);line-height:1.9;
+  text-transform:uppercase;letter-spacing:.05em;
+}
+.drawer .dmeta a{color:var(--fg);font-weight:700}
+
+/* ===================== CHAPTER scaffolding ===================== */
+.chapter{padding-top:var(--chapter);padding-bottom:var(--chapter)}
+.chapter--tight{padding-top:clamp(56px,9vh,110px);padding-bottom:clamp(56px,9vh,110px)}
+
+/* tiny editorial section index (01/02 …) — uppercase tracked */
+.chapter-index{
+  display:flex;align-items:center;gap:14px;
+  font-family:var(--body);font-weight:700;
+  font-size:.7rem;text-transform:uppercase;letter-spacing:.2em;color:var(--muted);
+  margin-bottom:var(--group);
+}
+.chapter-index .num{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;font-size:1rem;letter-spacing:0;color:var(--fg);
+}
+.chapter-index .bar{flex:1 1 auto;height:var(--hair);background:var(--line);max-width:120px}
+
+/* clip-reveal for section titles */
+.reveal{overflow:hidden}
+.reveal > .rl{
+  display:block;
+  transform:translateY(102%);
+  transition:transform .7s cubic-bezier(.16,1,.3,1);
+}
+.reveal.in > .rl{transform:translateY(0)}
+.reveal > .rl.d1{transition-delay:.06s}
+.reveal > .rl.d2{transition-delay:.12s}
+.reveal > .rl.d3{transition-delay:.18s}
+
+/* ===================== HERO — calm, asymmetric, one focus ===================== */
+.hero{
+  min-height:clamp(72vh,80vh,860px);
+  display:flex;flex-direction:column;justify-content:center;
+  padding-top:clamp(40px,8vh,90px);padding-bottom:clamp(40px,8vh,90px);
+}
+.hero .hero-edition{
+  font-family:var(--body);font-weight:700;
+  font-size:.74rem;text-transform:uppercase;letter-spacing:.24em;
+  color:var(--muted);margin-bottom:clamp(18px,3vh,30px);
+}
+.hero-claim{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;
+  /* sized so SOTTOSOPRA always fits one line down to ~360px */
+  font-size:clamp(3rem,15vw,12.5rem);
+  line-height:.84;letter-spacing:-.03em;text-transform:uppercase;
+}
+.hero-claim .l1,.hero-claim .l2{
+  display:block;white-space:nowrap;word-break:keep-all;
+  -webkit-hyphens:none;hyphens:none;
+}
+.hero-facts{
+  margin-top:clamp(28px,5vh,52px);
+  display:flex;align-items:center;gap:clamp(14px,2vw,28px);flex-wrap:wrap;
+  font-family:var(--body);font-weight:700;
+  font-size:clamp(.78rem,1.3vw,.95rem);text-transform:uppercase;letter-spacing:.12em;
+}
+.hero-facts .sep{color:var(--muted)}
+.hero-actions{
+  margin-top:clamp(28px,4vh,42px);
+  display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+}
+.hero-actions .h-buy{
+  display:inline-flex;align-items:center;gap:12px;
+  background:var(--fg);color:var(--bg);
+  padding:18px 30px;min-height:56px;
+  font-size:.86rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;
+  transition:background .2s ease,color .2s ease,transform .12s ease;
+}
+.hero-actions .h-buy:hover{background:var(--bg);color:var(--fg);box-shadow:inset 0 0 0 var(--rule) var(--fg)}
+.hero-actions .h-buy .arr{font-family:var(--display);font-feature-settings:var(--ss);font-weight:900;font-size:1.05rem}
+.hero-actions .h-prog{
+  display:inline-flex;align-items:center;gap:10px;min-height:56px;
+  font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+  border-bottom:var(--rule) solid var(--fg);padding-bottom:3px;
+}
+.hero-actions .h-prog:hover{background:var(--fg);color:var(--bg)}
+
+/* ===================== KINETIC RIBBON (the spine) ===================== */
+.ribbon{
+  border-top:var(--rule) solid var(--fg);
+  border-bottom:var(--rule) solid var(--fg);
+  background:var(--fg);color:var(--bg);
+  overflow:hidden;padding:16px 0;
+}
+.ribbon-track{
+  display:flex;width:max-content;will-change:transform;
+}
+.ribbon span{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;font-size:clamp(1.5rem,3.4vw,2.7rem);
+  letter-spacing:.06em;white-space:nowrap;padding:0 .42em;text-transform:uppercase;
+}
+.ribbon .dot{font-size:1rem;align-self:center;opacity:.5}
+
+/* ===================== DATES — 4 spacious clickable blocks ===================== */
+.dates-head{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;
+  margin-bottom:clamp(34px,6vh,68px);
+}
+.dates-head .dh-ttl{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;font-size:clamp(2rem,5.5vw,4.2rem);line-height:.9;text-transform:uppercase;
+}
+.dates-list{display:flex;flex-direction:column}
+.date-row{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:clamp(20px,4vw,56px);
+  padding:clamp(26px,4.6vh,52px) 0;
+  border-top:var(--hair) solid var(--line);
+  transition:padding-left .25s ease;
+}
+.date-row:last-child{border-bottom:var(--hair) solid var(--line)}
+.date-row:hover{padding-left:clamp(6px,1vw,18px)}
+
+.dr-num{
+  display:flex;align-items:baseline;gap:.16em;
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;line-height:.8;letter-spacing:-.03em;text-transform:uppercase;
+}
+.dr-num .d{font-size:clamp(3.4rem,9vw,7.5rem)}
+.dr-num .m{font-size:clamp(1rem,2vw,2rem);letter-spacing:.06em}
+
+.dr-mid{min-width:0}
+.dr-dow{
+  font-family:var(--body);font-weight:700;
+  font-size:.76rem;text-transform:uppercase;letter-spacing:.18em;
+  color:var(--muted);margin-bottom:10px;
+}
+.dr-dow .free{color:var(--fg)}
+.dr-acts{
+  display:flex;flex-wrap:wrap;align-items:baseline;gap:.05em .5em;
+}
+.dr-acts .a{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;font-size:clamp(1.2rem,2.6vw,2rem);line-height:1.06;
+  letter-spacing:-.005em;text-transform:uppercase;
+}
+.dr-acts .sep{color:var(--muted);font-weight:900}
+
+.dr-cta{
+  flex:0 0 auto;
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  min-height:56px;min-width:172px;padding:0 26px;
+  font-family:var(--body);font-weight:700;
+  font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;
+  border:var(--rule) solid var(--fg);background:var(--bg);color:var(--fg);
+  transition:background .2s ease,color .2s ease;
+}
+.dr-cta:hover,.dr-cta:focus-visible{background:var(--fg);color:var(--bg)}
+.dr-cta .arr{font-family:var(--display);font-feature-settings:var(--ss);font-weight:900;font-size:.95rem}
+.dr-cta.free{background:var(--fg);color:var(--bg)}
+.dr-cta.free:hover,.dr-cta.free:focus-visible{background:var(--bg);color:var(--fg)}
+
+.dates-foot{
+  display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
+  margin-top:clamp(28px,5vh,52px);
+}
+.dates-foot .note{
+  font-size:.76rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);
+}
+.dates-foot .pass{
+  display:inline-flex;align-items:center;gap:12px;
+  background:var(--fg);color:var(--bg);
+  padding:15px 26px;min-height:52px;
+  font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+  transition:background .2s ease,color .2s ease;
+}
+.dates-foot .pass:hover{background:var(--bg);color:var(--fg);box-shadow:inset 0 0 0 var(--rule) var(--fg)}
+.dates-foot .pass .arr{font-family:var(--display);font-feature-settings:var(--ss);font-weight:900}
+
+/* ===================== LINEUP TEASER — scannable, one per line ===================== */
+.lineup-head{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;
+  margin-bottom:clamp(30px,5vh,56px);
+}
+.lineup-head .lh-ttl{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;font-size:clamp(2rem,5.5vw,4.2rem);line-height:.9;text-transform:uppercase;
+}
+.lu-day{margin-bottom:clamp(26px,4.4vh,48px)}
+.lu-day:last-of-type{margin-bottom:0}
+.lu-daylabel{
+  display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+  padding-bottom:10px;margin-bottom:clamp(12px,2vh,18px);
+  border-bottom:var(--hair) solid var(--line);
+  font-family:var(--body);font-weight:700;
+  font-size:.76rem;text-transform:uppercase;letter-spacing:.18em;
+}
+.lu-daylabel .dt{color:var(--muted);letter-spacing:.12em;font-weight:600}
+.lu-acts{display:flex;flex-wrap:wrap;align-items:baseline;gap:.04em .55em}
+.lu-acts a{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;font-size:clamp(1.7rem,4.6vw,3.4rem);line-height:1.04;
+  letter-spacing:-.01em;text-transform:uppercase;
+  transition:background .15s ease,color .15s ease;
+}
+.lu-acts a:hover{background:var(--fg);color:var(--bg)}
+.lu-acts .sep{color:var(--muted);font-weight:900;font-family:var(--display);font-feature-settings:var(--ss)}
+.lineup-more{display:flex;justify-content:flex-end;margin-top:clamp(30px,5vh,56px)}
+.lineup-more a{
+  display:inline-flex;align-items:center;gap:10px;min-height:48px;
+  font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+  border-bottom:var(--rule) solid var(--fg);padding-bottom:3px;
+}
+.lineup-more a:hover{background:var(--fg);color:var(--bg)}
+
+/* ===================== MANIFESTO — one strong line, lots of white ===================== */
+.manifesto{text-align:left}
+.manifesto .mf-eyebrow{
+  font-family:var(--body);font-weight:700;
+  font-size:.74rem;text-transform:uppercase;letter-spacing:.24em;color:var(--muted);
+  margin-bottom:clamp(20px,3.4vh,36px);
+}
+.manifesto .mf-line{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;font-size:clamp(2.4rem,8vw,7rem);line-height:.92;
+  letter-spacing:-.025em;text-transform:uppercase;max-width:18ch;
+}
+.manifesto .mf-cta{
+  margin-top:clamp(28px,4.6vh,48px);
+  display:inline-flex;align-items:center;gap:10px;min-height:48px;
+  font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+  border-bottom:var(--rule) solid var(--fg);padding-bottom:3px;
+}
+.manifesto .mf-cta:hover{background:var(--fg);color:var(--bg)}
+
+/* ===================== EXPERIENCES — single line ===================== */
+.exp-line{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;font-size:clamp(1.7rem,4.4vw,3.4rem);line-height:1.08;
+  text-transform:uppercase;max-width:24ch;
+}
+.exp-line .dim{color:var(--muted)}
+
+/* ===================== PARTECIPA — volontari + newsletter, paritari ===================== */
+.partecipa-head{margin-bottom:clamp(30px,5vh,56px)}
+.partecipa-head .ph-ttl{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;font-size:clamp(2rem,5.5vw,4.2rem);line-height:.9;text-transform:uppercase;
+}
+.cta-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:clamp(24px,4vw,56px);
+}
+.cta-cell{padding:clamp(26px,4vh,44px) clamp(24px,3vw,40px);border:var(--rule) solid var(--fg)}
+.cta-cell .eyebrow{color:var(--muted);display:block;margin-bottom:14px}
+.cta-cell h3{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;font-size:clamp(2rem,4vw,3.2rem);line-height:.92;
+  text-transform:uppercase;margin-bottom:16px;
+}
+.cta-cell p{
+  font-size:.86rem;color:var(--muted);margin-bottom:26px;max-width:36ch;
+  text-transform:uppercase;letter-spacing:.04em;font-weight:600;line-height:1.5;
+}
+.cta-link{
+  display:inline-flex;align-items:center;gap:10px;
+  border:var(--rule) solid var(--fg);
+  padding:14px 24px;font-size:.8rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.1em;min-height:48px;
+  transition:background .2s ease,color .2s ease;
+}
+.cta-link:hover{background:var(--fg);color:var(--bg)}
+.cta-link .arr{font-family:var(--display);font-feature-settings:var(--ss);font-weight:900}
+
+.nl-form{display:flex;border:var(--rule) solid var(--fg);max-width:480px}
+.nl-form input{
+  flex:1 1 auto;border:none;background:transparent;color:var(--fg);
+  padding:16px 16px;font-family:var(--body);font-size:16px;outline:none;min-width:0;
+  text-transform:uppercase;letter-spacing:.04em;
+}
+.nl-form input::placeholder{color:var(--muted)}
+.nl-form button{
+  flex:0 0 auto;border:none;border-left:var(--rule) solid var(--fg);
+  background:var(--fg);color:var(--bg);
+  padding:0 24px;font-size:.76rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.1em;min-height:48px;
+  transition:opacity .2s ease;
+}
+.nl-form button:hover{opacity:.8}
+.nl-consent{
+  display:flex;align-items:flex-start;gap:10px;margin-top:18px;
+  font-size:.78rem;color:var(--muted);line-height:1.5;max-width:44ch;
+}
+.nl-consent input{margin-top:2px;width:18px;height:18px;flex:0 0 auto;accent-color:var(--fg)}
+.nl-consent a{color:var(--fg);text-decoration:underline;text-underline-offset:2px}
+
+/* ===================== PARTNER — 3 marquees ===================== */
+.partners-head{margin-bottom:clamp(28px,4.6vh,48px)}
+.partners-head .pa-ttl{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;font-size:clamp(2rem,5.5vw,4.2rem);line-height:.9;text-transform:uppercase;
+}
+.partners-rail{border-top:var(--rule) solid var(--fg);border-bottom:var(--rule) solid var(--fg)}
+.p-tier{
+  position:relative;
+  border-bottom:var(--hair) solid var(--fg);
+  overflow:hidden;display:flex;align-items:center;
+}
+.p-tier:last-of-type{border-bottom:none}
+.p-tier .p-label{
+  flex:0 0 auto;z-index:2;align-self:stretch;display:flex;align-items:center;
+  padding:0 14px;background:var(--bg);
+  border-right:var(--hair) solid var(--fg);
+  font-family:var(--body);font-weight:700;
+  font-size:.6rem;text-transform:uppercase;letter-spacing:.16em;
+  color:var(--muted);white-space:nowrap;
+  writing-mode:vertical-rl;transform:rotate(180deg);text-align:center;
+}
+.p-flow{flex:1 1 auto;overflow:hidden}
+.p-track{display:flex;width:max-content;align-items:center;will-change:transform}
+.p-track.t1{animation:scroll 38s linear infinite;padding:clamp(18px,2.6vw,30px) 0}
+.p-track.t2{animation:scroll 32s linear infinite;padding:clamp(13px,1.9vw,21px) 0}
+.p-track.t3{animation:scroll 26s linear infinite;padding:clamp(9px,1.4vw,16px) 0}
+.p-tier:hover .p-track,.p-tier:focus-within .p-track{animation-play-state:paused}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+.chip{
+  flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;
+  border:var(--hair) solid var(--fg);color:var(--fg);
+  font-family:var(--body);font-weight:700;
+  text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;
+  transition:background .2s ease,color .2s ease;
+}
+.chip:hover,.chip:focus-visible{background:var(--fg);color:var(--bg)}
+.t1 .chip{margin:0 clamp(14px,1.4vw,22px);padding:18px 30px;font-size:1.05rem;letter-spacing:.06em}
+.t2 .chip{margin:0 clamp(12px,1.1vw,18px);padding:13px 22px;font-size:.85rem}
+.t3 .chip{margin:0 clamp(9px,.9vw,14px);padding:9px 16px;font-size:.72rem;color:var(--muted);border-color:var(--line)}
+.t3 .chip:hover,.t3 .chip:focus-visible{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+
+.partners-foot{
+  margin-top:clamp(24px,4vh,40px);
+  font-size:.88rem;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.06em;font-weight:600;
+}
+.partners-foot a{color:var(--fg);font-weight:700;border-bottom:var(--rule) solid var(--fg);padding-bottom:2px}
+.partners-foot a:hover{background:var(--fg);color:var(--bg)}
+
+/* ===================== NOW PLAYING (fixed desktop / static above footer mobile) ===================== */
+.np-bar{
+  position:fixed;left:0;right:0;bottom:0;z-index:80;height:var(--np-h);
+  background:var(--fg);color:var(--bg);
+  display:flex;align-items:stretch;
+  border-top:var(--rule) solid var(--fg);
+}
+.np-now{
+  display:flex;align-items:center;gap:12px;padding:0 16px;flex:0 0 auto;
+  border-right:var(--hair) solid rgba(255,255,255,.32);
+}
+.np-cover{
+  width:28px;height:28px;flex:none;position:relative;overflow:hidden;
+  border:1px solid var(--bg);
+  background:repeating-linear-gradient(45deg,var(--bg) 0 3px,transparent 3px 6px);
+}
+.np-eq{display:flex;align-items:flex-end;gap:2px;height:16px}
+.np-eq i{width:3px;background:var(--bg);height:40%;animation:eq .9s ease-in-out infinite}
+.np-eq i:nth-child(2){animation-delay:.2s}
+.np-eq i:nth-child(3){animation-delay:.45s}
+.np-eq i:nth-child(4){animation-delay:.1s}
+@keyframes eq{0%,100%{height:30%}50%{height:100%}}
+.np-label{
+  font-family:var(--body);font-size:.62rem;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;white-space:nowrap;
+}
+.np-feed{flex:1 1 auto;overflow:hidden;white-space:nowrap;display:flex;align-items:center}
+.np-feed .np-track{display:inline-flex;will-change:transform;animation:scroll-l 40s linear infinite}
+.np-feed:hover .np-track{animation-play-state:paused}
+.np-feed .np-track span{
+  font-family:var(--body);font-size:.76rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  padding:0 20px;display:inline-flex;align-items:center;gap:18px;white-space:nowrap;
+}
+.np-feed .np-track .dot{opacity:.5}
+@keyframes scroll-l{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.np-spotify{
+  flex:0 0 auto;padding:0 18px;
+  border-left:var(--hair) solid rgba(255,255,255,.32);
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--body);font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;
+  transition:background .2s ease,color .2s ease;
+}
+.np-spotify:hover,.np-spotify:focus-visible{background:var(--bg);color:var(--fg)}
+.np-spotify .arr{font-family:var(--display);font-feature-settings:var(--ss);font-weight:900;font-size:.85rem}
+
+/* ===================== FOOTER ===================== */
+.site-foot{background:var(--fg);color:var(--bg)}
+.foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr}
+.foot-cell{
+  padding:clamp(30px,5vh,58px) var(--gut);
+  border-left:var(--hair) solid rgba(255,255,255,.2);
+}
+.foot-cell:first-child{border-left:none}
+.foot-cell .big{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;font-size:clamp(2.2rem,6vw,4.6rem);line-height:.84;
+  letter-spacing:-.01em;text-transform:uppercase;
+}
+.foot-cell .eyebrow{opacity:.6;display:block;margin-bottom:18px}
+.foot-cell a{display:block;padding:6px 0;font-size:.88rem;opacity:.85;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.foot-cell a:hover{opacity:1;text-decoration:underline;text-underline-offset:3px}
+.foot-cell .tk{
+  display:inline-flex;align-items:center;gap:8px;margin-top:12px;
+  opacity:1;font-weight:700;border-bottom:1px solid rgba(255,255,255,.5);padding-bottom:2px;
+}
+.foot-foot{
+  display:flex;justify-content:space-between;align-items:center;gap:16px;
+  padding:18px var(--gut);
+  border-top:var(--hair) solid rgba(255,255,255,.2);
+  font-size:.7rem;letter-spacing:.08em;opacity:.78;flex-wrap:wrap;
+  text-transform:uppercase;font-weight:600;
+}
+.foot-foot img{height:14px;width:auto;opacity:.9}
+.foot-foot .ll a{display:inline;margin-left:16px;opacity:.78}
+.foot-foot .ll a:hover{opacity:1}
+
+/* ===================== STICKY BOTTOM CTA (mobile only) ===================== */
+.sticky-cta{
+  display:none;
+  position:fixed;left:0;right:0;bottom:0;z-index:180;
+  background:var(--bg);
+  border-top:var(--rule) solid var(--fg);
+  padding:10px var(--gut) calc(10px + env(safe-area-inset-bottom));
+  gap:10px;
+}
+.sticky-cta a{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  min-height:50px;font-weight:700;font-size:.85rem;
+  text-transform:uppercase;letter-spacing:.08em;
+}
+.sticky-cta .sc-tickets{flex:1 1 auto;background:var(--fg);color:var(--bg)}
+.sticky-cta .sc-prog{flex:0 0 auto;padding:0 22px;border:var(--rule) solid var(--fg);color:var(--fg)}
+.sticky-cta .arr{font-family:var(--display);font-feature-settings:var(--ss);font-weight:900}
+body.drawer-open .sticky-cta{display:none !important}
+
+/* ===================== RESPONSIVE ===================== */
+@media(max-width:920px){
+  .head-nav{display:none}
+  .head-spacer{display:none}
+  .head-burger{display:flex}
+  .cta-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr}
+  .foot-cell{border-left:none;border-top:var(--hair) solid rgba(255,255,255,.2)}
+  .foot-cell:first-child{border-top:none}
+}
+
+@media(max-width:760px){
+  :root{--chapter:clamp(64px,11vh,104px)}
+  body{font-size:16px;padding-bottom:76px}
+  .sticky-cta{display:flex}
+
+  .hero{min-height:auto}
+  .hero-claim{font-size:clamp(2.5rem,16vw,4.6rem)}
+
+  /* date rows: number on its own line, acts below, CTA full width */
+  .date-row{
+    grid-template-columns:1fr;
+    gap:16px;
+    padding:clamp(28px,5vh,40px) 0;
+  }
+  .date-row:hover{padding-left:0}
+  .dr-num .d{font-size:clamp(3.2rem,18vw,5rem)}
+  .dr-cta{width:100%;min-width:0}
+
+  /* lineup stacks one per line */
+  .lu-acts a{display:block;width:100%}
+  .lu-acts .sep{display:none}
+
+  /* now-playing becomes a static strip above footer (no clash with sticky CTA) */
+  .np-bar{position:static;height:auto;flex-wrap:wrap;border-top:var(--rule) solid var(--fg);border-bottom:0}
+  .np-now{flex:1 1 100%;justify-content:flex-start;border-right:none;border-bottom:var(--hair) solid rgba(255,255,255,.3);padding:10px 16px}
+  .np-feed{flex:1 1 auto;min-width:0;padding:8px 0}
+  .np-spotify{flex:0 0 auto;border-left:var(--hair) solid rgba(255,255,255,.3)}
+}
+
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .ribbon-track,.p-track,.np-feed .np-track{animation:none !important;transform:none !important}
+  .ribbon-track{flex-wrap:wrap;width:100%}
+  .ribbon-track > *:nth-child(n+11){display:none}
+  .p-track{flex-wrap:wrap;width:100%}
+  .np-eq i{animation:none;height:60%}
+  .drawer{transition:none}
+  .reveal > .rl{transform:none !important;transition:none !important}
+}
+</style>
+</head>
+<body data-theme="light">
+
+<a class="skip" href="#main">Salta al contenuto</a>
+
+<!-- ===================== HEADER ===================== -->
+<header class="site-head">
+  <div class="head-row">
+    <a class="head-logo" href="/" aria-label="Sottosopra — home">
+      <img src="/brand/sottosopra-logo-black.png" alt="Sottosopra">
+    </a>
+    <nav class="head-nav" aria-label="Principale">
+      <a href="/programma">Programma</a>
+      <a href="/info">Info</a>
+      <a href="/about">About</a>
+      <a href="/news">News</a>
+    </nav>
+    <span class="head-spacer"></span>
+    <a class="btn-tickets" href="https://dice.fm/sottosopra?utm_source=sito&utm_medium=header" target="_blank" rel="noopener">Biglietti <span class="arr">↗</span></a>
+    <button class="head-burger" id="burger" aria-label="Apri menu" aria-expanded="false" aria-controls="drawer">
+      <svg class="ic-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="21" y2="17"/></svg>
+      <svg class="ic-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- mobile full-screen drawer -->
+<nav class="drawer" id="drawer" aria-label="Menu mobile">
+  <a class="dnav" href="/programma">Programma</a>
+  <a class="dnav" href="/info">Info</a>
+  <a class="dnav" href="/about">About</a>
+  <a class="dnav" href="/news">News</a>
+  <button class="dflip" id="flipBtnMobile" type="button">CAPOVOLGI ↕</button>
+  <div class="dmeta">
+    30 LUG — 2 AGO 2026<br>
+    <a href="/info">GIARDINI DEL CASTELLO · CASTELFRANCO VENETO</a><br>
+    <a href="mailto:info@sottosopra.com">INFO@SOTTOSOPRA.COM</a>
+  </div>
+</nav>
+
+<main id="main">
+
+<!-- ===================== 01 · HERO — calm, asymmetric, one focus ===================== -->
+<section class="hero shell" aria-label="Edizione 2026">
+  <div class="hero-edition">SOTTOSOPRA · 8ª EDIZIONE</div>
+  <h1 class="hero-claim">
+    <span class="l1 flipS">SEMPRE</span><span class="l2 flipS">SOTTOSOPRA</span>
+  </h1>
+  <div class="hero-facts">
+    <span>30 LUG — 2 AGO 2026</span>
+    <span class="sep">·</span>
+    <span>GIARDINI DEL CASTELLO</span>
+    <span class="sep">·</span>
+    <span>CASTELFRANCO VENETO</span>
+  </div>
+  <div class="hero-actions">
+    <a class="h-buy" id="heroBuy" href="https://dice.fm/sottosopra?utm_source=sito&utm_medium=home" target="_blank" rel="noopener">BIGLIETTI <span class="arr">↗</span></a>
+    <a class="h-prog" href="/programma">PROGRAMMA</a>
+  </div>
+</section>
+
+<!-- RIBBON — the spine, pass 1 -->
+<div class="ribbon" aria-hidden="true" data-ribbon>
+  <div class="ribbon-track" data-ribbon-track>
+    <span>CAMBIA IL PUNTO DI VISTA</span><span class="dot">●</span>
+    <span>31 LUG / 01 / 02 AGO</span><span class="dot">●</span>
+    <span>GIARDINI DEL CASTELLO</span><span class="dot">●</span>
+    <span>CAMBIA IL PUNTO DI VISTA</span><span class="dot">●</span>
+    <span>31 LUG / 01 / 02 AGO</span><span class="dot">●</span>
+    <span>GIARDINI DEL CASTELLO</span><span class="dot">●</span>
+  </div>
+</div>
+
+<!-- ===================== 02 · LE 4 DATE — spacious ===================== -->
+<section class="chapter shell" aria-label="Le quattro giornate">
+  <div class="chapter-index"><span class="num">02</span><span>LE DATE</span><span class="bar"></span></div>
+  <div class="dates-head">
+    <h2 class="dh-ttl reveal"><span class="rl flipS">QUATTRO SERATE</span></h2>
+    <span class="tag">UNA PER OGNI MONDO · 2026</span>
+  </div>
+
+  <div class="dates-list">
+
+    <!-- GIO 30 — FREE -->
+    <div class="date-row">
+      <div class="dr-num"><span class="d flipS">30</span><span class="m">LUG</span></div>
+      <div class="dr-mid">
+        <div class="dr-dow">GIOVEDÌ · <span class="free">INGRESSO GRATIS</span> · TALK</div>
+        <div class="dr-acts">
+          <span class="a flipS">ADRIAN FARTADE</span>
+        </div>
+      </div>
+      <a class="dr-cta free" href="https://dice.fm/sottosopra-giovedi-free?utm_source=sito&utm_medium=home&utm_campaign=giovedi-free" target="_blank" rel="noopener" aria-label="Giovedì 30 luglio, ingresso gratuito, iscriviti su DICE">FREE — ISCRIVITI <span class="arr">↗</span></a>
+    </div>
+
+    <!-- VEN 31 -->
+    <div class="date-row">
+      <div class="dr-num"><span class="d flipS">31</span><span class="m">LUG</span></div>
+      <div class="dr-mid">
+        <div class="dr-dow">VENERDÌ · LIVE</div>
+        <div class="dr-acts">
+          <span class="a flipS">GENERIC ANIMAL</span><span class="sep">·</span><span class="a flipS">DEGHEIO</span><span class="sep">·</span><span class="a flipS">KRANO</span><span class="sep">·</span><span class="a flipS">CAVALLI MONGOLI</span>
+        </div>
+      </div>
+      <a class="dr-cta" href="https://dice.fm/sottosopra?utm_source=sito&utm_medium=home&utm_campaign=venerdi" target="_blank" rel="noopener" aria-label="Venerdì 31 luglio, biglietti su DICE">BIGLIETTI <span class="arr">↗</span></a>
+    </div>
+
+    <!-- SAB 01 -->
+    <div class="date-row">
+      <div class="dr-num"><span class="d flipS">01</span><span class="m">AGO</span></div>
+      <div class="dr-mid">
+        <div class="dr-dow">SABATO · LIVE</div>
+        <div class="dr-acts">
+          <span class="a flipS">POPA</span><span class="sep">·</span><span class="a flipS">VENDREDI SUR MER</span><span class="sep">·</span><span class="a flipS">FACCIANUVOLA</span>
+        </div>
+      </div>
+      <a class="dr-cta" href="https://dice.fm/sottosopra?utm_source=sito&utm_medium=home&utm_campaign=sabato" target="_blank" rel="noopener" aria-label="Sabato 1 agosto, biglietti su DICE">BIGLIETTI <span class="arr">↗</span></a>
+    </div>
+
+    <!-- DOM 02 -->
+    <div class="date-row">
+      <div class="dr-num"><span class="d flipS">02</span><span class="m">AGO</span></div>
+      <div class="dr-mid">
+        <div class="dr-dow">DOMENICA · LIVE</div>
+        <div class="dr-acts">
+          <span class="a flipS">JESSE THE FACCIO</span><span class="sep">·</span><span class="a flipS">AURORO BOREALO</span><span class="sep">·</span><span class="a flipS">EX-OTAGO</span>
+        </div>
+      </div>
+      <a class="dr-cta" href="https://dice.fm/sottosopra?utm_source=sito&utm_medium=home&utm_campaign=domenica" target="_blank" rel="noopener" aria-label="Domenica 2 agosto, biglietti su DICE">BIGLIETTI <span class="arr">↗</span></a>
+    </div>
+
+  </div>
+
+  <div class="dates-foot">
+    <span class="note">GIOVEDÌ GRATIS · ABBONAMENTO 3 GIORNI DISPONIBILE</span>
+    <a class="pass" href="https://dice.fm/sottosopra?utm_source=sito&utm_medium=home&utm_campaign=full-pass" target="_blank" rel="noopener">FULL PASS <span class="arr">↗</span></a>
+  </div>
+</section>
+
+<!-- RIBBON — pass 2 -->
+<div class="ribbon" aria-hidden="true" data-ribbon>
+  <div class="ribbon-track" data-ribbon-track>
+    <span>SEMPRE SOTTOSOPRA</span><span class="dot">●</span>
+    <span>ARTE · MUSICA · CORPO · FESTA</span><span class="dot">●</span>
+    <span>DAL 2017</span><span class="dot">●</span>
+    <span>SEMPRE SOTTOSOPRA</span><span class="dot">●</span>
+    <span>ARTE · MUSICA · CORPO · FESTA</span><span class="dot">●</span>
+    <span>DAL 2017</span><span class="dot">●</span>
+  </div>
+</div>
+
+<!-- ===================== 03 · LINEUP teaser ===================== -->
+<section class="chapter shell" aria-label="Lineup">
+  <div class="chapter-index"><span class="num">03</span><span>LINEUP</span><span class="bar"></span></div>
+  <div class="lineup-head">
+    <h2 class="lh-ttl reveal"><span class="rl flipS">CHI SUONA</span></h2>
+    <span class="tag">LINE-UP IN AGGIORNAMENTO</span>
+  </div>
+
+  <div class="lu-day">
+    <div class="lu-daylabel"><span>GIOVEDÌ — TALK · FREE</span><span class="dt">30 LUG</span></div>
+    <div class="lu-acts">
+      <a href="/programma" class="flipS">ADRIAN FARTADE</a>
+    </div>
+  </div>
+
+  <div class="lu-day">
+    <div class="lu-daylabel"><span>VENERDÌ — LIVE</span><span class="dt">31 LUG</span></div>
+    <div class="lu-acts">
+      <a href="/programma" class="flipS">GENERIC ANIMAL</a><span class="sep">·</span><a href="/programma" class="flipS">DEGHEIO</a><span class="sep">·</span><a href="/programma" class="flipS">KRANO</a><span class="sep">·</span><a href="/programma" class="flipS">CAVALLI MONGOLI</a>
+    </div>
+  </div>
+
+  <div class="lu-day">
+    <div class="lu-daylabel"><span>SABATO — LIVE</span><span class="dt">01 AGO</span></div>
+    <div class="lu-acts">
+      <a href="/programma" class="flipS">POPA</a><span class="sep">·</span><a href="/programma" class="flipS">VENDREDI SUR MER</a><span class="sep">·</span><a href="/programma" class="flipS">FACCIANUVOLA</a>
+    </div>
+  </div>
+
+  <div class="lu-day">
+    <div class="lu-daylabel"><span>DOMENICA — LIVE</span><span class="dt">02 AGO</span></div>
+    <div class="lu-acts">
+      <a href="/programma" class="flipS">JESSE THE FACCIO</a><span class="sep">·</span><a href="/programma" class="flipS">AURORO BOREALO</a><span class="sep">·</span><a href="/programma" class="flipS">EX-OTAGO</a>
+    </div>
+  </div>
+
+  <div class="lineup-more">
+    <a href="/programma">TUTTO IL PROGRAMMA ↗</a>
+  </div>
+</section>
+
+<!-- RIBBON — pass 3 -->
+<div class="ribbon" aria-hidden="true" data-ribbon>
+  <div class="ribbon-track" data-ribbon-track>
+    <span>NON SOLO CONCERTI</span><span class="dot">●</span>
+    <span>TALK · WORKSHOP · LIBRI · SPORT · SOFT CLUBBING</span><span class="dot">●</span>
+    <span>NON SOLO CONCERTI</span><span class="dot">●</span>
+    <span>TALK · WORKSHOP · LIBRI · SPORT · SOFT CLUBBING</span><span class="dot">●</span>
+  </div>
+</div>
+
+<!-- ===================== 04 · MANIFESTO ===================== -->
+<section class="chapter shell" aria-label="Manifesto">
+  <div class="chapter-index"><span class="num">04</span><span>MANIFESTO</span><span class="bar"></span></div>
+  <div class="manifesto">
+    <div class="mf-eyebrow">CHI SIAMO</div>
+    <p class="mf-line reveal">
+      <span class="rl flipS">CAMBIA</span><span class="rl d1 flipS">IL PUNTO</span><span class="rl d2 flipS">DI VISTA.</span>
+    </p>
+    <a class="mf-cta" href="/about">CHI SIAMO ↗</a>
+  </div>
+</section>
+
+<!-- ===================== 05 · ESPERIENZE — one line ===================== -->
+<section class="chapter--tight shell" aria-label="Esperienze">
+  <div class="chapter-index"><span class="num">05</span><span>ESPERIENZE</span><span class="bar"></span></div>
+  <p class="exp-line">
+    NON SOLO CONCERTI: <span class="dim flipS">TALK, WORKSHOP, LIBRI, SPORT, SOFT CLUBBING.</span>
+  </p>
+</section>
+
+<!-- RIBBON — pass 4 -->
+<div class="ribbon" aria-hidden="true" data-ribbon>
+  <div class="ribbon-track" data-ribbon-track>
+    <span>IL FESTIVAL LO FACCIAMO IN OTTANTA</span><span class="dot">●</span>
+    <span>MANCHI SOLO TU</span><span class="dot">●</span>
+    <span>IL FESTIVAL LO FACCIAMO IN OTTANTA</span><span class="dot">●</span>
+    <span>MANCHI SOLO TU</span><span class="dot">●</span>
+  </div>
+</div>
+
+<!-- ===================== 06 · PARTECIPA ===================== -->
+<section class="chapter shell" aria-label="Partecipa">
+  <div class="chapter-index"><span class="num">06</span><span>PARTECIPA</span><span class="bar"></span></div>
+  <div class="partecipa-head">
+    <h2 class="ph-ttl reveal"><span class="rl flipS">FAI PARTE</span></h2>
+  </div>
+  <div class="cta-grid">
+    <div class="cta-cell">
+      <span class="eyebrow">VOLONTARI*</span>
+      <h3 class="flipS">IN OTTANTA</h3>
+      <p>IL FESTIVAL LO FACCIAMO IN OTTANTA — MANCHI SOLO TU*.</p>
+      <a class="cta-link" href="/about#volontari">DIVENTA VOLONTARI* <span class="arr">↗</span></a>
+    </div>
+    <div class="cta-cell">
+      <span class="eyebrow">NEWSLETTER</span>
+      <h3 class="flipS">PRIMA DI TUTTI</h3>
+      <p>DATE, LINE-UP E BIGLIETTI PRIMA DI TUTTI. NIENTE SPAM.</p>
+      <form class="nl-form" onsubmit="return false">
+        <input type="email" placeholder="LA-TUA@EMAIL.IT" aria-label="La tua email" required>
+        <button type="submit">ISCRIVITI</button>
+      </form>
+      <label class="nl-consent">
+        <input type="checkbox" required>
+        <span>Acconsento al trattamento dei dati per ricevere la newsletter. <a href="/privacy">Privacy</a>.</span>
+      </label>
+    </div>
+  </div>
+</section>
+
+<!-- RIBBON — pass 5 -->
+<div class="ribbon" aria-hidden="true" data-ribbon>
+  <div class="ribbon-track" data-ribbon-track>
+    <span>LO RENDONO POSSIBILE</span><span class="dot">●</span>
+    <span>EDIZIONE 2026</span><span class="dot">●</span>
+    <span>LO RENDONO POSSIBILE</span><span class="dot">●</span>
+    <span>EDIZIONE 2026</span><span class="dot">●</span>
+    <span>LO RENDONO POSSIBILE</span><span class="dot">●</span>
+    <span>EDIZIONE 2026</span><span class="dot">●</span>
+  </div>
+</div>
+
+<!-- ===================== 07 · PARTNER — 3 marquees ===================== -->
+<section class="chapter shell" aria-label="Partner">
+  <div class="chapter-index"><span class="num">07</span><span>PARTNER</span><span class="bar"></span></div>
+  <div class="partners-head">
+    <h2 class="pa-ttl reveal"><span class="rl flipS">LO RENDONO POSSIBILE</span></h2>
+  </div>
+
+  <div class="partners-rail">
+    <!-- TIER 1 — MAIN PARTNER -->
+    <div class="p-tier">
+      <span class="p-label">MAIN PARTNER</span>
+      <div class="p-flow">
+        <div class="p-track t1">
+          <a class="chip" href="#" rel="noopener">AZIMUT</a>
+          <a class="chip" href="#" rel="noopener">BANCA TERRE VENETE</a>
+          <a class="chip" href="#" rel="noopener">CECCATO</a>
+          <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">AZIMUT</a>
+          <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">BANCA TERRE VENETE</a>
+          <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">CECCATO</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIER 2 — PARTNER -->
+    <div class="p-tier">
+      <span class="p-label">PARTNER</span>
+      <div class="p-flow">
+        <div class="p-track t2">
+          <a class="chip" href="#" rel="noopener">PRODECO</a>
+          <a class="chip" href="#" rel="noopener">CNA</a>
+          <a class="chip" href="#" rel="noopener">ADRIATICA STRADE</a>
+          <a class="chip" href="#" rel="noopener">MERIEUX</a>
+          <a class="chip" href="#" rel="noopener">LIBRERIA ZABARELLA</a>
+          <a class="chip" href="#" rel="noopener">COOP L’INCONTRO</a>
+          <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">PRODECO</a>
+          <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">CNA</a>
+          <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">ADRIATICA STRADE</a>
+          <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">MERIEUX</a>
+          <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">LIBRERIA ZABARELLA</a>
+          <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">COOP L’INCONTRO</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIER 3 — SUPPORTER -->
+    <div class="p-tier">
+      <span class="p-label">SUPPORTER</span>
+      <div class="p-flow">
+        <div class="p-track t3">
+          <a class="chip" href="#" rel="noopener">ATLANTIS</a>
+          <a class="chip" href="#" rel="noopener">EUREKA</a>
+          <a class="chip" href="#" rel="noopener">COMUNE DI CASTELFRANCO</a>
+          <a class="chip" href="#" rel="noopener">PRO LOCO</a>
+          <a class="chip" href="#" rel="noopener">AVIS CASTELFRANCO</a>
+          <a class="chip" href="#" rel="noopener">BIRRA ANTONIANA</a>
+          <a class="chip" href="#" rel="noopener">CAFFÈ DIEMME</a>
+          <a class="chip" href="#" rel="noopener">RADIO COMPANY</a>
+          <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">ATLANTIS</a>
+          <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">EUREKA</a>
+          <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">COMUNE DI CASTELFRANCO</a>
+          <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">PRO LOCO</a>
+          <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">AVIS CASTELFRANCO</a>
+          <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">BIRRA ANTONIANA</a>
+          <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">CAFFÈ DIEMME</a>
+          <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">RADIO COMPANY</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="partners-foot">VUOI SOSTENERE L’EDIZIONE 2026? <a href="mailto:info@sottosopra.com">INFO@SOTTOSOPRA.COM</a></p>
+</section>
+
+</main>
+
+<!-- ===================== NOW PLAYING (fixed desktop / static above footer mobile) ===================== -->
+<div class="np-bar" role="status" aria-label="Ora in cassa">
+  <div class="np-now">
+    <span class="np-cover" aria-hidden="true"></span>
+    <span class="np-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <span class="np-label">NOW PLAYING</span>
+  </div>
+  <div class="np-feed" aria-hidden="true">
+    <div class="np-track">
+      <span>GENERIC ANIMAL — LIMONATA <span class="dot">●</span> VENDREDI SUR MER — ÉCOUTE CHÉRIE <span class="dot">●</span> EX-OTAGO — CINGHIALI <span class="dot">●</span> AURORO BOREALO — TUTTO BENE <span class="dot">●</span> KRANO — LIVE <span class="dot">●</span> POPA — SOUL <span class="dot">●</span> </span>
+      <span>GENERIC ANIMAL — LIMONATA <span class="dot">●</span> VENDREDI SUR MER — ÉCOUTE CHÉRIE <span class="dot">●</span> EX-OTAGO — CINGHIALI <span class="dot">●</span> AURORO BOREALO — TUTTO BENE <span class="dot">●</span> KRANO — LIVE <span class="dot">●</span> POPA — SOUL <span class="dot">●</span> </span>
+    </div>
+  </div>
+  <a class="np-spotify" href="https://open.spotify.com/playlist/sottosopra" target="_blank" rel="noopener">ASCOLTA SU SPOTIFY <span class="arr">↗</span></a>
+</div>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="site-foot">
+  <div class="foot-grid">
+    <div class="foot-cell">
+      <div class="big flipS">30·07<br>— 2·08<br>’26</div>
+    </div>
+    <div class="foot-cell">
+      <span class="eyebrow">NAVIGA</span>
+      <a href="/programma">Programma</a>
+      <a href="/info">Info</a>
+      <a href="/about">About</a>
+      <a href="/news">News</a>
+    </div>
+    <div class="foot-cell">
+      <span class="eyebrow">CONTATTI</span>
+      <a href="mailto:info@sottosopra.com">info@sottosopra.com</a>
+      <a href="https://instagram.com/sottosoprafestival" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://facebook.com/sottosoprafestival" target="_blank" rel="noopener">Facebook</a>
+      <a class="tk" href="https://dice.fm/sottosopra?utm_source=sito&utm_medium=footer" target="_blank" rel="noopener">BIGLIETTI ↗</a>
+    </div>
+  </div>
+  <div class="foot-foot">
+    <span class="flipS">SOTTOSOPRA APS · CAMBIA IL PUNTO DI VISTA</span>
+    <span class="ll">
+      <img src="/brand/sottosopra-logo-white.png" alt="Sottosopra">
+      <a href="/privacy">Privacy</a><a href="/cookie">Cookie</a>
+    </span>
+  </div>
+</footer>
+
+<!-- ===================== STICKY BOTTOM CTA (mobile) ===================== -->
+<div class="sticky-cta" aria-label="Azioni rapide">
+  <a class="sc-tickets" href="https://dice.fm/sottosopra?utm_source=sito&utm_medium=sticky" target="_blank" rel="noopener">Biglietti <span class="arr">↗</span></a>
+  <a class="sc-prog" href="/programma">Programma</a>
+</div>
+
+<script>
+(function(){
+  var body=document.body;
+  var reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  /* ---- mobile drawer + focus-trap ---- */
+  var burger=document.getElementById("burger");
+  var drawer=document.getElementById("drawer");
+  function setDrawer(open){
+    drawer.classList.toggle("open",open);
+    body.classList.toggle("drawer-open",open);
+    burger.setAttribute("aria-expanded",open?"true":"false");
+    burger.setAttribute("aria-label",open?"Chiudi menu":"Apri menu");
+    if(open){var f=drawer.querySelector("a[href],button");if(f)f.focus();}
+  }
+  if(burger&&drawer){
+    burger.addEventListener("click",function(){setDrawer(!drawer.classList.contains("open"))});
+    drawer.querySelectorAll("a.dnav").forEach(function(a){
+      a.addEventListener("click",function(){setDrawer(false)});
+    });
+    document.addEventListener("keydown",function(e){
+      if(e.key==="Escape"&&drawer.classList.contains("open")){setDrawer(false);burger.focus();}
+    });
+    drawer.addEventListener("keydown",function(e){
+      if(e.key!=="Tab"||!drawer.classList.contains("open"))return;
+      var f=drawer.querySelectorAll("a[href],button");
+      if(!f.length)return;
+      var first=f[0],last=f[f.length-1];
+      if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
+      else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
+    });
+  }
+
+  /* ---- palette-invert easter egg: key "S" (desktop) + drawer button ---- */
+  function toggleInvert(){
+    var dark=body.getAttribute("data-theme")==="dark";
+    body.setAttribute("data-theme",dark?"light":"dark");
+  }
+  document.addEventListener("keydown",function(e){
+    if(e.key==="s"||e.key==="S"){
+      var t=e.target.tagName;
+      if(t==="INPUT"||t==="TEXTAREA"||e.metaKey||e.ctrlKey||e.altKey)return;
+      toggleInvert();
+    }
+  });
+  var fm=document.getElementById("flipBtnMobile");
+  if(fm)fm.addEventListener("click",function(){toggleInvert();setDrawer(false);});
+
+  if(reduce)return;
+
+  /* ---- KINETIC RIBBON: scroll-reactive speed (the signature) ---- */
+  /* Each ribbon track owns a position; base drift + a boost from scroll velocity.
+     Wraps seamlessly because each track holds two identical halves (-50% loop). */
+  var ribbons=[].slice.call(document.querySelectorAll('[data-ribbon-track]')).map(function(track){
+    return {el:track, x:0, w:0};
+  });
+  function measure(){ribbons.forEach(function(r){r.w=r.el.scrollWidth/2;});}
+  measure();
+  window.addEventListener('resize',measure);
+
+  var lastY=window.scrollY, vel=0;
+  window.addEventListener('scroll',function(){
+    var y=window.scrollY;
+    vel=Math.min(Math.abs(y-lastY),120); // clamp burst
+    lastY=y;
+  },{passive:true});
+
+  var base=0.45;            // px/frame idle drift
+  function raf(){
+    vel*=0.90;             // decay toward idle
+    var step=base + vel*0.12;
+    ribbons.forEach(function(r){
+      if(!r.w){return;}
+      r.x-=step;
+      if(r.x<=-r.w)r.x+=r.w;
+      r.el.style.transform='translateX('+r.x.toFixed(2)+'px)';
+    });
+    requestAnimationFrame(raf);
+  }
+  requestAnimationFrame(raf);
+
+  /* ---- clip-reveal for section titles ---- */
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}
+      });
+    },{rootMargin:'0px 0px -12% 0px',threshold:.2});
+    document.querySelectorAll('.reveal').forEach(function(el){io.observe(el);});
+  }else{
+    document.querySelectorAll('.reveal').forEach(function(el){el.classList.add('in');});
+  }
+
+  /* ---- magnetic micro-physics on the primary hero CTA (desktop, fine pointer only) ---- */
+  if(matchMedia('(pointer:fine)').matches){
+    var buy=document.getElementById('heroBuy');
+    if(buy){
+      buy.addEventListener('mousemove',function(e){
+        var r=buy.getBoundingClientRect();
+        var dx=(e.clientX-(r.left+r.width/2))/r.width;
+        var dy=(e.clientY-(r.top+r.height/2))/r.height;
+        buy.style.transform='translate('+(dx*7).toFixed(1)+'px,'+(dy*6).toFixed(1)+'px)';
+      });
+      buy.addEventListener('mouseleave',function(){buy.style.transform='';});
+    }
+  }
+})();
+</script>
+
+<!-- SCROLL-S-FLIP (verificato): default S dritta, scrollando -> scaleY(-1) rovesciata -->
+<style>
+.sflip{display:inline-block;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.sflip.is-flipped{transform:scaleY(-1)}
+@media(prefers-reduced-motion:reduce){.sflip{transition:none;transform:none!important}}
+/* palette invert (S easter-egg): page flips white<->black; footer stays the inverse of the page */
+body[data-theme="dark"]{--bg:#000;--fg:#fff;--muted:#9A9A9A;--line:#262626;--elev:#141414}
+body[data-theme="dark"] .head-logo img{filter:invert(1)}
+body[data-theme="dark"] .site-foot{background:#fff;color:#000}
+body[data-theme="dark"] .site-foot .foot-cell,
+body[data-theme="dark"] .site-foot .foot-foot{border-color:rgba(0,0,0,.2)}
+body[data-theme="dark"] .site-foot .foot-cell{border-left-color:rgba(0,0,0,.2);border-top-color:rgba(0,0,0,.2)}
+body[data-theme="dark"] .foot-foot img{filter:invert(1)}
+body{transition:background .35s ease,color .35s ease}
+</style>
+<script>
+(function(){
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  // avvolgi ogni "S" negli elementi .flipS (devono contenere SOLO testo UPPERCASE, niente tag figli)
+  document.querySelectorAll('.flipS').forEach(function(h){
+    h.innerHTML=h.innerHTML.replace(/S/g,'<span class="sflip">S</span>');
+  });
+  var L=[].slice.call(document.querySelectorAll('.sflip')),tick=false;
+  function upd(){tick=false;var line=innerHeight*0.5;
+    L.forEach(function(el){el.classList.toggle('is-flipped', el.getBoundingClientRect().top<line);});}
+  addEventListener('scroll',function(){if(!tick){tick=true;requestAnimationFrame(upd)}},{passive:true});
+  addEventListener('resize',upd);
+  setTimeout(upd,500); // hero: flip animato poco dopo il load, il resto scrollando
+})();
+</script>
+</body>
+</html>

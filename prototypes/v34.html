@@ -1,0 +1,652 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SOTTOSOPRA — Capovolta editoriale</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+@font-face{
+  font-family:"SoSo26";
+  src:url("/fonts/SoSo26.woff") format("woff");
+  font-weight:normal;
+  font-style:normal;
+  font-display:swap;
+}
+
+:root{
+  --black:#000;
+  --c2:#262626;
+  --c4:#6b6b6b;
+  --c5:#9a9a9a;
+  --c6:#e4e4e4;
+  --c7:#f4f4f4;
+  --white:#fff;
+
+  /* token semantici invertibili — SOLO il toggle utente li scambia, MAI lo scroll */
+  --bg:var(--white);
+  --fg:var(--black);
+  --line:var(--black);
+  --muted:var(--c4);
+
+  --flip-ms:0.6s;
+}
+
+/* INVERSIONE PALETTE — gesto intenzionale dell'utente (tasto S / bottone). Non legato allo scroll. */
+html[data-theme="dark"]{
+  --bg:var(--black);
+  --fg:var(--white);
+  --line:var(--white);
+  --muted:var(--c5);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+
+body{
+  background:var(--bg);
+  color:var(--fg);
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:16px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  /* transizione SOLO sul cambio tema intenzionale; lo scroll non tocca la palette */
+  transition:background var(--flip-ms) ease,color var(--flip-ms) ease;
+}
+
+/* contenitore che si capovolge — gesto firma su azione utente */
+#world{
+  position:relative;
+  transform-origin:center center;
+  transition:transform var(--flip-ms) cubic-bezier(.7,0,.3,1);
+}
+html[data-flipped="true"] #world{ transform:rotate(180deg); }
+
+.display{
+  font-family:"SoSo26","Inter",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  font-weight:normal;
+  line-height:0.88;
+  letter-spacing:-0.015em;
+}
+.eyebrow{
+  font-family:"Inter";font-size:12px;font-weight:600;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+}
+.meta{
+  font-family:"Inter";font-size:11px;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;
+}
+
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+
+/* ============ HEADER ============ */
+header{
+  position:sticky;top:0;z-index:200;
+  background:var(--bg);
+  border-bottom:1px solid var(--line);
+  transition:background var(--flip-ms) ease;
+}
+.bar{
+  max-width:1280px;margin:0 auto;padding:0 32px;
+  height:64px;display:flex;align-items:center;justify-content:space-between;gap:24px;
+}
+.logo{display:flex;align-items:center;height:20px}
+.logo img{height:20px;width:auto}
+.logo .dark-only{display:none}
+html[data-theme="dark"] .logo .light-only{display:none}
+html[data-theme="dark"] .logo .dark-only{display:block}
+
+nav.main{display:flex;gap:28px;align-items:center}
+nav.main a{font-size:13px;font-weight:500;letter-spacing:.02em;position:relative;padding:4px 0}
+nav.main a::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:1px;background:var(--fg);transition:right .25s ease}
+nav.main a:hover::after{right:0}
+
+.header-right{display:flex;align-items:center;gap:12px}
+
+/* tasto S — gesto sottosopra, sobrio */
+.flipbtn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  height:34px;width:34px;padding:0;
+  border:1px solid var(--fg);
+  background:var(--bg);color:var(--fg);
+  cursor:pointer;
+  transition:background .2s ease,color .2s ease;
+}
+.flipbtn .key{
+  font-family:"SoSo26","Inter",sans-serif;font-feature-settings:"ss07","ss08";
+  font-size:17px;line-height:1;display:inline-block;
+  transition:transform var(--flip-ms) cubic-bezier(.7,0,.3,1);
+}
+.flipbtn:hover{background:var(--fg);color:var(--bg)}
+.flipbtn[aria-pressed="true"] .key{transform:rotate(180deg)}
+
+.btn-tickets{
+  display:inline-flex;align-items:center;height:34px;padding:0 18px;
+  background:var(--fg);color:var(--bg);
+  border:1px solid var(--fg);
+  font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase;
+  transition:background .2s ease,color .2s ease;
+}
+.btn-tickets:hover{background:var(--bg);color:var(--fg)}
+
+/* hamburger — nascosto su desktop */
+.burger{
+  display:none;
+  width:38px;height:34px;border:1px solid var(--fg);background:var(--bg);
+  cursor:pointer;align-items:center;justify-content:center;flex-direction:column;gap:5px;
+}
+.burger span{display:block;width:18px;height:2px;background:var(--fg);transition:transform .25s ease,opacity .2s ease}
+.burger[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+.burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+/* drawer mobile */
+.drawer{
+  display:none;
+  position:fixed;inset:64px 0 0 0;z-index:190;
+  background:var(--bg);
+  border-top:1px solid var(--line);
+  padding:24px;
+  flex-direction:column;
+}
+.drawer.open{display:flex}
+.drawer a.dl{
+  font-family:"SoSo26","Inter",sans-serif;font-feature-settings:"ss07","ss08","liga","calt";
+  font-size:2.6rem;line-height:1.15;padding:10px 0;border-bottom:1px solid var(--line);
+}
+.drawer .btn-tickets{height:56px;margin-top:24px;font-size:15px;justify-content:center}
+.drawer .flip-line{
+  margin-top:20px;display:flex;align-items:center;gap:12px;
+  font-family:"Inter";font-size:13px;font-weight:600;letter-spacing:.04em;color:var(--muted);
+}
+.drawer .flip-line button{
+  width:42px;height:42px;border:1px solid var(--fg);background:var(--bg);color:var(--fg);cursor:pointer;
+  font-family:"SoSo26","Inter",sans-serif;font-feature-settings:"ss07","ss08";font-size:18px;
+}
+
+/* ============ HERO — gesto sottosopra specchiato, FIRMA ============ */
+.hero{position:relative;border-bottom:1px solid var(--line)}
+.hero-half{position:relative;overflow:hidden;height:42vh;min-height:280px;max-height:440px;display:flex;flex-direction:column}
+.hero-top{background:var(--bg);color:var(--fg);justify-content:flex-end}
+.hero-bottom{background:var(--fg);color:var(--bg);justify-content:flex-start}
+
+.giant{
+  font-family:"SoSo26","Inter",sans-serif;font-feature-settings:"ss07","ss08","liga","calt";
+  font-size:clamp(4.5rem,21vw,17rem);
+  line-height:.8;
+  letter-spacing:-0.02em;
+  text-align:center;
+  width:100%;
+}
+.hero-bottom .giant{transform:rotate(180deg)}
+
+.hero-meta{position:absolute;z-index:6}
+.meta-tl{top:18px;left:32px}
+.meta-tr{top:18px;right:32px;text-align:right;line-height:1.5}
+.hero-bottom .bm{position:absolute;z-index:6}
+.bm-bl{bottom:18px;left:32px;transform:rotate(180deg);transform-origin:left center}
+
+/* asse di specchiatura: DATE GIGANTI + biglietti subito (pattern vincente 06) */
+.axis{
+  position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);
+  z-index:5;display:flex;align-items:center;justify-content:center;
+}
+.axis-rail{
+  width:100%;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  background:var(--bg);
+  min-height:72px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;gap:24px;
+  transition:background var(--flip-ms) ease;
+}
+.axis-dates{
+  font-family:"SoSo26","Inter",sans-serif;font-feature-settings:"ss07","ss08";
+  font-size:clamp(1.5rem,4.4vw,3rem);
+  letter-spacing:.01em;font-variant-numeric:tabular-nums;
+  display:flex;gap:.4em;align-items:baseline;
+}
+.axis-dates .sep{opacity:.35}
+.axis-dates .mo{font-size:.5em;letter-spacing:.06em;align-self:center}
+.axis-cta{
+  display:inline-flex;align-items:center;height:46px;padding:0 22px;white-space:nowrap;
+  background:var(--fg);color:var(--bg);border:1px solid var(--fg);
+  font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase;
+  transition:background .2s ease,color .2s ease;
+}
+.axis-cta:hover{background:var(--bg);color:var(--fg)}
+
+/* riga claim — minimale, due voci */
+.claimrow{border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr}
+.claimrow > *{padding:20px 32px}
+.claimrow .right{text-align:right;border-left:1px solid var(--line)}
+.claimrow .big{font-family:"SoSo26","Inter",sans-serif;font-feature-settings:"ss07","ss08";font-size:clamp(1.1rem,2.2vw,1.5rem);letter-spacing:.01em;margin-top:6px}
+
+/* ============ LINEUP — essenziale ============ */
+.section{border-bottom:1px solid var(--line)}
+.sec-head{
+  display:flex;justify-content:space-between;align-items:baseline;gap:16px;
+  padding:24px 32px;border-bottom:1px solid var(--line);
+  max-width:1280px;margin:0 auto;
+}
+.sec-head h2{font-family:"SoSo26","Inter",sans-serif;font-feature-settings:"ss07","ss08","liga","calt";font-size:clamp(1.7rem,3vw,2.4rem);line-height:1}
+.sec-head .meta{color:var(--muted)}
+
+.lineup{max-width:1280px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:baseline;gap:.05em .55em;padding:40px 32px}
+.lineup a.act{
+  font-family:"SoSo26","Inter",sans-serif;font-feature-settings:"ss07","ss08","liga","calt";
+  font-size:clamp(2rem,5.4vw,4.6rem);line-height:1.02;letter-spacing:-0.02em;
+  display:inline-block;transition:opacity .2s ease;
+}
+.lineup a.act:hover{opacity:.45}
+.lineup .dot{font-size:clamp(1rem,2vw,1.6rem);color:var(--muted);transform:translateY(-.15em)}
+.lineup-foot{padding:20px 32px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;max-width:1280px;margin:0 auto;border-top:1px solid var(--line)}
+.txtlink{font-weight:600;font-size:14px;border-bottom:1px solid var(--fg);padding-bottom:2px}
+
+/* ============ NASTRO / MARQUEE — piace al team ============ */
+.ribbon{
+  background:var(--fg);color:var(--bg);
+  overflow:hidden;white-space:nowrap;
+  border-bottom:1px solid var(--line);display:flex;
+}
+.ribbon-track{
+  display:inline-flex;
+  font-family:"SoSo26","Inter",sans-serif;font-feature-settings:"ss07","ss08","liga","calt";
+  font-size:clamp(1.8rem,3.6vw,3rem);
+  letter-spacing:.04em;text-transform:uppercase;
+  padding:16px 0;
+  animation:slide 30s linear infinite;
+  will-change:transform;
+}
+.ribbon:hover .ribbon-track{animation-play-state:paused}
+.ribbon-track span{padding:0 .5em;display:inline-block}
+.ribbon-track .star{transform:rotate(180deg);opacity:.5;display:inline-block;padding:0 .35em}
+@keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ============ DATE / PROGRAMMA — tre serate, super facile ============ */
+.days{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr)}
+.day{
+  padding:40px 32px;border-right:1px solid var(--line);
+  display:flex;flex-direction:column;gap:14px;
+}
+.day:last-child{border-right:none}
+.day .dnum{font-family:"SoSo26","Inter",sans-serif;font-feature-settings:"ss07","ss08";font-size:clamp(3.2rem,7vw,5.5rem);line-height:.85;letter-spacing:-0.02em}
+.day .dwd{font-family:"Inter";font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.day .dwd b{color:var(--fg);font-weight:700}
+.day .dbtn{
+  margin-top:auto;display:inline-flex;align-items:center;align-self:flex-start;
+  height:42px;padding:0 18px;border:1px solid var(--fg);
+  font-weight:700;font-size:12px;letter-spacing:.05em;text-transform:uppercase;
+  transition:background .2s ease,color .2s ease;
+}
+.day .dbtn:hover{background:var(--fg);color:var(--bg)}
+
+/* ============ ESPERIENZE — una riga, essenziale ============ */
+.exp{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line)}
+.exp .cell{padding:30px 24px;border-right:1px solid var(--line);min-height:120px;display:flex;flex-direction:column;justify-content:space-between;gap:14px}
+.exp .cell:last-child{border-right:none}
+.exp .num{font-family:"Inter";font-size:12px;font-weight:600;letter-spacing:.06em;color:var(--muted)}
+.exp .lab{font-family:"SoSo26","Inter",sans-serif;font-feature-settings:"ss07","ss08";font-size:clamp(1.4rem,2.4vw,2rem);line-height:.95}
+
+/* ============ BLOCCHI CTA — capovolgimento riservato (micro-effetto) ============ */
+.paired{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--line);max-width:1280px;margin:0 auto}
+.pane{padding:48px 32px;min-height:240px;display:flex;flex-direction:column;justify-content:center;gap:14px}
+.pane.left{border-right:1px solid var(--line)}
+.pane.right{background:var(--fg);color:var(--bg)}
+.pane h3{font-family:"SoSo26","Inter",sans-serif;font-feature-settings:"ss07","ss08","liga","calt";font-size:clamp(2rem,4vw,3.2rem);line-height:.95}
+.pane .eyebrow{color:var(--muted)}
+.pane.right .eyebrow{color:var(--bg);opacity:.7}
+.cta{
+  display:inline-flex;align-items:center;align-self:flex-start;height:48px;padding:0 24px;
+  border:1px solid currentColor;font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase;
+  transition:background .2s ease,color .2s ease;
+}
+/* micro-gesto sottosopra: SOLO al hover dei blocchi CTA, mai allo scroll */
+.cta .lbl{display:inline-block;transition:transform .35s cubic-bezier(.7,0,.3,1)}
+.pane.left .cta:hover{background:var(--fg);color:var(--bg)}
+.pane.left .cta:hover .lbl{transform:rotate(180deg)}
+.pane.right .cta{border-color:var(--bg)}
+.pane.right .cta:hover{background:var(--bg);color:var(--fg)}
+.pane.right .cta:hover .lbl{transform:rotate(180deg)}
+
+/* ============ SPONSOR ============ */
+.sponsor{max-width:1280px;margin:0 auto;padding:40px 32px;border-bottom:1px solid var(--line)}
+.sponsor .eyebrow{margin-bottom:24px;display:block}
+.sponsor-row{display:flex;flex-wrap:wrap;border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.sponsor-row .s{
+  flex:1 1 20%;min-width:160px;
+  border-right:1px solid var(--line);border-bottom:1px solid var(--line);
+  padding:26px 20px;display:flex;align-items:center;justify-content:center;text-align:center;
+  font-family:"SoSo26","Inter",sans-serif;font-feature-settings:"ss07","ss08";font-size:1.3rem;letter-spacing:.01em;
+  transition:background .2s ease,color .2s ease;
+}
+.sponsor-row .s:hover{background:var(--fg);color:var(--bg)}
+
+/* ============ NEWSLETTER ============ */
+.nl{max-width:1280px;margin:0 auto;border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr}
+.nl .l{padding:48px 32px;border-right:1px solid var(--line)}
+.nl .l h3{font-family:"SoSo26","Inter",sans-serif;font-feature-settings:"ss07","ss08","liga","calt";font-size:clamp(1.8rem,3.4vw,2.8rem);line-height:.95;margin-bottom:10px}
+.nl .l p{color:var(--muted);font-size:14px;max-width:34ch}
+.nl .r{padding:48px 32px;display:flex;flex-direction:column;justify-content:center;gap:16px}
+.nl form{display:flex;border:1px solid var(--fg)}
+.nl input{flex:1;border:none;background:transparent;color:var(--fg);padding:15px 16px;font-family:"Inter";font-size:14px;outline:none}
+.nl input::placeholder{color:var(--muted)}
+.nl button{border:none;background:var(--fg);color:var(--bg);padding:0 22px;font-family:"Inter";font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:opacity .2s}
+.nl button:hover{opacity:.82}
+.nl .vol{font-family:"Inter";font-size:13px;color:var(--muted)}
+.nl .vol a{color:var(--fg);border-bottom:1px solid var(--fg);padding-bottom:1px;font-weight:600}
+
+/* ============ FOOTER ============ */
+footer{max-width:1280px;margin:0 auto;padding:40px 32px 64px}
+.foot-top{display:flex;justify-content:space-between;align-items:flex-start;gap:32px;flex-wrap:wrap}
+.foot-logo img{height:18px;width:auto}
+.foot-logo .dark-only{display:none}
+html[data-theme="dark"] .foot-logo .light-only{display:none}
+html[data-theme="dark"] .foot-logo .dark-only{display:block}
+.foot-col{font-family:"Inter";font-size:13px;letter-spacing:.01em;line-height:2}
+.foot-col a:hover{text-decoration:underline}
+.foot-big{
+  font-family:"SoSo26","Inter",sans-serif;font-feature-settings:"ss07","ss08","liga","calt";
+  font-size:clamp(2.8rem,13vw,11rem);line-height:.82;margin-top:44px;letter-spacing:-0.02em;
+}
+.foot-big .flip{display:inline-block;transform:rotate(180deg)}
+.foot-legal{margin-top:28px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-family:"Inter";font-size:12px;color:var(--muted)}
+.foot-legal a:hover{text-decoration:underline}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:880px){
+  nav.main{display:none}
+  .burger{display:flex}
+  .header-right .flipbtn{display:none} /* su mobile il flip vive nel drawer */
+  .claimrow{grid-template-columns:1fr}
+  .claimrow .right{text-align:left;border-left:none;border-top:1px solid var(--line)}
+  .days{grid-template-columns:1fr}
+  .day{border-right:none;border-bottom:1px solid var(--line)}
+  .day:last-child{border-bottom:none}
+  .exp{grid-template-columns:1fr 1fr}
+  .exp .cell:nth-child(2){border-right:none}
+  .exp .cell:nth-child(1),.exp .cell:nth-child(2){border-bottom:1px solid var(--line)}
+  .paired{grid-template-columns:1fr}
+  .pane.left{border-right:none;border-bottom:1px solid var(--line)}
+  .nl{grid-template-columns:1fr}
+  .nl .l{border-right:none;border-bottom:1px solid var(--line)}
+}
+@media (max-width:560px){
+  .bar{padding:0 18px}
+  .sec-head,.lineup,.lineup-foot,.sponsor,.nl .l,.nl .r,footer{padding-left:18px;padding-right:18px}
+  .day{padding:28px 18px}
+  .hero-half{height:38vh;min-height:220px}
+  .meta-tr{font-size:10px}
+  .axis-rail{flex-direction:column;align-items:flex-start;gap:14px;padding:16px 18px}
+  .axis-cta{align-self:stretch;justify-content:center}
+  .exp{grid-template-columns:1fr}
+  .exp .cell{border-right:none;border-bottom:1px solid var(--line)}
+  .exp .cell:last-child{border-bottom:none}
+  .sponsor-row .s{flex:1 1 100%}
+}
+
+/* ============ REDUCED MOTION ============ */
+@media (prefers-reduced-motion:reduce){
+  #world,.flipbtn .key,.cta .lbl{transition:none}
+  .ribbon-track{animation:none;transform:none;white-space:normal;display:block;text-align:center}
+  .ribbon-track span{padding:0 .3em}
+}
+</style>
+</head>
+<body>
+
+<div id="world">
+
+<header>
+  <div class="bar">
+    <a class="logo" href="#" aria-label="Sottosopra — home">
+      <img class="light-only" src="/brand/sottosopra-logo-black.png" alt="SOTTOSOPRA">
+      <img class="dark-only" src="/brand/sottosopra-logo-white.png" alt="SOTTOSOPRA">
+    </a>
+    <nav class="main" aria-label="Principale">
+      <a href="#">Programma</a>
+      <a href="#">Info</a>
+      <a href="#">About</a>
+      <a href="#">News</a>
+    </nav>
+    <div class="header-right">
+      <button class="flipbtn" id="flip" aria-pressed="false" aria-label="Capovolgi la pagina (tasto S)">
+        <span class="key">S</span>
+      </button>
+      <a class="btn-tickets" href="#">Biglietti</a>
+      <button class="burger" id="burger" aria-expanded="false" aria-controls="drawer" aria-label="Apri menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- drawer mobile -->
+<nav class="drawer" id="drawer" aria-label="Menu mobile">
+  <a class="dl" href="#">Programma</a>
+  <a class="dl" href="#">Info</a>
+  <a class="dl" href="#">About</a>
+  <a class="dl" href="#">News</a>
+  <a class="btn-tickets" href="#">Biglietti</a>
+  <div class="flip-line">
+    <button id="flip-m" aria-label="Capovolgi la pagina"><span class="key" style="display:inline-block">S</span></button>
+    Capovolgi
+  </div>
+</nav>
+
+<!-- ============ HERO — gesto sottosopra specchiato (firma) ============ -->
+<section class="hero" aria-label="Sottosopra 2026">
+  <div class="hero-half hero-top">
+    <span class="hero-meta meta-tl meta">8ª edizione</span>
+    <span class="hero-meta meta-tr meta">Castelfranco Veneto<br>Giardini del Castello</span>
+    <div class="giant">SOTTO</div>
+  </div>
+
+  <div class="hero-half hero-bottom">
+    <div class="giant">SOPRA</div>
+    <span class="bm bm-bl meta">Sempre Sottosopra</span>
+  </div>
+
+  <!-- asse: DATE GIGANTI + BIGLIETTI subito -->
+  <div class="axis">
+    <div class="axis-rail">
+      <div class="axis-dates">
+        <span>31</span><span class="sep">/</span><span>01</span><span class="sep">/</span><span>02</span><span class="mo">AGO ’26</span>
+      </div>
+      <a class="axis-cta" href="#">Biglietti su DICE →</a>
+    </div>
+  </div>
+</section>
+
+<!-- riga claim — due voci, niente paragrafi -->
+<div class="claimrow">
+  <div class="c-left">
+    <span class="eyebrow">2026</span>
+    <div class="big display">Sempre Sottosopra</div>
+  </div>
+  <div class="c-right right">
+    <span class="eyebrow">Dal 2017</span>
+    <div class="big display">Cambia il punto di vista</div>
+  </div>
+</div>
+
+<!-- ============ LINEUP — essenziale, nomi soli ============ -->
+<section class="section" aria-label="Lineup 2026">
+  <div class="sec-head">
+    <h2>Lineup</h2>
+    <span class="meta">In aggiornamento</span>
+  </div>
+  <div class="lineup">
+    <a class="act" href="#">Generic Animal</a><span class="dot">·</span>
+    <a class="act" href="#">Ex-Otago</a><span class="dot">·</span>
+    <a class="act" href="#">Vendredi sur Mer</a><span class="dot">·</span>
+    <a class="act" href="#">Alberto Ferrari</a><span class="dot">·</span>
+    <a class="act" href="#">Auroro Borealo</a><span class="dot">·</span>
+    <a class="act" href="#">Popa</a><span class="dot">·</span>
+    <a class="act" href="#">Krano</a><span class="dot">·</span>
+    <a class="act" href="#">Jesse The Faccio</a>
+  </div>
+  <div class="lineup-foot">
+    <span class="meta" style="color:var(--muted)">8 nomi · serate + orari nel programma</span>
+    <a class="txtlink" href="#">Tutto il programma →</a>
+  </div>
+</section>
+
+<!-- ============ NASTRO ============ -->
+<div class="ribbon" aria-hidden="true">
+  <div class="ribbon-track">
+    <span>SEMPRE SOTTOSOPRA</span><span class="star">✱</span>
+    <span>31 / 01 / 02 AGOSTO 2026</span><span class="star">✱</span>
+    <span>GIARDINI DEL CASTELLO</span><span class="star">✱</span>
+    <span>SEMPRE SOTTOSOPRA</span><span class="star">✱</span>
+    <span>31 / 01 / 02 AGOSTO 2026</span><span class="star">✱</span>
+    <span>GIARDINI DEL CASTELLO</span><span class="star">✱</span>
+  </div>
+</div>
+
+<!-- ============ DATE / PROGRAMMA — tre serate, super facile ============ -->
+<section class="section" aria-label="Le tre serate">
+  <div class="sec-head">
+    <h2>Tre serate</h2>
+    <span class="meta">Biglietti per giornata o full pass</span>
+  </div>
+  <div class="days">
+    <div class="day">
+      <div class="dnum display">31</div>
+      <div class="dwd"><b>Venerdì</b> · luglio</div>
+      <a class="dbtn" href="#">Biglietti →</a>
+    </div>
+    <div class="day">
+      <div class="dnum display">01</div>
+      <div class="dwd"><b>Sabato</b> · agosto</div>
+      <a class="dbtn" href="#">Biglietti →</a>
+    </div>
+    <div class="day">
+      <div class="dnum display">02</div>
+      <div class="dwd"><b>Domenica</b> · agosto</div>
+      <a class="dbtn" href="#">Biglietti →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ESPERIENZE — essenziale ============ -->
+<section class="section" aria-label="Esperienze">
+  <div class="sec-head">
+    <h2>Non solo musica</h2>
+    <span class="meta">Giorno + sera</span>
+  </div>
+  <div class="exp">
+    <div class="cell"><span class="num">01</span><span class="lab display">Workshop</span></div>
+    <div class="cell"><span class="num">02</span><span class="lab display">Talk</span></div>
+    <div class="cell"><span class="num">03</span><span class="lab display">Libri</span></div>
+    <div class="cell"><span class="num">04</span><span class="lab display">Brunch</span></div>
+  </div>
+</section>
+
+<!-- ============ BLOCCHI CTA — micro-gesto sottosopra al hover ============ -->
+<section class="paired" aria-label="Biglietti e volontari">
+  <div class="pane left">
+    <span class="eyebrow">Azione #1</span>
+    <h3 class="display">Prendi i biglietti</h3>
+    <a class="cta" href="#"><span class="lbl">Biglietti su DICE →</span></a>
+  </div>
+  <div class="pane right">
+    <span class="eyebrow">Entra nel team</span>
+    <h3 class="display">Diventa volontariɜ</h3>
+    <a class="cta" href="#"><span class="lbl">Candidati →</span></a>
+  </div>
+</section>
+
+<!-- ============ SPONSOR ============ -->
+<section class="sponsor" aria-label="Partner">
+  <span class="eyebrow">Con il sostegno di</span>
+  <div class="sponsor-row">
+    <div class="s display">Azimut</div>
+    <div class="s display">Ceccato</div>
+    <div class="s display">Prodeco</div>
+    <div class="s display">CNA</div>
+    <div class="s display">Banca Terre Venete</div>
+  </div>
+</section>
+
+<!-- ============ NEWSLETTER ============ -->
+<section class="nl" aria-label="Newsletter e volontari">
+  <div class="l">
+    <h3 class="display">Resta sottosopra</h3>
+    <p>Date e biglietti prima di tutti. Niente spam.</p>
+  </div>
+  <div class="r">
+    <form onsubmit="return false">
+      <input type="email" placeholder="La tua email" aria-label="Email">
+      <button type="submit">Iscrivimi</button>
+    </form>
+    <span class="vol">Vuoi dare una mano? <a href="#">Diventa volontariɜ</a></span>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="foot-top">
+    <div class="foot-logo">
+      <img class="light-only" src="/brand/sottosopra-logo-black.png" alt="SOTTOSOPRA">
+      <img class="dark-only" src="/brand/sottosopra-logo-white.png" alt="SOTTOSOPRA">
+    </div>
+    <div class="foot-col">
+      <div><a href="#">Programma</a></div><div><a href="#">Info</a></div><div><a href="#">About</a></div><div><a href="#">News</a></div>
+    </div>
+    <div class="foot-col">
+      <div><a href="mailto:info@sottosopra.com">info@sottosopra.com</a></div>
+      <div><a href="#">Instagram</a></div>
+      <div><a href="#">Facebook</a></div>
+    </div>
+  </div>
+
+  <div class="foot-big display">SOTT<span class="flip">OSOPRA</span></div>
+
+  <div class="foot-legal">
+    <span>© 2026 APS Sottosopra · Castelfranco Veneto</span>
+    <span><a href="#">Privacy</a> · <a href="#">Cookie</a></span>
+  </div>
+</footer>
+
+</div><!-- /#world -->
+
+<script>
+(function(){
+  var root=document.documentElement;
+  var flipped=false;
+  function setFlip(on){
+    flipped=on;
+    root.setAttribute('data-flipped', on?'true':'false');
+    root.setAttribute('data-theme', on?'dark':'light');
+    var b1=document.getElementById('flip'); if(b1) b1.setAttribute('aria-pressed', on?'true':'false');
+  }
+  function toggle(){ setFlip(!flipped); }
+
+  var b1=document.getElementById('flip'); if(b1) b1.addEventListener('click',toggle);
+  var bm=document.getElementById('flip-m'); if(bm) bm.addEventListener('click',toggle);
+
+  document.addEventListener('keydown',function(e){
+    if(e.target && (e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')) return;
+    if(e.key==='s'||e.key==='S'){ e.preventDefault(); toggle(); }
+  });
+
+  // hamburger drawer
+  var burger=document.getElementById('burger');
+  var drawer=document.getElementById('drawer');
+  function setMenu(open){
+    burger.setAttribute('aria-expanded', open?'true':'false');
+    burger.setAttribute('aria-label', open?'Chiudi menu':'Apri menu');
+    drawer.classList.toggle('open', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
+  burger.addEventListener('click',function(){ setMenu(!drawer.classList.contains('open')); });
+  drawer.querySelectorAll('a').forEach(function(a){ a.addEventListener('click',function(){ setMenu(false); }); });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') setMenu(false); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1161 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sottosopra 2026 — Sempre Sottosopra</title>
+<meta name="description" content="Sottosopra Festival · 8ª edizione · Castelfranco Veneto · Giardini del Castello · 31 luglio, 1, 2 agosto 2026. Cambia il punto di vista.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   SOTTOSOPRA · v27 "Liquido d'Inchiostro"
+   La folla si deforma sotto il cursore come acqua; il wordmark
+   si liquefa al passaggio del mouse. WebGL displacement (OGL)
+   con flowmap RG, split di grigi al posto dell'aberrazione RGB,
+   idle-pause del loop, fallback <img> statico sempre presente.
+   ============================================================ */
+
+@font-face{
+  font-family:"SoSo26";
+  src:url("/fonts/SoSo26.woff") format("woff");
+  font-weight:100 900;
+  font-display:swap;
+}
+
+:root{
+  --bg:#000000;
+  --fg:#FFFFFF;
+  --muted:#9A9A9A;
+  --muted-2:#6B6B6B;
+  --line:#262626;
+  --bg-elev:#141414;
+
+  --s4:4px; --s8:8px; --s16:16px; --s24:24px; --s32:32px;
+  --s48:48px; --s64:64px; --s96:96px; --s128:128px; --s192:192px;
+
+  --maxw:1320px;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--fg);
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:17px;
+  line-height:1.6;
+  font-weight:400;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  overflow-x:hidden;
+}
+
+/* ---- Display type ---- */
+.so{
+  font-family:"SoSo26","Inter",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  font-weight:700;
+  line-height:.9;
+  letter-spacing:-0.015em;
+}
+
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+
+.kicker{
+  font-family:"Inter",sans-serif;
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:.26em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+
+.wrap{
+  width:100%;
+  max-width:var(--maxw);
+  margin-inline:auto;
+  padding-inline:var(--s32);
+}
+
+/* ============================================================
+   HEADER — mix-blend difference resta leggibile su foto B/N
+   ============================================================ */
+header.site{
+  position:fixed;
+  inset:0 0 auto 0;
+  z-index:100;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:var(--s24);
+  padding:16px var(--s32);
+  mix-blend-mode:difference;
+  color:#fff;
+}
+header.site .logo img{height:22px;width:auto}
+nav.main{display:flex;gap:var(--s32);align-items:center}
+nav.main a{
+  font-size:13px;font-weight:500;letter-spacing:.05em;
+  text-transform:uppercase;
+  opacity:.9;transition:opacity .2s ease;
+}
+nav.main a:hover{opacity:1}
+.btn-tix{
+  font-family:"SoSo26","Inter",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  font-size:15px;font-weight:700;letter-spacing:.04em;
+  border:1.5px solid #fff;
+  padding:9px 20px;
+  border-radius:3px;
+  display:inline-block;
+  transition:background .2s ease,color .2s ease,transform .2s ease;
+  text-transform:uppercase;
+}
+.btn-tix:hover{background:#fff;color:#000;transform:translateY(-1px)}
+@media(max-width:860px){
+  nav.main{display:none}
+}
+
+/* ============================================================
+   HERO — foto piena (canvas WebGL sopra <img> statico)
+   ============================================================ */
+.hero{
+  position:relative;
+  height:100svh;
+  min-height:640px;
+  width:100%;
+  overflow:hidden;
+  background:#000;
+  isolation:isolate;
+}
+/* Stato statico: l'immagine reale, sempre visibile, anche senza JS */
+.hero__media{
+  position:absolute;
+  inset:0;
+  z-index:0;
+}
+.hero__media img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:50% 32%;
+  /* trattamento B/N + contrasto cinematografico */
+  filter:grayscale(1) contrast(1.18) brightness(.86);
+}
+/* il canvas si sovrappone all'<img> quando il WebGL è pronto */
+.hero__canvas{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  z-index:1;
+  opacity:0;
+  transition:opacity .6s ease;
+  pointer-events:none; /* gli eventi mouse li cattura .hero, non il canvas */
+}
+.hero.gl-ready .hero__canvas{opacity:1}
+.hero.gl-ready .hero__media img{opacity:0;transition:opacity .6s ease}
+
+/* vignettatura + leggibilità testo */
+.hero__scrim{
+  position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:
+    linear-gradient(to top, rgba(0,0,0,.82) 0%, rgba(0,0,0,.32) 34%, rgba(0,0,0,0) 60%),
+    radial-gradient(120% 90% at 70% 30%, rgba(0,0,0,0) 40%, rgba(0,0,0,.55) 100%);
+}
+
+.hero__inner{
+  position:relative;
+  z-index:3;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  padding-bottom:var(--s64);
+  pointer-events:none;
+}
+.hero__inner > *{pointer-events:auto}
+
+.hero__top{
+  position:absolute;
+  top:0;left:0;right:0;
+  padding-top:108px;
+}
+.hero__top .kicker{color:rgba(255,255,255,.82)}
+
+/* wordmark gigante che "si liquefa" — testo reale, fallback ok */
+.hero__title{
+  font-size:clamp(3.4rem, 13.5vw, 13rem);
+  line-height:.82;
+  letter-spacing:-0.02em;
+  text-transform:uppercase;
+  color:#fff;
+  margin:0;
+  mix-blend-mode:normal;
+}
+.hero__title .line{display:block}
+.hero__title .flip{display:inline-block;transform:scaleY(-1)} /* la "RA" sottosopra */
+
+.hero__meta{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:var(--s24);
+  margin-top:var(--s24);
+  border-top:1px solid rgba(255,255,255,.28);
+  padding-top:var(--s24);
+}
+.hero__claim{
+  font-size:clamp(1.6rem,3vw,2.4rem);
+  letter-spacing:-0.01em;
+  max-width:14ch;
+}
+.hero__facts{
+  display:flex;
+  gap:var(--s32);
+  flex-wrap:wrap;
+}
+.fact{
+  display:flex;flex-direction:column;gap:4px;
+  font-size:14px;
+}
+.fact b{
+  font-family:"SoSo26","Inter",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  font-weight:700;font-size:17px;letter-spacing:.01em;
+}
+.fact span{color:rgba(255,255,255,.7);font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+
+.hero__cta{
+  display:flex;gap:var(--s16);align-items:center;flex-wrap:wrap;
+  margin-top:var(--s32);
+}
+.btn{
+  font-family:"SoSo26","Inter",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  font-weight:700;text-transform:uppercase;letter-spacing:.04em;
+  font-size:16px;
+  padding:14px 28px;
+  border-radius:3px;
+  display:inline-flex;align-items:center;gap:10px;
+  transition:transform .2s var(--ease),background .2s ease,color .2s ease;
+}
+.btn--solid{background:#fff;color:#000}
+.btn--solid:hover{transform:translateY(-2px)}
+.btn--ghost{border:1.5px solid rgba(255,255,255,.55)}
+.btn--ghost:hover{border-color:#fff;transform:translateY(-2px)}
+
+/* hint interazione */
+.hero__hint{
+  position:absolute;
+  right:var(--s32);
+  bottom:var(--s32);
+  z-index:3;
+  display:flex;align-items:center;gap:10px;
+  font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:rgba(255,255,255,.7);
+  pointer-events:none;
+}
+.hero__hint .dot{
+  width:7px;height:7px;border-radius:50%;background:#fff;
+  animation:pulse 2.4s var(--ease) infinite;
+}
+@keyframes pulse{0%,100%{transform:scale(.7);opacity:.5}50%{transform:scale(1.2);opacity:1}}
+.hero__morph{
+  position:absolute;left:var(--s32);bottom:var(--s32);z-index:4;
+  display:none;align-items:center;gap:8px;
+  font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:rgba(255,255,255,.78);
+  border:1px solid rgba(255,255,255,.3);
+  border-radius:3px;padding:8px 12px;
+  transition:background .2s,color .2s,border-color .2s;
+}
+.hero.gl-ready .hero__morph{display:inline-flex}
+.hero__morph:hover{background:#fff;color:#000;border-color:#fff}
+
+/* ============================================================
+   MARQUEE firma (nastro SoSo26)
+   ============================================================ */
+.marquee{
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  background:var(--bg);
+  overflow:hidden;
+  padding:var(--s24) 0;
+}
+.marquee__track{
+  display:flex;
+  width:max-content;
+  white-space:nowrap;
+  will-change:transform;
+  animation:marquee 32s linear infinite;
+}
+.marquee__track span{
+  font-family:"SoSo26","Inter",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  font-weight:700;
+  font-size:clamp(2rem,5vw,3.4rem);
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  padding:0 var(--s48);
+  color:var(--fg);
+}
+.marquee__track span::after{content:"·";margin-left:var(--s96);color:var(--muted-2)}
+@keyframes marquee{to{transform:translateX(-50%)}}
+.marquee:hover .marquee__track{animation-play-state:paused}
+
+/* ============================================================
+   SECTION shell
+   ============================================================ */
+section{position:relative}
+.sec{padding:var(--s128) 0}
+.sec__head{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  gap:var(--s24);margin-bottom:var(--s64);flex-wrap:wrap;
+}
+.sec__title{
+  font-size:clamp(2.2rem,6vw,5rem);
+  text-transform:uppercase;line-height:.9;
+}
+.sec__num{
+  font-family:"SoSo26","Inter",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  font-weight:700;font-size:13px;letter-spacing:.2em;color:var(--muted);
+}
+
+/* reveal on scroll (enhancement; visibile di default) */
+.reveal{opacity:1;transform:none}
+.js .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.js .reveal.in{opacity:1;transform:none}
+
+/* ============================================================
+   LINEUP — lista tipografica gigante
+   ============================================================ */
+.lineup__list{
+  border-top:1px solid var(--line);
+}
+.lineup__row{
+  display:flex;align-items:baseline;justify-content:space-between;
+  gap:var(--s24);
+  padding:var(--s24) 0;
+  border-bottom:1px solid var(--line);
+  position:relative;
+  overflow:hidden;
+}
+.lineup__row .name{
+  font-family:"SoSo26","Inter",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  font-weight:700;
+  font-size:clamp(2rem,7vw,5.5rem);
+  text-transform:uppercase;line-height:.92;
+  letter-spacing:-0.01em;
+  transition:transform .35s var(--ease),opacity .3s ease;
+  z-index:1;
+}
+.lineup__row .tag{
+  font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
+  white-space:nowrap;z-index:1;
+}
+/* scia liquida che entra al hover */
+.lineup__row::before{
+  content:"";position:absolute;inset:0;
+  background:var(--fg);transform:translateX(-101%);
+  transition:transform .5s var(--ease);z-index:0;
+}
+@media(hover:hover){
+  .lineup__row:hover::before{transform:translateX(0)}
+  .lineup__row:hover .name{color:var(--bg);transform:translateX(18px) skewX(-4deg)}
+  .lineup__row:hover .tag{color:var(--bg)}
+}
+.lineup__foot{
+  margin-top:var(--s48);
+  display:flex;gap:var(--s24);flex-wrap:wrap;align-items:center;
+  color:var(--muted);font-size:15px;
+}
+
+/* ============================================================
+   GIORNATE — 3 colonne
+   ============================================================ */
+.days{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1px;
+  background:var(--line);
+  border:1px solid var(--line);
+}
+.day{
+  background:var(--bg);
+  padding:var(--s48) var(--s32);
+  display:flex;flex-direction:column;gap:var(--s16);
+  min-height:300px;
+  transition:background .3s ease,color .3s ease;
+}
+.day .day__date{
+  font-family:"SoSo26","Inter",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  font-weight:700;font-size:clamp(2.4rem,4vw,3.4rem);line-height:.9;
+  text-transform:uppercase;
+}
+.day .day__day{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.day ul{list-style:none;margin-top:auto;display:flex;flex-direction:column;gap:8px}
+.day ul li{font-size:15px;color:var(--fg);padding-left:18px;position:relative}
+.day ul li::before{content:"→";position:absolute;left:0;color:var(--muted)}
+.day a.day__tix{
+  margin-top:var(--s16);
+  font-family:"SoSo26","Inter",sans-serif;font-feature-settings:"ss07","ss08","liga","calt";
+  font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:14px;
+  border:1.5px solid var(--fg);border-radius:3px;padding:10px 16px;text-align:center;
+  transition:background .2s,color .2s;
+}
+.day a.day__tix:hover{background:var(--fg);color:var(--bg)}
+@media(hover:hover){
+  .day:hover{background:var(--bg-elev)}
+}
+@media(max-width:820px){
+  .days{grid-template-columns:1fr}
+}
+
+/* ============================================================
+   ESPERIENZE — foto + testo (il morph giorno/notte tematizzato)
+   ============================================================ */
+.exp{
+  display:grid;
+  grid-template-columns:1.05fr .95fr;
+  gap:var(--s64);
+  align-items:center;
+}
+.exp__media{
+  position:relative;
+  aspect-ratio:16/10;
+  overflow:hidden;
+  border:1px solid var(--line);
+}
+.exp__media img{
+  width:100%;height:100%;object-fit:cover;
+  filter:grayscale(1) contrast(1.12) brightness(.95);
+  transition:transform .8s var(--ease),filter .6s ease;
+}
+@media(hover:hover){
+  .exp__media:hover img{transform:scale(1.05)}
+}
+.exp__media figcaption{
+  position:absolute;left:0;bottom:0;
+  font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  background:var(--bg);color:var(--fg);
+  border-top:1px solid var(--line);border-right:1px solid var(--line);
+  padding:8px 14px;
+}
+.exp__body h3{
+  font-family:"SoSo26","Inter",sans-serif;font-feature-settings:"ss07","ss08","liga","calt";
+  font-weight:700;text-transform:uppercase;font-size:clamp(1.8rem,3.4vw,2.8rem);
+  line-height:.95;margin-bottom:var(--s24);
+}
+.exp__body p{color:var(--muted);max-width:46ch;margin-bottom:var(--s24)}
+.exp__tags{display:flex;flex-wrap:wrap;gap:10px}
+.exp__tags li{
+  list-style:none;
+  font-size:13px;letter-spacing:.04em;text-transform:uppercase;
+  border:1px solid var(--line);border-radius:3px;padding:7px 14px;color:var(--fg);
+}
+@media(max-width:820px){
+  .exp{grid-template-columns:1fr;gap:var(--s32)}
+}
+
+/* ============================================================
+   ARCHIVIO — strip foto B/N
+   ============================================================ */
+.archive__grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);
+}
+.arch{
+  position:relative;background:#000;aspect-ratio:4/5;overflow:hidden;
+}
+.arch img{
+  width:100%;height:100%;object-fit:cover;
+  filter:grayscale(1) contrast(1.15) brightness(.78);
+  transition:transform .7s var(--ease),filter .5s ease;
+}
+.arch__year{
+  position:absolute;left:0;bottom:0;z-index:2;
+  font-family:"SoSo26","Inter",sans-serif;font-feature-settings:"ss07","ss08","liga","calt";
+  font-weight:700;font-size:clamp(1.4rem,3vw,2.2rem);
+  padding:10px 14px;
+}
+.arch::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7),transparent 55%);z-index:1}
+@media(hover:hover){
+  .arch:hover img{transform:scale(1.06);filter:grayscale(1) contrast(1.15) brightness(.95)}
+}
+@media(max-width:820px){
+  .archive__grid{grid-template-columns:repeat(2,1fr)}
+}
+
+/* ============================================================
+   SPONSOR marquee
+   ============================================================ */
+.sponsor{border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;padding:var(--s32) 0}
+.sponsor__track{display:flex;width:max-content;animation:marquee 28s linear infinite}
+.sponsor__track span{
+  font-family:"SoSo26","Inter",sans-serif;font-feature-settings:"ss07","ss08","liga","calt";
+  font-weight:700;font-size:clamp(1.4rem,3vw,2.2rem);text-transform:uppercase;
+  letter-spacing:.02em;padding:0 var(--s48);color:var(--muted);white-space:nowrap;
+}
+.sponsor:hover .sponsor__track{animation-play-state:paused}
+
+/* ============================================================
+   CTA + Newsletter
+   ============================================================ */
+.join{
+  display:grid;grid-template-columns:1fr 1fr;gap:var(--s64);
+  align-items:start;
+}
+.join__block h2{
+  font-family:"SoSo26","Inter",sans-serif;font-feature-settings:"ss07","ss08","liga","calt";
+  font-weight:700;text-transform:uppercase;font-size:clamp(1.8rem,3.4vw,2.6rem);line-height:.95;margin-bottom:var(--s16);
+}
+.join__block p{color:var(--muted);margin-bottom:var(--s24);max-width:42ch}
+.form{display:flex;gap:10px;flex-wrap:wrap}
+.form input[type=email]{
+  flex:1;min-width:200px;
+  background:transparent;border:1.5px solid var(--line);border-radius:3px;
+  padding:14px 16px;color:var(--fg);font-size:16px;font-family:inherit;
+  transition:border-color .2s;
+}
+.form input[type=email]:focus{outline:none;border-color:var(--fg)}
+.form button{
+  font-family:"SoSo26","Inter",sans-serif;font-feature-settings:"ss07","ss08","liga","calt";
+  font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:16px;
+  background:var(--fg);color:var(--bg);padding:14px 26px;border-radius:3px;
+  transition:transform .2s var(--ease);
+}
+.form button:hover{transform:translateY(-2px)}
+@media(max-width:820px){.join{grid-template-columns:1fr;gap:var(--s48)}}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer.site{
+  border-top:1px solid var(--line);
+  padding:var(--s96) 0 var(--s48);
+}
+.foot__top{display:flex;justify-content:space-between;gap:var(--s48);flex-wrap:wrap;align-items:flex-start}
+.foot__brand img{height:30px;width:auto;margin-bottom:var(--s24)}
+.foot__brand p{color:var(--muted);max-width:30ch;font-size:15px}
+.foot__cols{display:flex;gap:var(--s96);flex-wrap:wrap}
+.foot__col h4{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:var(--s16)}
+.foot__col a{display:block;font-size:15px;padding:5px 0;opacity:.9;transition:opacity .2s}
+.foot__col a:hover{opacity:1;text-decoration:underline}
+.foot__bottom{
+  margin-top:var(--s64);padding-top:var(--s24);border-top:1px solid var(--line);
+  display:flex;justify-content:space-between;gap:var(--s24);flex-wrap:wrap;
+  font-size:13px;color:var(--muted-2);
+}
+.foot__bottom a{color:var(--muted)}
+
+/* ============================================================
+   reduced motion
+   ============================================================ */
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;scroll-behavior:auto !important}
+  .marquee__track,.sponsor__track{animation:none;transform:none}
+  .js .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================== HEADER ============================== -->
+<header class="site">
+  <a class="logo" href="/" aria-label="Sottosopra — home">
+    <img src="/brand/sottosopra-logo-white.png" alt="Sottosopra">
+  </a>
+  <nav class="main" aria-label="Navigazione principale">
+    <a href="/programma">Programma</a>
+    <a href="/info">Info</a>
+    <a href="/about">About</a>
+    <a href="/news">News</a>
+  </nav>
+  <a class="btn-tix" href="https://dice.fm/?utm_source=sito&utm_medium=header" rel="noopener">Biglietti</a>
+</header>
+
+<!-- ============================== HERO ============================== -->
+<section class="hero" id="hero" aria-label="Sottosopra 2026">
+  <!-- STATO STATICO: foto reale sempre visibile, fallback senza JS -->
+  <div class="hero__media">
+    <img id="hero-img"
+         src="/media/crowd-night-portrait.jpg"
+         alt="Una ragazza tra la folla, di notte, al festival Sottosopra"
+         fetchpriority="high" decoding="async">
+  </div>
+  <!-- canvas WebGL (enhancement): si attiva solo se OGL carica -->
+  <canvas class="hero__canvas" id="hero-gl" aria-hidden="true"></canvas>
+
+  <div class="hero__scrim" aria-hidden="true"></div>
+
+  <button class="hero__morph" id="morph-btn" type="button" aria-label="Inverti giorno e notte">
+    ↺ Giorno / Notte
+  </button>
+
+  <div class="hero__hint" aria-hidden="true">
+    <span class="dot"></span> Muovi il mouse sulla folla
+  </div>
+
+  <div class="hero__inner wrap">
+    <div class="hero__top">
+      <p class="kicker">8ª edizione · Castelfranco Veneto</p>
+    </div>
+
+    <h1 class="hero__title so">
+      <span class="line">Sempre</span>
+      <span class="line">Sottosop<span class="flip">ra</span></span>
+    </h1>
+
+    <div class="hero__meta">
+      <p class="hero__claim so">Cambia il punto di vista.</p>
+      <div class="hero__facts">
+        <div class="fact"><b>31 Lug — 2 Ago</b><span>2026</span></div>
+        <div class="fact"><b>Giardini del Castello</b><span>Castelfranco V.</span></div>
+        <div class="fact"><b>3 serate</b><span>Musica · Arte · Cibo</span></div>
+      </div>
+    </div>
+
+    <div class="hero__cta">
+      <a class="btn btn--solid" href="https://dice.fm/?utm_source=sito&utm_medium=home" rel="noopener">Biglietti su DICE →</a>
+      <a class="btn btn--ghost" href="#lineup">Vedi la lineup</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== MARQUEE ============================== -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee__track">
+    <span>Sempre Sottosopra</span><span>Cambia il punto di vista</span>
+    <span>31 Lug — 2 Ago 2026</span><span>Giardini del Castello</span>
+    <span>Sempre Sottosopra</span><span>Cambia il punto di vista</span>
+    <span>31 Lug — 2 Ago 2026</span><span>Giardini del Castello</span>
+  </div>
+</div>
+
+<!-- ============================== LINEUP ============================== -->
+<section class="sec" id="lineup">
+  <div class="wrap">
+    <div class="sec__head reveal">
+      <h2 class="sec__title so">Lineup</h2>
+      <span class="sec__num">/ 01 — Chi suona</span>
+    </div>
+
+    <div class="lineup__list reveal">
+      <a class="lineup__row" href="#programma"><span class="name so">Generic Animal</span><span class="tag">Ven 31 · Main</span></a>
+      <a class="lineup__row" href="#programma"><span class="name so">Ex-Otago</span><span class="tag">Ven 31 · Main</span></a>
+      <a class="lineup__row" href="#programma"><span class="name so">Vendredi sur Mer</span><span class="tag">Sab 1 · Main</span></a>
+      <a class="lineup__row" href="#programma"><span class="name so">Alberto Ferrari</span><span class="tag">Sab 1</span></a>
+      <a class="lineup__row" href="#programma"><span class="name so">Auroro Borealo</span><span class="tag">Sab 1</span></a>
+      <a class="lineup__row" href="#programma"><span class="name so">Popa</span><span class="tag">Dom 2</span></a>
+      <a class="lineup__row" href="#programma"><span class="name so">Krano</span><span class="tag">Dom 2</span></a>
+      <a class="lineup__row" href="#programma"><span class="name so">Jesse The Faccio</span><span class="tag">Dom 2 · Closing</span></a>
+    </div>
+
+    <div class="lineup__foot reveal">
+      <span>+ workshop, talk, libri e il brunch della domenica.</span>
+      <a class="btn btn--ghost" href="/programma">Programma completo →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== GIORNATE ============================== -->
+<section class="sec" id="programma" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec__head reveal">
+      <h2 class="sec__title so">Tre serate</h2>
+      <span class="sec__num">/ 02 — Le giornate</span>
+    </div>
+
+    <div class="days reveal">
+      <article class="day">
+        <span class="day__day">Venerdì</span>
+        <span class="day__date so">31<br>Lug</span>
+        <ul>
+          <li>Generic Animal</li>
+          <li>Ex-Otago</li>
+          <li>Apertura cancelli h19</li>
+        </ul>
+        <a class="day__tix" href="https://dice.fm/?utm_source=sito&utm_medium=programma" rel="noopener">Biglietti venerdì</a>
+      </article>
+      <article class="day">
+        <span class="day__day">Sabato</span>
+        <span class="day__date so">01<br>Ago</span>
+        <ul>
+          <li>Vendredi sur Mer</li>
+          <li>Alberto Ferrari</li>
+          <li>Auroro Borealo</li>
+        </ul>
+        <a class="day__tix" href="https://dice.fm/?utm_source=sito&utm_medium=programma" rel="noopener">Biglietti sabato</a>
+      </article>
+      <article class="day">
+        <span class="day__day">Domenica</span>
+        <span class="day__date so">02<br>Ago</span>
+        <ul>
+          <li>Popa · Krano</li>
+          <li>Jesse The Faccio</li>
+          <li>Brunch dalle h11</li>
+        </ul>
+        <a class="day__tix" href="https://dice.fm/?utm_source=sito&utm_medium=programma" rel="noopener">Biglietti domenica</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== ESPERIENZE ============================== -->
+<section class="sec" id="esperienze" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec__head reveal">
+      <h2 class="sec__title so">Non solo musica</h2>
+      <span class="sec__num">/ 03 — Esperienze</span>
+    </div>
+
+    <div class="exp reveal">
+      <figure class="exp__media">
+        <img src="/media/garden-day.jpg" alt="Il giardino del castello di giorno, sdraio e persone che si rilassano">
+        <figcaption>Giardini del Castello · giorno</figcaption>
+      </figure>
+      <div class="exp__body">
+        <h3>Di giorno è un altro festival</h3>
+        <p>Sottosopra non finisce con i concerti. Workshop, talk, presentazioni di libri e il brunch della domenica trasformano i Giardini in un luogo dove fermarsi, parlare e cambiare prospettiva — letteralmente.</p>
+        <ul class="exp__tags">
+          <li>Workshop</li><li>Talk</li><li>Libri</li><li>Brunch</li><li>Arte</li><li>Cibo</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== ARCHIVIO ============================== -->
+<section class="sec" id="archivio" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec__head reveal">
+      <h2 class="sec__title so">Otto anni</h2>
+      <span class="sec__num">/ 04 — Archivio</span>
+    </div>
+    <div class="archive__grid reveal">
+      <figure class="arch"><img src="/media/archive-2017.jpg" alt="Sottosopra 2017"><figcaption class="arch__year so">2017</figcaption></figure>
+      <figure class="arch"><img src="/media/archive-2019.jpg" alt="Sottosopra 2019"><figcaption class="arch__year so">2019</figcaption></figure>
+      <figure class="arch"><img src="/media/archive-2022.jpg" alt="Sottosopra 2022"><figcaption class="arch__year so">2022</figcaption></figure>
+      <figure class="arch"><img src="/media/archive-innesta.jpg" alt="Sottosopra Innesta"><figcaption class="arch__year so">Innesta</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== SPONSOR ============================== -->
+<div class="sponsor" aria-label="Partner e sponsor">
+  <div class="sponsor__track">
+    <span>Azimut</span><span>Ceccato</span><span>Prodeco</span><span>CNA</span><span>Banca Terre Venete</span>
+    <span>Azimut</span><span>Ceccato</span><span>Prodeco</span><span>CNA</span><span>Banca Terre Venete</span>
+  </div>
+</div>
+
+<!-- ============================== JOIN / NEWSLETTER ============================== -->
+<section class="sec" id="join">
+  <div class="wrap">
+    <div class="join">
+      <div class="join__block reveal">
+        <h2>Diventa volontari*</h2>
+        <p>Ogni edizione di Sottosopra vive grazie a ~80 persone che la costruiscono. Se vuoi far parte del team, scrivici: c'è posto per ogni punto di vista.</p>
+        <a class="btn btn--solid" href="mailto:info@sottosopra.com?subject=Volontari%20Sottosopra%202026">Entra in Sottosopra →</a>
+      </div>
+      <div class="join__block reveal">
+        <h2>Resta aggiornat*</h2>
+        <p>Date, lineup, biglietti early bird: le prime a saperlo sono le persone iscritte alla newsletter.</p>
+        <form class="form" onsubmit="event.preventDefault();this.reset();this.querySelector('button').textContent='Iscritt*!';">
+          <label for="nl" style="position:absolute;left:-9999px">Email</label>
+          <input id="nl" type="email" placeholder="la-tua@email.it" required>
+          <button type="submit">Iscriviti</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== FOOTER ============================== -->
+<footer class="site">
+  <div class="wrap">
+    <div class="foot__top">
+      <div class="foot__brand">
+        <img src="/brand/sottosopra-logo-white.png" alt="Sottosopra">
+        <p>Festival culturale interdisciplinare. Castelfranco Veneto, dal 2017.</p>
+      </div>
+      <div class="foot__cols">
+        <div class="foot__col">
+          <h4>Festival</h4>
+          <a href="/programma">Programma</a>
+          <a href="/info">Info & accessi</a>
+          <a href="/about">About</a>
+          <a href="/news">News</a>
+        </div>
+        <div class="foot__col">
+          <h4>Biglietti</h4>
+          <a href="https://dice.fm/?utm_source=sito&utm_medium=footer" rel="noopener">Acquista su DICE</a>
+          <a href="mailto:info@sottosopra.com">Diventa volontari*</a>
+          <a href="mailto:info@sottosopra.com">Diventa partner</a>
+        </div>
+        <div class="foot__col">
+          <h4>Contatti</h4>
+          <a href="mailto:info@sottosopra.com">info@sottosopra.com</a>
+          <a href="https://instagram.com/sottosoprafestival" rel="noopener">@sottosoprafestival</a>
+          <a href="https://facebook.com" rel="noopener">Facebook</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot__bottom">
+      <span>© 2026 APS Sottosopra · Cambia il punto di vista.</span>
+      <span><a href="/privacy">Privacy</a> · <a href="/cookie">Cookie</a></span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================================
+     WEBGL ISLAND — OGL displacement hero (enhancement)
+     Lazy: parte solo quando l'hero è in viewport, non su mobile,
+     non con reduced-motion. Fallback = <img> statico già nel DOM.
+     ============================================================ -->
+<script>
+document.documentElement.classList.add('js');
+
+/* ---------- Scroll reveal (IntersectionObserver + fallback) ---------- */
+(function(){
+  var nodes = document.querySelectorAll('.reveal');
+  function revealAll(){ nodes.forEach(function(el){el.classList.add('in');}); }
+
+  if (!('IntersectionObserver' in window)) { revealAll(); return; }
+
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+  }, {threshold:.12, rootMargin:'0px 0px -8% 0px'});
+  nodes.forEach(function(el){io.observe(el);});
+
+  // Safety net: se l'IO non scatta (ambienti headless/offscreen) mostra tutto,
+  // così il contenuto non resta mai invisibile.
+  window.addEventListener('load', function(){
+    setTimeout(function(){
+      var anyHidden = false;
+      nodes.forEach(function(el){ if(!el.classList.contains('in')) anyHidden = true; });
+      if (anyHidden) revealAll();
+    }, 600);
+  });
+})();
+
+/* ---------- HERO WebGL displacement (OGL) ---------- */
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var coarse = window.matchMedia('(pointer: coarse)').matches;
+  var small  = window.innerWidth < 760;
+  // Niente WebGL su mobile/touch/reduced-motion → resta il magnifico <img> statico
+  if (reduce || coarse || small) return;
+
+  var heroEl  = document.getElementById('hero');
+  var canvas  = document.getElementById('hero-gl');
+  var imgEl   = document.getElementById('hero-img');
+  var morphBtn= document.getElementById('morph-btn');
+
+  // Carica OGL solo quando l'hero è (quasi) visibile
+  function loadOGL(){
+    return new Promise(function(resolve, reject){
+      import('https://cdn.jsdelivr.net/npm/ogl@1.0.11/+esm')
+        .then(resolve).catch(reject);
+    });
+  }
+
+  var started = false;
+  function maybeStart(){
+    if (started) return;
+    started = true;
+    loadOGL().then(initGL).catch(function(err){
+      console.warn('OGL non disponibile, fallback statico attivo.', err);
+      // niente da fare: l'<img> resta visibile, hero senza .gl-ready
+    });
+  }
+
+  // L'hero è sempre in cima: avvia appena la pagina è pronta (non dipende
+  // dall'IntersectionObserver, che in alcuni ambienti headless non scatta).
+  if (document.readyState === 'complete') {
+    maybeStart();
+  } else {
+    window.addEventListener('load', maybeStart);
+    // avvio anticipato se il DOM è pronto, senza attendere tutte le risorse
+    if (document.readyState !== 'loading') maybeStart();
+    else document.addEventListener('DOMContentLoaded', maybeStart);
+  }
+
+  function initGL(OGL){
+    var Renderer=OGL.Renderer, Program=OGL.Program, Mesh=OGL.Mesh,
+        Triangle=OGL.Triangle, Texture=OGL.Texture, Vec2=OGL.Vec2;
+
+    var renderer = new Renderer({
+      canvas: canvas, alpha:false, antialias:false,
+      dpr: Math.min(window.devicePixelRatio||1, 2)
+    });
+    var gl = renderer.gl;
+    gl.clearColor(0,0,0,1);
+
+    // ---- Flowmap off-screen: una scia RG che svanisce ----
+    // La implementiamo come uniform di mouse + velocità + decadimento nel frag,
+    // mantenendo un piccolo "buffer" CPU-side per la scia (semplice, robusto, GPU-light).
+    // (Approccio shader-puro: niente render target multipli → minore costo, stesso risultato visivo.)
+
+    var vertex = `
+      attribute vec2 uv;
+      attribute vec2 position;
+      varying vec2 vUv;
+      void main(){ vUv = uv; gl_Position = vec4(position, 0.0, 1.0); }
+    `;
+
+    // displacement (ripple/fish-eye) + flowmap di velocità + split di luminanza B/N
+    var fragment = `
+      precision highp float;
+      varying vec2 vUv;
+      uniform sampler2D tMap;     // foto notte
+      uniform sampler2D tMap2;    // foto giorno (per il morph easter-egg)
+      uniform vec2  uMouse;       // posizione mouse [0..1], y in alto
+      uniform vec2  uVel;         // velocità mouse
+      uniform float uTrail;       // intensità scia (decade nel tempo)
+      uniform float uAspect;      // ratio del canvas
+      uniform vec2  uImgRatio;    // cover scaling
+      uniform float uMorph;       // 0 = notte, 1 = giorno
+      uniform float uTime;
+
+      // converte in luminanza
+      float luma(vec3 c){ return dot(c, vec3(0.299, 0.587, 0.114)); }
+
+      void main(){
+        // ---- cover-fit delle UV (object-fit: cover) ----
+        vec2 uv = (vUv - 0.5) * uImgRatio + 0.5;
+
+        // ---- distanza dal mouse, corretta per aspect ----
+        vec2 m = uMouse;
+        vec2 d = vUv - m;
+        d.x *= uAspect;
+        float dist = length(d);
+
+        // raggio del "tocco": cresce leggermente con la velocità
+        float speed = length(uVel);
+        float radius = 0.18 + speed * 0.6;
+        // caduta morbida
+        float fall = smoothstep(radius, 0.0, dist);
+
+        // ---- ripple liquido: increspatura concentrica + spinta direzionale ----
+        float ring = sin(dist * 26.0 - uTime * 3.2) * 0.5 + 0.5;
+        float ripple = fall * ring;
+
+        // fish-eye: spinge le UV verso/contro il centro del tocco
+        vec2 dir = normalize(d + 1e-5);
+        vec2 push = dir * fall * (0.045 + uTrail * 0.05);
+
+        // scia di velocità (flowmap): trascina nella direzione del movimento
+        push += uVel * fall * (0.7 + uTrail);
+
+        // ondulazione fluida
+        push += dir * ripple * (0.012 + uTrail * 0.02);
+
+        vec2 disp = uv - push;
+
+        // ---- split di LUMINANZA (mai RGB): campiona 2 offset, prende la luma ----
+        float sep = (0.004 + speed * 0.05) * fall;
+        vec3 ca = texture2D(tMap, disp + dir * sep).rgb;
+        vec3 cb = texture2D(tMap, disp - dir * sep).rgb;
+        float la = luma(ca);
+        float lb = luma(cb);
+        // morph giorno/notte
+        if (uMorph > 0.001){
+          vec3 da = texture2D(tMap2, disp + dir * sep).rgb;
+          vec3 db = texture2D(tMap2, disp - dir * sep).rgb;
+          la = mix(la, luma(da), uMorph);
+          lb = mix(lb, luma(db), uMorph);
+        }
+        // ricomposizione B/N: lo split appare come bagliore di luminanza
+        float L = (la + lb) * 0.5;
+        float glow = abs(la - lb) * 2.2; // bordo luminoso dove la scia separa
+        L += glow * fall;
+
+        // contrasto cinematografico
+        L = clamp((L - 0.5) * 1.18 + 0.5, 0.0, 1.0);
+        L *= 0.9; // leggera sottoesposizione coerente con l'<img>
+
+        gl_FragColor = vec4(vec3(L), 1.0);
+      }
+    `;
+
+    // ---- carica le due texture (notte già nel DOM, giorno on-demand) ----
+    var texNight = new Texture(gl, {generateMipmaps:false, premultiplyAlpha:false});
+    var texDay   = new Texture(gl, {generateMipmaps:false, premultiplyAlpha:false});
+
+    var program = new Program(gl, {
+      vertex: vertex, fragment: fragment,
+      uniforms:{
+        tMap:     {value: texNight},
+        tMap2:    {value: texDay},
+        uMouse:   {value: new Vec2(0.5, 0.5)},
+        uVel:     {value: new Vec2(0, 0)},
+        uTrail:   {value: 0},
+        uAspect:  {value: 1},
+        uImgRatio:{value: new Vec2(1, 1)},
+        uMorph:   {value: 0},
+        uTime:    {value: 0}
+      }
+    });
+
+    var geometry = new Triangle(gl);
+    var mesh = new Mesh(gl, {geometry: geometry, program: program});
+
+    // Texture same-origin: nessun crossOrigin (eviterebbe il CORS check
+    // su server senza header Access-Control e farebbe fallire il load).
+    var imgN = new Image();
+    var imgD = new Image();
+    var nightW=1, nightH=1;
+
+    imgN.onload = function(){
+      texNight.image = imgN;
+      nightW = imgN.naturalWidth; nightH = imgN.naturalHeight;
+      resize();
+      heroEl.classList.add('gl-ready'); // fade-in del canvas, fade-out <img>
+      kick();
+    };
+    imgN.onerror = function(){
+      // l'<img> statico resta visibile: nessun degrado dell'esperienza
+      console.warn('Texture notte non caricata, fallback statico attivo.');
+    };
+    imgN.src = imgEl.currentSrc || '/media/crowd-night-portrait.jpg';
+
+    imgD.onload = function(){ texDay.image = imgD; };
+    // precarica la foto giorno per il morph (non blocca l'avvio)
+    imgD.src = '/media/garden-day.jpg';
+
+    // ---- cover-fit: calcola uImgRatio per object-fit:cover ----
+    function computeCover(){
+      var cw = canvas.clientWidth, ch = canvas.clientHeight;
+      if (!cw || !ch || !nightW || !nightH) return;
+      var canvasAR = cw/ch, imgAR = nightW/nightH;
+      if (canvasAR > imgAR){ // canvas più largo → fit width, crop height
+        program.uniforms.uImgRatio.value.set(1, imgAR/canvasAR);
+      } else {
+        program.uniforms.uImgRatio.value.set(canvasAR/imgAR, 1);
+      }
+      program.uniforms.uAspect.value = canvasAR;
+    }
+
+    function resize(){
+      var w = heroEl.clientWidth, h = heroEl.clientHeight;
+      renderer.setSize(w, h);
+      computeCover();
+    }
+    window.addEventListener('resize', resize);
+
+    // ---- input mouse + velocità + idle-guard ----
+    var mouse = new Vec2(0.5, 0.5);
+    var target= new Vec2(0.5, 0.5);
+    var lastPos = new Vec2(0.5, 0.5);
+    var vel = new Vec2(0, 0);
+    var idleFrames = 0;
+    var IDLE_MAX = 90;          // ~1.5s a 60fps → sospende il loop
+    var running = false;
+    var rafId = 0;
+
+    function onMove(e){
+      var r = heroEl.getBoundingClientRect();
+      var x = (e.clientX - r.left) / r.width;
+      var y = 1.0 - (e.clientY - r.top) / r.height; // y verso l'alto
+      target.set(x, y);
+      idleFrames = 0;
+      kick();
+    }
+    heroEl.addEventListener('mousemove', onMove, {passive:true});
+    heroEl.addEventListener('mouseleave', function(){ idleFrames = IDLE_MAX - 20; });
+
+    // ---- morph easter-egg: giorno <-> notte ----
+    var morphTarget = 0, morphCurrent = 0;
+    morphBtn.addEventListener('click', function(){
+      morphTarget = morphTarget > .5 ? 0 : 1;
+      idleFrames = 0; kick();
+    });
+
+    // ---- loop ----
+    var t0 = performance.now();
+    function frame(){
+      rafId = requestAnimationFrame(frame);
+      var now = performance.now();
+      var t = (now - t0) / 1000;
+      program.uniforms.uTime.value = t;
+
+      // smoothing posizione (inerzia → sensazione liquida)
+      mouse.x += (target.x - mouse.x) * 0.12;
+      mouse.y += (target.y - mouse.y) * 0.12;
+
+      // velocità = delta posizione smussata
+      vel.x += ((mouse.x - lastPos.x) - vel.x) * 0.5;
+      vel.y += ((mouse.y - lastPos.y) - vel.y) * 0.5;
+      lastPos.set(mouse.x, mouse.y);
+
+      // trail decade dolcemente verso 0
+      var speed = Math.hypot(vel.x, vel.y);
+      var trail = program.uniforms.uTrail.value;
+      trail += (Math.min(speed * 8.0, 1.0) - trail) * 0.08;
+      program.uniforms.uTrail.value = trail;
+
+      program.uniforms.uMouse.value.set(mouse.x, mouse.y);
+      program.uniforms.uVel.value.set(vel.x, vel.y);
+
+      // morph smoothing
+      morphCurrent += (morphTarget - morphCurrent) * 0.06;
+      program.uniforms.uMorph.value = morphCurrent;
+
+      renderer.render({scene: mesh});
+
+      // idle-guard: se nessun input e tutto è "a riposo", sospendi il loop
+      var settled =
+        speed < 0.0004 &&
+        trail < 0.01 &&
+        Math.abs(morphTarget - morphCurrent) < 0.002;
+      idleFrames = settled ? idleFrames + 1 : 0;
+      if (idleFrames > IDLE_MAX){
+        // render finale pulito (stato a riposo) poi stop
+        program.uniforms.uVel.value.set(0,0);
+        program.uniforms.uTrail.value = 0;
+        renderer.render({scene: mesh});
+        running = false;
+        cancelAnimationFrame(rafId);
+      }
+    }
+
+    function kick(){
+      if (running) return;
+      running = true;
+      idleFrames = 0;
+      rafId = requestAnimationFrame(frame);
+    }
+
+    // primo render dello stato a riposo (foto piena, nessuna deformazione)
+    function firstPaint(){
+      resize();
+      renderer.render({scene: mesh});
+    }
+    firstPaint();
+
+    // pausa quando l'hero esce dalla viewport (risparmio totale)
+    if ('IntersectionObserver' in window){
+      var visObs = new IntersectionObserver(function(en){
+        if (!en[0].isIntersecting){
+          running = false; cancelAnimationFrame(rafId);
+        }
+      }, {threshold:0});
+      visObs.observe(heroEl);
+    }
+  }
+})();
+</script>
+</body>
+</html>

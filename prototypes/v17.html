@@ -1,0 +1,819 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SOTTOSOPRA — Punto di Vista</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  @font-face{
+    font-family:"SoSo26";
+    src:url("/fonts/SoSo26.woff") format("woff");
+    font-weight:normal;font-style:normal;font-display:swap;
+  }
+
+  :root{
+    --bg:#0a0a0a;
+    --bg-soft:#111;
+    --fg:#fafafa;
+    --muted:#8d8d8d;
+    --line:#262626;
+    --line-soft:#1b1b1b;
+    --paper:#f4f1ec;
+    --ink:#0a0a0a;
+    --lens:148px;
+    --sp:8px;
+    --max:1280px;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:var(--bg);
+    color:var(--fg);
+    font-family:"Inter",system-ui,sans-serif;
+    font-size:17px;line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+    cursor:auto;
+  }
+  /* hide native cursor only on pointer-fine, JS-enabled */
+  body.lens-on{cursor:none}
+  body.lens-on a,body.lens-on button{cursor:none}
+
+  .display{
+    font-family:"SoSo26","Inter",sans-serif;
+    font-feature-settings:"ss07","ss08","liga","calt";
+    line-height:.9;letter-spacing:-.01em;
+    text-transform:uppercase;
+  }
+  .mono{font-family:"Space Mono",monospace}
+
+  a{color:inherit;text-decoration:none}
+  img{display:block;max-width:100%}
+
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 clamp(20px,5vw,56px)}
+
+  /* ============ LENS CURSOR (overlay, enhancement only) ============ */
+  #lens{
+    position:fixed;top:0;left:0;
+    width:var(--lens);height:var(--lens);
+    margin-left:calc(var(--lens) / -2);margin-top:calc(var(--lens) / -2);
+    border-radius:50%;
+    border:1.5px solid #fff;
+    box-shadow:0 0 0 1px #000, 0 0 30px rgba(0,0,0,.5);
+    pointer-events:none;z-index:9000;
+    transform:translate3d(-9999px,-9999px,0) scale(.4);
+    transition:transform .18s cubic-bezier(.2,.8,.2,1), opacity .2s;
+    opacity:0;
+    mix-blend-mode:normal;
+    overflow:hidden;
+    background:#0a0a0a;
+  }
+  #lens.active{opacity:1}
+  #lens .lens-label{
+    position:absolute;left:50%;top:50%;
+    transform:translate(-50%,-50%) rotate(180deg);
+    font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.18em;
+    color:#fff;white-space:nowrap;text-transform:uppercase;
+    text-align:center;line-height:1.4;
+  }
+  /* the flipped "world" inside the lens, filled by JS clone */
+  #lens .lens-inner{
+    position:absolute;inset:0;
+    transform:scaleY(-1) scale(1.18);
+    transform-origin:center;
+    filter:grayscale(1) contrast(1.15);
+  }
+
+  /* ============ HEADER ============ */
+  header{
+    position:sticky;top:0;z-index:200;
+    background:rgba(10,10,10,.82);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{display:flex;align-items:center;justify-content:space-between;height:70px}
+  .nav .logo img{height:20px;width:auto;filter:none}
+  .nav ul{display:flex;gap:28px;list-style:none}
+  .nav ul a{
+    font-size:13px;letter-spacing:.04em;color:var(--muted);
+    transition:color .2s;position:relative;
+  }
+  .nav ul a:hover{color:var(--fg)}
+  .cta{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:"Space Mono",monospace;
+    font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    background:var(--fg);color:var(--bg);
+    padding:11px 20px;border:1.5px solid var(--fg);border-radius:2px;
+    transition:transform .2s ease,background .2s,color .2s;
+    will-change:transform;
+  }
+  .cta:hover{background:transparent;color:var(--fg)}
+  .nav-toggle{display:none}
+
+  /* ============ HERO ============ */
+  .hero{
+    position:relative;
+    padding:clamp(48px,9vw,120px) 0 clamp(40px,7vw,90px);
+    border-bottom:1px solid var(--line);
+    overflow:hidden;
+  }
+  .hero-grid{display:grid;grid-template-columns:1.4fr .9fr;gap:48px;align-items:end}
+  .eyebrow{
+    font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:22px;
+    display:flex;gap:14px;flex-wrap:wrap;align-items:center;
+  }
+  .eyebrow b{color:var(--fg);font-weight:700}
+  .hero h1{
+    font-family:"SoSo26","Inter",sans-serif;
+    font-feature-settings:"ss07","ss08","liga","calt";
+    text-transform:uppercase;
+    font-size:clamp(3.4rem,12.5vw,11.5rem);
+    line-height:.84;letter-spacing:-.02em;
+    margin:0 0 6px;
+  }
+  .hero h1 .flip{display:inline-block;transform:rotate(180deg)}
+  /* repulsion letters */
+  .repel{display:inline-block;will-change:transform}
+  .repel-line{display:block}
+  .hero .claim{
+    font-family:"SoSo26","Inter",sans-serif;
+    font-feature-settings:"ss07","ss08","liga","calt";
+    text-transform:uppercase;
+    font-size:clamp(1.1rem,2.6vw,2rem);
+    color:var(--muted);letter-spacing:.02em;margin-top:18px;line-height:1;
+  }
+  .hero .claim em{font-style:normal;color:var(--fg)}
+  .hero-side{
+    border-left:1px solid var(--line);padding-left:28px;
+    padding-bottom:6px;
+  }
+  .hero-side p{color:var(--muted);font-size:15px;margin-bottom:24px;max-width:34ch}
+  .hero-side p strong{color:var(--fg);font-weight:600}
+  .hero-actions{display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+  .ghost{
+    display:inline-flex;align-items:center;gap:10px;
+    font-family:"Space Mono",monospace;font-size:13px;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--fg);
+    border:1.5px solid var(--line);border-radius:2px;padding:11px 18px;
+    transition:border-color .2s,transform .2s;will-change:transform;
+  }
+  .ghost:hover{border-color:var(--fg)}
+
+  .hero-hint{
+    margin-top:clamp(40px,6vw,72px);
+    display:flex;align-items:center;gap:14px;
+    font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--muted);
+  }
+  .hero-hint .dot{
+    width:9px;height:9px;border-radius:50%;background:var(--fg);
+    animation:pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:.3;transform:scale(.7)}50%{opacity:1;transform:scale(1)}}
+  kbd{
+    font-family:"Space Mono",monospace;font-size:11px;
+    background:var(--bg-soft);border:1px solid var(--line);border-bottom-width:2px;
+    border-radius:3px;padding:2px 7px;color:var(--fg);
+  }
+
+  /* ============ SECTION SCAFFOLD ============ */
+  section{padding:clamp(56px,8vw,104px) 0}
+  .sec-head{
+    display:flex;align-items:baseline;justify-content:space-between;
+    gap:24px;margin-bottom:clamp(28px,4vw,48px);
+    border-bottom:1px solid var(--line);padding-bottom:18px;flex-wrap:wrap;
+  }
+  .sec-head .idx{
+    font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.18em;
+    color:var(--muted);text-transform:uppercase;
+  }
+  .sec-head h2{
+    font-family:"SoSo26","Inter",sans-serif;
+    font-feature-settings:"ss07","ss08","liga","calt";
+    text-transform:uppercase;
+    font-size:clamp(2rem,5.5vw,4.6rem);line-height:.86;letter-spacing:-.015em;
+  }
+  .sec-head .sub{
+    font-family:"Space Mono",monospace;font-size:12px;color:var(--muted);
+    letter-spacing:.08em;max-width:30ch;text-align:right;
+  }
+
+  /* ============ LINEUP — silhouette reveal + halftone ============ */
+  .lineup-note{
+    font-family:"Space Mono",monospace;font-size:12px;color:var(--muted);
+    letter-spacing:.1em;text-transform:uppercase;margin-bottom:26px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .lineup-note span{width:34px;height:1px;background:var(--line)}
+  .lineup{
+    display:grid;grid-template-columns:repeat(4,1fr);
+    border-top:1px solid var(--line);border-left:1px solid var(--line);
+  }
+  .artist{
+    position:relative;
+    border-right:1px solid var(--line);border-bottom:1px solid var(--line);
+    aspect-ratio:3/4;
+    overflow:hidden;
+    background:#000;
+    display:flex;align-items:flex-end;
+    isolation:isolate;
+  }
+  /* halftone "photo" placeholder: a silhouette figure made of dots, default visible */
+  .artist .ht{
+    position:absolute;inset:0;z-index:0;
+    /* the "figure": head + shoulders bust, lighter in the middle */
+    background:
+      radial-gradient(ellipse 30% 22% at 50% 30%, rgba(255,255,255,.55) 0%, rgba(255,255,255,.18) 60%, transparent 72%),
+      radial-gradient(ellipse 62% 46% at 50% 96%, rgba(255,255,255,.40) 0%, rgba(255,255,255,.10) 58%, transparent 74%),
+      var(--ht-dots);
+    background-size:auto, auto, 8px 8px;
+    /* halftone effect: clip the dots to the luminance via mask */
+    -webkit-mask:var(--ht-dots);
+    mask:var(--ht-dots);
+    -webkit-mask-size:8px 8px;mask-size:8px 8px;
+    filter:grayscale(1);
+    transition:transform .5s cubic-bezier(.2,.8,.2,1), filter .4s, background-size .4s, -webkit-mask-size .4s, mask-size .4s;
+  }
+  :root{
+    --ht-dots:radial-gradient(circle, #fff 1.6px, transparent 1.9px);
+  }
+  /* dark veil — "who's that artist" — semi-transparent so it's READABLE static */
+  .artist .silo{
+    position:absolute;inset:0;z-index:1;
+    background:linear-gradient(180deg, rgba(0,0,0,.10) 0%, rgba(0,0,0,.78) 80%);
+    transition:background .45s ease;
+  }
+  .artist .meta{
+    position:relative;z-index:2;padding:16px 16px 18px;width:100%;
+  }
+  .artist .num{
+    font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;
+    color:var(--muted);margin-bottom:6px;display:block;
+  }
+  .artist .name{
+    font-family:"SoSo26","Inter",sans-serif;
+    font-feature-settings:"ss07","ss08","liga","calt";
+    text-transform:uppercase;
+    font-size:clamp(1.15rem,1.9vw,1.7rem);line-height:.92;
+    color:var(--fg);
+  }
+  .artist .tag{
+    font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);
+    letter-spacing:.08em;margin-top:8px;opacity:0;max-height:0;
+    transition:opacity .35s,max-height .35s;text-transform:uppercase;
+  }
+  .artist:hover .ht{transform:scale(1.06)}
+  .artist:hover .silo{background:linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,.5) 90%)}
+  .artist:hover .tag{opacity:1;max-height:40px}
+  .artist::after{ /* fish-eye-ish bulge ring hint */
+    content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+    box-shadow:inset 0 0 0 0 rgba(255,255,255,0);
+    transition:box-shadow .4s;
+  }
+  .artist:hover::after{box-shadow:inset 0 0 60px rgba(255,255,255,.06)}
+
+  /* ============ PROGRAMMA / DATES — big numerals reactive ============ */
+  .days{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+  .day{
+    background:var(--bg);padding:clamp(26px,4vw,44px) clamp(22px,3vw,34px);
+    position:relative;transition:background .25s;
+  }
+  .day:hover{background:var(--bg-soft)}
+  .day .dow{
+    font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:10px;
+  }
+  .day .dnum{
+    font-family:"SoSo26","Inter",sans-serif;
+    font-feature-settings:"ss07","ss08","liga","calt";
+    font-size:clamp(4rem,9vw,8rem);line-height:.8;letter-spacing:-.03em;
+    display:flex;align-items:baseline;gap:8px;
+  }
+  .day .dnum small{
+    font-family:"Space Mono",monospace;font-size:13px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--muted);font-weight:700;
+  }
+  .day .acts{margin-top:22px;border-top:1px solid var(--line);padding-top:16px}
+  .day .acts li{
+    list-style:none;display:flex;justify-content:space-between;gap:12px;
+    padding:7px 0;font-size:14px;color:var(--muted);
+    border-bottom:1px dashed var(--line-soft);
+  }
+  .day .acts li:last-child{border-bottom:0}
+  .day .acts li b{color:var(--fg);font-weight:600}
+  .day .acts li span{font-family:"Space Mono",monospace;font-size:12px}
+
+  /* ============ EXPERIENCES ============ */
+  .exp{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .exp .card{
+    border:1px solid var(--line);border-radius:3px;padding:24px 22px;
+    min-height:200px;display:flex;flex-direction:column;justify-content:space-between;
+    transition:border-color .25s,background .25s;background:var(--bg);
+  }
+  .exp .card:hover{border-color:var(--fg);background:var(--bg-soft)}
+  .exp .card .k{
+    font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.16em;
+    color:var(--muted);text-transform:uppercase;
+  }
+  .exp .card h3{
+    font-family:"SoSo26","Inter",sans-serif;
+    font-feature-settings:"ss07","ss08","liga","calt";
+    text-transform:uppercase;font-size:1.5rem;line-height:.92;margin:14px 0 8px;
+  }
+  .exp .card p{font-size:13.5px;color:var(--muted);line-height:1.5}
+
+  /* ============ SPONSOR marquee ============ */
+  .sponsor-wrap{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:0;overflow:hidden}
+  .sponsor-label{
+    font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--muted);padding:18px 0 0;
+  }
+  .marquee{display:flex;gap:0;overflow:hidden;padding:22px 0;position:relative}
+  .marquee-track{display:flex;gap:64px;white-space:nowrap;animation:scroll 26s linear infinite;padding-right:64px}
+  .marquee:hover .marquee-track{animation-play-state:paused}
+  @keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  .marquee .sp{
+    font-family:"SoSo26","Inter",sans-serif;
+    font-feature-settings:"ss07","ss08","liga","calt";
+    text-transform:uppercase;font-size:clamp(1.6rem,3vw,2.6rem);
+    color:var(--muted);letter-spacing:0;flex:0 0 auto;transition:color .2s;
+  }
+  .marquee .sp:hover{color:var(--fg)}
+  .marquee .star{color:var(--line);font-family:"Inter";font-size:1.4rem;align-self:center}
+
+  /* ============ CTA / NEWSLETTER (spotlight section, default revealed) ============ */
+  .spot{
+    position:relative;background:#000;border-top:1px solid var(--line);
+    padding:clamp(64px,10vw,130px) 0;overflow:hidden;
+  }
+  /* default: content fully lit. The interactive spotlight is an ADDITIVE highlight via JS var. */
+  .spot::before{
+    content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+    background:radial-gradient(var(--lens) circle at var(--mx,50%) var(--my,30%),
+      rgba(255,255,255,.10) 0%, rgba(255,255,255,.03) 40%, transparent 70%);
+    transition:opacity .3s;
+  }
+  .spot .wrap{position:relative;z-index:1}
+  .spot-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:center}
+  .spot h2{
+    font-family:"SoSo26","Inter",sans-serif;
+    font-feature-settings:"ss07","ss08","liga","calt";
+    text-transform:uppercase;font-size:clamp(2.4rem,6vw,5.2rem);line-height:.84;
+    letter-spacing:-.02em;margin-bottom:18px;
+  }
+  .spot p{color:var(--muted);max-width:40ch;margin-bottom:30px}
+  .spot .actions{display:flex;gap:14px;flex-wrap:wrap}
+  .news-card{
+    border:1px solid var(--line);border-radius:4px;padding:30px;background:#070707;
+  }
+  .news-card .k{
+    font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.16em;
+    color:var(--muted);text-transform:uppercase;margin-bottom:14px;
+  }
+  .news-card h3{
+    font-family:"SoSo26","Inter",sans-serif;
+    font-feature-settings:"ss07","ss08","liga","calt";
+    text-transform:uppercase;font-size:1.6rem;margin-bottom:16px;line-height:.95;
+  }
+  .nl-form{display:flex;gap:8px;margin-top:8px}
+  .nl-form input{
+    flex:1;background:transparent;border:1px solid var(--line);border-radius:2px;
+    color:var(--fg);font-family:"Space Mono",monospace;font-size:13px;
+    padding:12px 14px;min-width:0;
+  }
+  .nl-form input::placeholder{color:var(--muted)}
+  .nl-form input:focus{outline:2px solid var(--fg);outline-offset:1px;border-color:transparent}
+  .nl-form button{
+    background:var(--fg);color:var(--bg);border:0;border-radius:2px;
+    font-family:"Space Mono",monospace;font-size:13px;font-weight:700;
+    letter-spacing:.08em;text-transform:uppercase;padding:12px 18px;cursor:pointer;
+    transition:opacity .2s;
+  }
+  .nl-form button:hover{opacity:.85}
+
+  /* ============ NEWS strip ============ */
+  .news-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .post{
+    border:1px solid var(--line);border-radius:3px;padding:22px;background:var(--bg);
+    transition:border-color .25s,transform .25s;display:block;
+  }
+  .post:hover{border-color:var(--fg)}
+  .post .date{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);letter-spacing:.1em}
+  .post h3{
+    font-family:"SoSo26","Inter",sans-serif;
+    font-feature-settings:"ss07","ss08","liga","calt";
+    text-transform:uppercase;font-size:1.35rem;line-height:.95;margin:12px 0 8px;
+  }
+  .post p{font-size:13.5px;color:var(--muted)}
+  .post .more{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg);margin-top:14px;display:inline-block}
+
+  /* ============ FOOTER ============ */
+  footer{background:#000;border-top:1px solid var(--line);padding:clamp(48px,7vw,90px) 0 40px}
+  .foot-top{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap;align-items:flex-start}
+  footer .flogo img{height:26px;margin-bottom:18px}
+  footer .ftag{
+    font-family:"SoSo26","Inter",sans-serif;font-feature-settings:"ss07","ss08","liga","calt";
+    text-transform:uppercase;font-size:clamp(1.4rem,3vw,2.4rem);line-height:.9;max-width:14ch;
+  }
+  .foot-cols{display:flex;gap:60px;flex-wrap:wrap}
+  .foot-col h4{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+  .foot-col a,.foot-col p{display:block;font-size:14px;color:var(--fg);margin-bottom:9px;transition:color .2s}
+  .foot-col a:hover{color:var(--muted)}
+  .foot-bottom{
+    display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+    margin-top:clamp(40px,6vw,72px);padding-top:22px;border-top:1px solid var(--line);
+    font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width:900px){
+    .hero-grid{grid-template-columns:1fr;gap:32px}
+    .hero-side{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:28px}
+    .lineup{grid-template-columns:repeat(2,1fr)}
+    .days{grid-template-columns:1fr}
+    .exp{grid-template-columns:repeat(2,1fr)}
+    .spot-grid{grid-template-columns:1fr;gap:34px}
+    .news-row{grid-template-columns:1fr}
+    .nav ul{display:none}
+  }
+  @media (max-width:520px){
+    body{font-size:16px}
+    .lineup{grid-template-columns:1fr}
+    .exp{grid-template-columns:1fr}
+    .marquee .sp{font-size:1.5rem}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important;transition:none !important;scroll-behavior:auto}
+    #lens{display:none}
+    .marquee-track{animation:none !important;transform:none}
+    .artist .silo{background:linear-gradient(180deg,rgba(0,0,0,.05) 0%,rgba(0,0,0,.55) 88%)}
+    .artist .tag{opacity:1;max-height:40px}
+  }
+</style>
+</head>
+<body>
+
+<!-- LENS CURSOR (enhancement only — hidden until JS + fine pointer) -->
+<div id="lens" aria-hidden="true">
+  <div class="lens-inner" id="lensInner"></div>
+  <div class="lens-label">↑↓<br>punto<br>di vista</div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="#" aria-label="Sottosopra home">
+      <img src="/brand/sottosopra-logo-white.png" alt="SOTTOSOPRA">
+    </a>
+    <nav aria-label="Principale">
+      <ul>
+        <li><a href="#programma">Programma</a></li>
+        <li><a href="#info">Info</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#news">News</a></li>
+      </ul>
+    </nav>
+    <a class="cta magnetic" href="https://dice.fm" target="_blank" rel="noopener">Biglietti ↗</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero" aria-label="Edizione 2026">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">
+          <span>8ª EDIZIONE</span> · <span>CASTELFRANCO VENETO</span> · <b>31 LUG — 2 AGO 2026</b>
+        </div>
+        <h1 class="display" id="heroTitle" data-repel>
+          <span class="repel-line">SEMPRE</span>
+          <span class="repel-line">SOTTOSOP<span class="flip">RA</span></span>
+        </h1>
+        <p class="claim">Cambia il <em>punto di vista</em>.</p>
+        <div class="hero-hint">
+          <span class="dot"></span>
+          Muovi il cursore — è una lente che capovolge · <kbd>S</kbd> inverte tutto
+        </div>
+      </div>
+      <aside class="hero-side">
+        <p>Festival di <strong>musica e cultura</strong> nei Giardini del Castello. Tre giorni di concerti, workshop, talk e brunch domenicale.</p>
+        <div class="hero-actions">
+          <a class="cta magnetic" href="https://dice.fm" target="_blank" rel="noopener">Compra i biglietti ↗</a>
+          <a class="ghost magnetic" href="#programma">Vedi il programma</a>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- LINEUP — silhouette reveal + halftone -->
+<section id="lineup" class="lens-zone" aria-label="Lineup">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="idx">01 / LINEUP</span>
+        <h2 class="display">Chi suona</h2>
+      </div>
+      <p class="sub mono">Passa sopra ogni riquadro per svelare l'artista — il buio si dirada.</p>
+    </div>
+    <div class="lineup-note mono"><span></span>WHO'S THAT ARTIST · 8 NOMI · SVELA AL PASSAGGIO<span></span></div>
+    <div class="lineup">
+      <article class="artist"><div class="ht"></div><div class="silo"></div><div class="meta"><span class="num">A01</span><span class="name display">Generic Animal</span><span class="tag mono">indie / cantautorato</span></div></article>
+      <article class="artist"><div class="ht"></div><div class="silo"></div><div class="meta"><span class="num">A02</span><span class="name display">Ex-Otago</span><span class="tag mono">pop / live band</span></div></article>
+      <article class="artist"><div class="ht"></div><div class="silo"></div><div class="meta"><span class="num">A03</span><span class="name display">Vendredi sur Mer</span><span class="tag mono">french pop</span></div></article>
+      <article class="artist"><div class="ht"></div><div class="silo"></div><div class="meta"><span class="num">A04</span><span class="name display">Alberto Ferrari</span><span class="tag mono">verdena / solo</span></div></article>
+      <article class="artist"><div class="ht"></div><div class="silo"></div><div class="meta"><span class="num">A05</span><span class="name display">Auroro Borealo</span><span class="tag mono">cantautorato</span></div></article>
+      <article class="artist"><div class="ht"></div><div class="silo"></div><div class="meta"><span class="num">A06</span><span class="name display">Popa</span><span class="tag mono">elettronica</span></div></article>
+      <article class="artist"><div class="ht"></div><div class="silo"></div><div class="meta"><span class="num">A07</span><span class="name display">Krano</span><span class="tag mono">producer / dj</span></div></article>
+      <article class="artist"><div class="ht"></div><div class="silo"></div><div class="meta"><span class="num">A08</span><span class="name display">Jesse The Faccio</span><span class="tag mono">rap / live</span></div></article>
+    </div>
+  </div>
+</section>
+
+<!-- PROGRAMMA / DATE -->
+<section id="programma" aria-label="Programma e date">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="idx">02 / PROGRAMMA</span>
+        <h2 class="display">Tre giorni</h2>
+      </div>
+      <p class="sub mono">Giardini del Castello · Castelfranco Veneto · apertura cancelli 18:30</p>
+    </div>
+    <div class="days">
+      <div class="day">
+        <div class="dow">Venerdì</div>
+        <div class="dnum display">31<small>LUG</small></div>
+        <ul class="acts">
+          <li><b>Generic Animal</b><span>22:30</span></li>
+          <li><b>Popa</b><span>21:00</span></li>
+          <li><b>Krano · dj set</b><span>23:45</span></li>
+          <li>Talk d'apertura<span>19:30</span></li>
+        </ul>
+      </div>
+      <div class="day">
+        <div class="dow">Sabato</div>
+        <div class="dnum display">01<small>AGO</small></div>
+        <ul class="acts">
+          <li><b>Ex-Otago</b><span>22:30</span></li>
+          <li><b>Vendredi sur Mer</b><span>21:00</span></li>
+          <li><b>Alberto Ferrari</b><span>20:00</span></li>
+          <li>Workshop ceramica<span>17:00</span></li>
+        </ul>
+      </div>
+      <div class="day">
+        <div class="dow">Domenica</div>
+        <div class="dnum display">02<small>AGO</small></div>
+        <ul class="acts">
+          <li><b>Auroro Borealo</b><span>21:30</span></li>
+          <li><b>Jesse The Faccio</b><span>20:00</span></li>
+          <li>Brunch domenicale<span>11:30</span></li>
+          <li>Presentazione libri<span>16:00</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ESPERIENZE -->
+<section id="info" aria-label="Esperienze">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="idx">03 / OLTRE LA MUSICA</span>
+        <h2 class="display">Esperienze</h2>
+      </div>
+      <p class="sub mono">Non solo concerti: il festival è un punto di vista diverso su tutto.</p>
+    </div>
+    <div class="exp">
+      <div class="card"><div class="k">/ LAB</div><h3 class="display">Workshop</h3><p>Ceramica, stampa, serigrafia. Mani in pasta con artigiani e collettivi del territorio.</p></div>
+      <div class="card"><div class="k">/ VOCE</div><h3 class="display">Talk</h3><p>Incontri su musica, ambiente e comunità. Cambia prospettiva, ascolta chi la vede sottosopra.</p></div>
+      <div class="card"><div class="k">/ CARTA</div><h3 class="display">Libri</h3><p>Presentazioni e reading nel verde del castello, all'ora del tramonto.</p></div>
+      <div class="card"><div class="k">/ TAVOLA</div><h3 class="display">Brunch</h3><p>Domenica si chiude con il brunch tra i giardini: cibo locale, vinili e lentezza.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- SPONSOR MARQUEE -->
+<div class="sponsor-wrap" aria-label="Partner">
+  <div class="wrap"><div class="sponsor-label mono">PARTNER E SOSTENITORI 2026</div></div>
+  <div class="marquee">
+    <div class="marquee-track display" aria-hidden="false">
+      <span class="sp">Azimut</span><span class="star">✳</span>
+      <span class="sp">Ceccato</span><span class="star">✳</span>
+      <span class="sp">Prodeco</span><span class="star">✳</span>
+      <span class="sp">CNA</span><span class="star">✳</span>
+      <span class="sp">Banca Terre Venete</span><span class="star">✳</span>
+      <span class="sp">Azimut</span><span class="star">✳</span>
+      <span class="sp">Ceccato</span><span class="star">✳</span>
+      <span class="sp">Prodeco</span><span class="star">✳</span>
+      <span class="sp">CNA</span><span class="star">✳</span>
+      <span class="sp">Banca Terre Venete</span><span class="star">✳</span>
+    </div>
+  </div>
+</div>
+
+<!-- CTA / NEWSLETTER — spotlight zone -->
+<section id="about" class="spot lens-zone" aria-label="Unisciti a Sottosopra">
+  <div class="wrap">
+    <div class="spot-grid">
+      <div>
+        <span class="idx mono" style="color:var(--muted);letter-spacing:.18em">04 / ENTRA NEL BUIO</span>
+        <h2 class="display" style="margin-top:14px">Diventa<br>volontario</h2>
+        <p>~80 persone fanno succedere Sottosopra ogni anno. Porta la tua energia: il festival si costruisce insieme, dal palco al brunch.</p>
+        <div class="actions">
+          <a class="cta magnetic" href="mailto:info@sottosopra.com">Candidati ↗</a>
+          <a class="ghost magnetic" href="#news">Leggi le storie</a>
+        </div>
+      </div>
+      <div class="news-card">
+        <div class="k">/ NEWSLETTER</div>
+        <h3 class="display">Resta sottosopra</h3>
+        <p style="color:var(--muted);font-size:14px;margin-bottom:18px">Date, lineup e aperture biglietti. Niente spam, solo punti di vista.</p>
+        <form class="nl-form" onsubmit="return false">
+          <input type="email" name="email" placeholder="tua@email.it" aria-label="La tua email" required>
+          <button type="submit">Iscrivimi</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NEWS -->
+<section id="news" aria-label="News">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="idx">05 / NEWS</span>
+        <h2 class="display">Ultime</h2>
+      </div>
+      <p class="sub mono">Aggiornamenti dal festival e dietro le quinte.</p>
+    </div>
+    <div class="news-row">
+      <a class="post magnetic" href="#"><span class="date">29 · 08 · 2025</span><h3 class="display">Il festival attraverso i sensi</h3><p>Un racconto dell'edizione passata fra suoni, profumi e incontri nei giardini.</p><span class="more">Leggi →</span></a>
+      <a class="post magnetic" href="#"><span class="date">12 · 06 · 2026</span><h3 class="display">Apertura biglietti</h3><p>Da oggi su DICE: full pass e ingressi singoli per le tre serate del 2026.</p><span class="more">Leggi →</span></a>
+      <a class="post magnetic" href="#"><span class="date">02 · 05 · 2026</span><h3 class="display">Cercasi volontari</h3><p>Aperte le candidature per entrare nello staff. Posti limitati, energia illimitata.</p><span class="more">Leggi →</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-top">
+      <div>
+        <div class="flogo"><img src="/brand/sottosopra-logo-white.png" alt="SOTTOSOPRA"></div>
+        <div class="ftag display">Cambia il punto di vista</div>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h4>Esplora</h4>
+          <a href="#programma">Programma</a>
+          <a href="#info">Info</a>
+          <a href="#about">About</a>
+          <a href="#news">News</a>
+        </div>
+        <div class="foot-col">
+          <h4>Contatti</h4>
+          <a href="mailto:info@sottosopra.com">info@sottosopra.com</a>
+          <a href="https://instagram.com/sottosoprafestival" target="_blank" rel="noopener">IG @sottosoprafestival</a>
+          <p>Castelfranco Veneto</p>
+        </div>
+        <div class="foot-col">
+          <h4>Azione</h4>
+          <a href="https://dice.fm" target="_blank" rel="noopener">Biglietti su DICE ↗</a>
+          <a href="mailto:info@sottosopra.com">Diventa volontario</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 SOTTOSOPRA · Giardini del Castello</span>
+      <span>Sempre Sottosopra · 31 LUG — 2 AGO</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var fine = window.matchMedia('(pointer: fine)').matches;
+
+  /* ---------- 1. LENS CURSOR — flips what it frames (sottosopra gesture) ---------- */
+  if(fine && !reduce){
+    document.body.classList.add('lens-on');
+    var lens = document.getElementById('lens');
+    var zones = document.querySelectorAll('.lens-zone, .hero, .days, .lineup, .marquee');
+    var mx=0,my=0, lx=0,ly=0, active=false;
+    var raf=null;
+
+    function move(e){
+      mx=e.clientX; my=e.clientY;
+      lens.classList.add('active');
+      if(!raf) loop();
+      // feed spotlight var to the dark zone under cursor
+      var el = e.target.closest('.spot');
+      if(el){
+        var r = el.getBoundingClientRect();
+        el.style.setProperty('--mx', ((e.clientX-r.left)/r.width*100)+'%');
+        el.style.setProperty('--my', ((e.clientY-r.top)/r.height*100)+'%');
+      }
+    }
+    function loop(){
+      lx += (mx-lx)*0.28; ly += (my-ly)*0.28;
+      lens.style.transform = 'translate3d('+lx+'px,'+ly+'px,0)';
+      // when hovering a "framable" element, the lens grows + shows flipped clone hint
+      raf = requestAnimationFrame(loop);
+    }
+    window.addEventListener('mousemove', move, {passive:true});
+    window.addEventListener('mouseleave', function(){ lens.classList.remove('active'); });
+
+    // grow lens over interactive/framable targets
+    var framable = document.querySelectorAll('.artist, .cta, .ghost, .day, .post, .sp, h1, h2, .ftag');
+    framable.forEach(function(el){
+      el.addEventListener('mouseenter', function(){ lens.style.setProperty('--lens','188px'); });
+      el.addEventListener('mouseleave', function(){ lens.style.setProperty('--lens','148px'); });
+    });
+  }
+
+  /* ---------- 2. MAGNETIC BUTTONS ---------- */
+  if(fine && !reduce){
+    document.querySelectorAll('.magnetic').forEach(function(el){
+      var strength = el.classList.contains('cta') ? 0.4 : 0.28;
+      el.addEventListener('mousemove', function(e){
+        var r = el.getBoundingClientRect();
+        var x = e.clientX - (r.left + r.width/2);
+        var y = e.clientY - (r.top + r.height/2);
+        el.style.transform = 'translate('+(x*strength)+'px,'+(y*strength)+'px)';
+      });
+      el.addEventListener('mouseleave', function(){ el.style.transform=''; });
+    });
+  }
+
+  /* ---------- 3. TEXT REPULSION — letters flee the mouse (hero title) ---------- */
+  if(fine && !reduce){
+    var title = document.getElementById('heroTitle');
+    if(title){
+      title.querySelectorAll('.repel-line').forEach(function(line){
+        // wrap each non-flip char in a span (keep the .flip RA intact)
+        var html='';
+        var nodes = Array.prototype.slice.call(line.childNodes);
+        nodes.forEach(function(n){
+          if(n.nodeType===3){ // text node
+            n.textContent.split('').forEach(function(ch){
+              if(ch===' ') html += ' ';
+              else html += '<span class="repel">'+ch+'</span>';
+            });
+          } else { // element (the .flip RA)
+            html += n.outerHTML;
+          }
+        });
+        line.innerHTML = html;
+      });
+      var letters = title.querySelectorAll('.repel');
+      title.addEventListener('mousemove', function(e){
+        letters.forEach(function(l){
+          var r = l.getBoundingClientRect();
+          var cx = r.left + r.width/2, cy = r.top + r.height/2;
+          var dx = cx - e.clientX, dy = cy - e.clientY;
+          var dist = Math.hypot(dx,dy);
+          var radius = 130;
+          if(dist < radius){
+            var f = (1 - dist/radius);
+            var ang = Math.atan2(dy,dx);
+            l.style.transform = 'translate('+(Math.cos(ang)*f*26)+'px,'+(Math.sin(ang)*f*26)+'px)';
+          } else {
+            l.style.transform = '';
+          }
+        });
+      });
+      title.addEventListener('mouseleave', function(){
+        letters.forEach(function(l){ l.style.transform=''; });
+      });
+    }
+  }
+
+  /* ---------- 4. TASTO S — inverte tutto (gesto sottosopra nativo) ---------- */
+  var flipped = false;
+  window.addEventListener('keydown', function(e){
+    if(e.target.tagName==='INPUT' || e.target.tagName==='TEXTAREA') return;
+    if(e.key==='s' || e.key==='S'){
+      flipped = !flipped;
+      if(flipped){
+        document.documentElement.style.filter = 'invert(1)';
+        document.documentElement.style.transition = reduce ? 'none' : 'filter .5s ease';
+      } else {
+        document.documentElement.style.filter = '';
+      }
+    }
+  });
+})();
+</script>
+</body>
+</html>

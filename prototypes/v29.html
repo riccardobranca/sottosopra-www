@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOTTOSOPRA — Sempre Sottosopra · 31 Lug — 2 Ago 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============ FONT ============ */
+@font-face{
+  font-family:"SoSo26";
+  src:url("/fonts/SoSo26.woff") format("woff");
+  font-weight:normal;
+  font-style:normal;
+  font-display:swap;
+}
+
+/* ============ TOKENS ============ */
+:root{
+  --bg:#000000;
+  --fg:#FFFFFF;
+  --muted:#9A9A9A;
+  --line:#262626;
+  --bg-elev:#141414;
+  --header-h:68px;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--fg);
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:17px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+
+.display{
+  font-family:"SoSo26","Inter",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  line-height:.9;
+  letter-spacing:-.01em;
+  text-transform:uppercase;
+}
+.label{
+  font-family:"Inter",sans-serif;
+  font-size:.72rem;
+  font-weight:600;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+
+/* photo treatment B/N */
+.bw{
+  filter:grayscale(1) contrast(1.12) brightness(.92);
+}
+
+.wrap{max-width:1320px;margin:0 auto;padding:0 32px}
+
+/* ============ HEADER ============ */
+header{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  height:var(--header-h);
+  display:flex;align-items:center;
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+}
+header .wrap{display:flex;align-items:center;justify-content:space-between;width:100%;padding:0 32px}
+.logo img{height:24px;width:auto}
+nav.main{display:flex;gap:30px;align-items:center}
+nav.main a{
+  font-size:.8rem;font-weight:500;letter-spacing:.04em;color:var(--muted);
+  transition:color .2s var(--ease);
+}
+nav.main a:hover{color:var(--fg)}
+.btn-tix{
+  font-family:"Inter",sans-serif;
+  font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  background:var(--fg);color:var(--bg);
+  padding:11px 22px;border-radius:2px;
+  border:1px solid var(--fg);
+  transition:background .2s var(--ease),color .2s var(--ease);
+}
+.btn-tix:hover{background:var(--bg);color:var(--fg)}
+.nav-right{display:flex;align-items:center;gap:26px}
+.burger{display:none}
+
+/* ============ HERO ============ */
+.hero{
+  position:relative;
+  min-height:100vh;min-height:100svh;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  overflow:hidden;
+  padding-bottom:48px;
+}
+.hero-media{
+  position:absolute;inset:0;z-index:0;
+}
+.hero-media img{
+  width:100%;height:100%;object-fit:cover;object-position:center 35%;
+}
+.hero-media::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(0,0,0,.55) 0%,rgba(0,0,0,.15) 38%,rgba(0,0,0,.45) 70%,rgba(0,0,0,.92) 100%);
+}
+.hero-inner{position:relative;z-index:2;width:100%}
+.hero-inner .wrap{padding:0 32px}
+
+.hero-eyebrow{
+  display:flex;gap:18px;align-items:center;flex-wrap:wrap;
+  margin-bottom:22px;
+}
+.hero-eyebrow .label{color:#cfcfcf}
+.hero-eyebrow .dot{width:5px;height:5px;background:var(--fg);border-radius:50%;opacity:.7}
+
+/* date mask-reveal */
+.dates{margin-bottom:24px}
+.date-line{
+  overflow:hidden;
+  display:block;
+}
+.date-line .inner{
+  display:block;
+  font-size:clamp(3.4rem,13.5vw,12.5rem);
+  font-weight:normal;
+  transform:translateY(0);
+}
+.claim-row{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  gap:30px;flex-wrap:wrap;
+  border-top:1px solid rgba(255,255,255,.22);
+  padding-top:24px;
+}
+.claim-row .claim{
+  font-size:clamp(1.6rem,3.2vw,2.6rem);
+  max-width:13ch;
+}
+.claim-meta{text-align:right;max-width:34ch}
+.claim-meta p{font-size:.92rem;color:#d4d4d4;line-height:1.5}
+.claim-meta .place{color:var(--fg);font-weight:600}
+
+.hero-cta{
+  display:flex;gap:14px;flex-wrap:wrap;margin-top:30px;align-items:center;
+}
+.cta-primary{
+  font-family:"Inter",sans-serif;font-size:.84rem;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;
+  background:var(--fg);color:var(--bg);
+  padding:16px 34px;border-radius:2px;border:1px solid var(--fg);
+  transition:transform .2s var(--ease),background .2s var(--ease),color .2s var(--ease);
+}
+.cta-primary:hover{background:transparent;color:var(--fg);transform:translateY(-2px)}
+.cta-ghost{
+  font-size:.84rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  padding:16px 26px;border:1px solid rgba(255,255,255,.4);border-radius:2px;
+  transition:border-color .2s var(--ease),background .2s var(--ease);
+}
+.cta-ghost:hover{border-color:var(--fg);background:rgba(255,255,255,.06)}
+
+.scroll-hint{
+  position:absolute;bottom:18px;left:50%;transform:translateX(-50%);
+  z-index:3;display:flex;flex-direction:column;align-items:center;gap:8px;
+  color:var(--muted);
+}
+.scroll-hint .label{font-size:.62rem}
+.scroll-hint .bar{width:1px;height:34px;background:linear-gradient(var(--fg),transparent);animation:pulse 2s var(--ease) infinite}
+@keyframes pulse{0%,100%{opacity:.3;transform:scaleY(.6)}50%{opacity:1;transform:scaleY(1)}}
+
+/* ============ SECTION INTRO ============ */
+.section-head{padding:96px 0 40px}
+.section-head .label{margin-bottom:18px}
+.section-head h2{font-size:clamp(2.2rem,6vw,5rem)}
+.section-head .sub{color:var(--muted);max-width:52ch;margin-top:18px;font-size:1.02rem}
+
+/* ============ DECK / STACK CARDS ============ */
+.deck-intro .wrap{display:flex;justify-content:space-between;align-items:flex-end;gap:40px;flex-wrap:wrap}
+.deck-count{font-size:.8rem;color:var(--muted);letter-spacing:.18em;text-transform:uppercase}
+
+.deck{
+  position:relative;
+}
+.card{
+  position:sticky;
+  top:var(--header-h);
+  height:calc(100vh - var(--header-h));
+  height:calc(100svh - var(--header-h));
+  min-height:560px;
+  overflow:hidden;
+  border-top:1px solid rgba(255,255,255,.16);
+  background:#0a0a0a;
+  transform-origin:50% 0;
+  will-change:transform,filter;
+}
+.card-media{position:absolute;inset:0;z-index:0}
+.card-media img{width:100%;height:100%;object-fit:cover}
+.card-media::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(115deg,rgba(0,0,0,.88) 0%,rgba(0,0,0,.5) 40%,rgba(0,0,0,.25) 70%,rgba(0,0,0,.55) 100%);
+}
+.card-inner{
+  position:relative;z-index:2;height:100%;
+  display:flex;flex-direction:column;justify-content:space-between;
+  padding:clamp(28px,5vw,64px);
+}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:24px}
+.card-index{
+  font-family:"SoSo26",sans-serif;font-feature-settings:"ss07","ss08","liga","calt";
+  font-size:1.5rem;opacity:.75;
+}
+.card-kind{
+  font-size:.7rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
+  border:1px solid rgba(255,255,255,.4);padding:7px 13px;border-radius:2px;
+  color:#e7e7e7;
+}
+.card-day{
+  font-size:.82rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+  color:#cfcfcf;margin-bottom:6px;
+}
+.card-date{
+  font-size:clamp(3.6rem,12vw,11rem);
+  margin-bottom:18px;
+}
+.card-lineup{
+  display:flex;flex-wrap:wrap;gap:10px 22px;max-width:58ch;
+}
+.card-lineup span{
+  font-size:clamp(1.05rem,2.3vw,1.7rem);font-weight:600;
+  color:#f2f2f2;
+}
+.card-lineup span.exp{color:var(--muted);font-weight:500;font-size:clamp(.95rem,1.8vw,1.25rem)}
+.card-foot{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
+.card-note{font-size:.92rem;color:#cfcfcf;max-width:40ch}
+.card-tix{
+  font-size:.8rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  background:var(--fg);color:var(--bg);padding:14px 28px;border-radius:2px;
+  border:1px solid var(--fg);white-space:nowrap;
+  transition:background .2s var(--ease),color .2s var(--ease);
+}
+.card-tix:hover{background:transparent;color:var(--fg)}
+
+/* the full-pass card (last) */
+.card.card-pass .card-media::after{
+  background:linear-gradient(135deg,rgba(0,0,0,.92),rgba(0,0,0,.6) 55%,rgba(0,0,0,.85));
+}
+.card-pass .card-inner{justify-content:center;align-items:flex-start;text-align:left}
+.card-pass .pass-title{font-size:clamp(3rem,9vw,8rem);margin-bottom:10px}
+.card-pass .pass-sub{font-size:clamp(1.1rem,2.4vw,1.7rem);color:#e2e2e2;max-width:24ch;margin-bottom:34px}
+.card-pass .cta-primary{font-size:1rem;padding:20px 44px}
+
+/* scroll-driven enhancement (progressive) */
+@supports (animation-timeline:view()){
+  .deck.sd .card:not(.card-pass){
+    animation:cardOut linear both;
+    animation-timeline:view();
+    animation-range:exit 0% exit 70%;
+  }
+  @keyframes cardOut{
+    to{transform:scale(.94) translateY(-8px);filter:brightness(.55) blur(2px);}
+  }
+}
+
+/* ============ ARTISTS GRID ============ */
+.artists{padding:40px 0 24px}
+.artist-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  border-top:1px solid var(--line);border-left:1px solid var(--line);
+}
+.artist{
+  border-right:1px solid var(--line);border-bottom:1px solid var(--line);
+  padding:26px 22px;min-height:160px;
+  display:flex;flex-direction:column;justify-content:space-between;
+  transition:background .25s var(--ease);
+}
+.artist:hover{background:var(--bg-elev)}
+.artist .a-meta{font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.artist .a-name{font-size:clamp(1.4rem,2.6vw,2.1rem);margin-top:18px}
+
+/* ============ EXPERIENCES ============ */
+.exp-section{padding:40px 0}
+.exp-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:32px;align-items:stretch}
+.exp-photo{position:relative;overflow:hidden;border:1px solid var(--line);min-height:420px}
+.exp-photo img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.exp-photo .exp-cap{
+  position:absolute;left:24px;bottom:22px;z-index:2;
+  background:rgba(0,0,0,.6);padding:8px 14px;font-size:.82rem;backdrop-filter:blur(4px);
+}
+.exp-list{display:flex;flex-direction:column;gap:14px;justify-content:center}
+.exp-item{
+  border:1px solid var(--line);padding:24px 26px;border-radius:2px;
+  transition:transform .2s var(--ease),border-color .2s var(--ease);
+}
+.exp-item:hover{transform:translateX(6px);border-color:rgba(255,255,255,.45)}
+.exp-item h3{font-size:1.3rem;margin-bottom:6px}
+.exp-item p{color:var(--muted);font-size:.95rem}
+
+/* ============ ARCHIVE STRIP ============ */
+.archive{padding:80px 0 40px;border-top:1px solid var(--line)}
+.archive-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:34px}
+.arch-card{position:relative;overflow:hidden;aspect-ratio:3/4;border:1px solid var(--line)}
+.arch-card img{width:100%;height:100%;object-fit:cover;transition:transform .5s var(--ease)}
+.arch-card:hover img{transform:scale(1.05)}
+.arch-card .arch-year{
+  position:absolute;left:14px;bottom:12px;z-index:2;
+  font-family:"SoSo26",sans-serif;font-feature-settings:"ss07","ss08","liga","calt";
+  font-size:2rem;
+}
+.arch-card::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(0,0,0,.8))}
+
+/* ============ SPONSORS ============ */
+.sponsors{padding:70px 0;border-top:1px solid var(--line);overflow:hidden}
+.sponsors .label{text-align:center;margin-bottom:34px}
+.marquee{position:relative;width:100%;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.marquee-track{display:flex;gap:72px;width:max-content;animation:scroll 26s linear infinite}
+.marquee-track span{
+  font-family:"SoSo26",sans-serif;font-feature-settings:"ss07","ss08","liga","calt";
+  font-size:clamp(1.6rem,3.4vw,2.6rem);color:var(--muted);white-space:nowrap;
+  text-transform:uppercase;
+}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+/* ============ NEWSLETTER / CTA ============ */
+.signup{padding:100px 0;border-top:1px solid var(--line)}
+.signup-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px}
+.signup h2{font-size:clamp(2.2rem,5vw,4rem);margin-bottom:18px}
+.signup p{color:var(--muted);max-width:46ch}
+.signup-box{border:1px solid var(--line);padding:34px;border-radius:2px;background:var(--bg-elev)}
+.signup-box h3{font-size:1.3rem;margin-bottom:10px}
+.signup-box .label{margin-bottom:24px}
+.field{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.field input{
+  flex:1;min-width:180px;background:transparent;border:1px solid var(--line);
+  color:var(--fg);padding:14px 16px;border-radius:2px;font-size:.95rem;font-family:inherit;
+}
+.field input:focus{outline:none;border-color:var(--fg)}
+.field button{
+  background:var(--fg);color:var(--bg);border:none;padding:14px 26px;border-radius:2px;
+  font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:.78rem;cursor:pointer;font-family:inherit;
+  transition:opacity .2s var(--ease);
+}
+.field button:hover{opacity:.85}
+.vol-link{margin-top:24px;display:inline-flex;align-items:center;gap:8px;font-size:.85rem;font-weight:600;border-bottom:1px solid var(--muted);padding-bottom:3px}
+.vol-link:hover{border-color:var(--fg)}
+
+/* ============ FOOTER ============ */
+footer{border-top:1px solid var(--line);padding:64px 0 48px}
+.foot-grid{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap;align-items:flex-start}
+.foot-grid .logo img{height:28px}
+.foot-links{display:flex;gap:40px;flex-wrap:wrap}
+.foot-col h4{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.foot-col a,.foot-col p{display:block;font-size:.92rem;color:#d4d4d4;margin-bottom:8px}
+.foot-col a:hover{color:var(--fg)}
+.foot-bottom{margin-top:54px;padding-top:24px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:.78rem;color:var(--muted)}
+.foot-bottom a{color:var(--muted)}
+.foot-bottom a:hover{color:var(--fg)}
+
+/* ============ RESPONSIVE ============ */
+@media(max-width:880px){
+  .signup-grid{grid-template-columns:1fr}
+  .exp-grid{grid-template-columns:1fr}
+  .artist-grid{grid-template-columns:repeat(2,1fr)}
+  .archive-row{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:680px){
+  .wrap{padding:0 20px}
+  header .wrap{padding:0 20px}
+  nav.main{display:none}
+  .burger{display:block;background:none;border:1px solid var(--line);color:var(--fg);
+    width:42px;height:42px;border-radius:2px;font-size:1rem;cursor:pointer}
+  .claim-row{flex-direction:column;align-items:flex-start}
+  .claim-meta{text-align:left}
+  .card-foot{flex-direction:column;align-items:flex-start}
+  .card{height:auto;min-height:calc(100svh - var(--header-h))}
+  .artist-grid{grid-template-columns:1fr}
+}
+
+/* ============ REDUCED MOTION ============ */
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .marquee-track{animation:none}
+  .scroll-hint .bar{animation:none}
+  .deck.sd .card{animation:none !important;transform:none !important;filter:none !important}
+  .date-line .inner{transform:none !important}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header>
+  <div class="wrap">
+    <a href="#top" class="logo"><img src="/brand/sottosopra-logo-white.png" alt="Sottosopra Festival"></a>
+    <nav class="main">
+      <a href="#deck">Programma</a>
+      <a href="#info">Info</a>
+      <a href="#about">About</a>
+      <a href="#news">News</a>
+    </nav>
+    <div class="nav-right">
+      <a href="https://dice.fm/?utm_source=sito&utm_medium=header" class="btn-tix">Biglietti</a>
+      <button class="burger" aria-label="Menu">☰</button>
+    </div>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="top">
+  <div class="hero-media">
+    <img class="bw" src="/media/crowd-night-wide.jpg" alt="Folla notturna al festival Sottosopra" fetchpriority="high">
+  </div>
+  <div class="hero-inner">
+    <div class="wrap">
+      <div class="hero-eyebrow">
+        <span class="label">8ª Edizione</span>
+        <span class="dot"></span>
+        <span class="label">Castelfranco Veneto</span>
+        <span class="dot"></span>
+        <span class="label">Giardini del Castello</span>
+      </div>
+
+      <div class="dates" id="heroDates">
+        <span class="date-line"><span class="inner display">31 Lug</span></span>
+        <span class="date-line"><span class="inner display">— 2 Ago</span></span>
+        <span class="date-line"><span class="inner display">2026</span></span>
+      </div>
+
+      <div class="claim-row">
+        <div class="claim display">Sempre Sottosopra</div>
+        <div class="claim-meta">
+          <p class="place">Tre serate nei Giardini del Castello.</p>
+          <p>Musica, workshop, talk, libri e brunch. Cambia il punto di vista.</p>
+        </div>
+      </div>
+
+      <div class="hero-cta">
+        <a href="https://dice.fm/?utm_source=sito&utm_medium=home" class="cta-primary">Biglietti → DICE</a>
+        <a href="#deck" class="cta-ghost">Il programma</a>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <span class="label">Scorri il mazzo</span>
+    <span class="bar"></span>
+  </div>
+</section>
+
+<!-- ============ DECK INTRO ============ -->
+<section class="section-head deck-intro" id="deck">
+  <div class="wrap">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:40px;flex-wrap:wrap">
+      <div>
+        <div class="label">Il mazzo delle giornate</div>
+        <h2 class="display">Quattro carte,<br>una sola festa</h2>
+        <p class="sub">Ogni giornata è una carta che si impila sulla precedente mentre scorri. Dal warm-up del giovedì al brunch della domenica, fino al Full Pass.</p>
+      </div>
+      <div class="deck-count">04 / Giornate</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STACKING DECK ============ -->
+<div class="deck" id="deckStack">
+
+  <!-- Card 1 — Warmup -->
+  <article class="card">
+    <div class="card-media"><img class="bw" src="/media/garden-day.jpg" alt="Giardino del castello di giorno"></div>
+    <div class="card-inner">
+      <div class="card-top">
+        <span class="card-index">01</span>
+        <span class="card-kind">Warm-up</span>
+      </div>
+      <div>
+        <div class="card-day">Giovedì 30 luglio</div>
+        <div class="card-date display">Apertura</div>
+        <div class="card-lineup">
+          <span>Krano</span>
+          <span class="exp">DJ set in giardino</span>
+          <span class="exp">Aperitivo</span>
+        </div>
+      </div>
+      <div class="card-foot">
+        <p class="card-note">Serata pre-festival nei Giardini: musica leggera, sdraio, primo brindisi.</p>
+        <a href="https://dice.fm/?utm_source=sito&utm_medium=programma&utm_content=giovedi" class="card-tix">Biglietti Giovedì</a>
+      </div>
+    </div>
+  </article>
+
+  <!-- Card 2 — Venerdì -->
+  <article class="card">
+    <div class="card-media"><img class="bw" src="/media/crowd-night-wide.jpg" alt="Folla notturna venerdì"></div>
+    <div class="card-inner">
+      <div class="card-top">
+        <span class="card-index">02</span>
+        <span class="card-kind">Festival</span>
+      </div>
+      <div>
+        <div class="card-day">Venerdì 31 luglio</div>
+        <div class="card-date display">Ven 31</div>
+        <div class="card-lineup">
+          <span>Generic Animal</span>
+          <span>Auroro Borealo</span>
+          <span>Popa</span>
+          <span class="exp">+ talk · libri</span>
+        </div>
+      </div>
+      <div class="card-foot">
+        <p class="card-note">Si apre il sipario. Indie italiano e nuove voci sotto le mura.</p>
+        <a href="https://dice.fm/?utm_source=sito&utm_medium=programma&utm_content=venerdi" class="card-tix">Biglietti Venerdì</a>
+      </div>
+    </div>
+  </article>
+
+  <!-- Card 3 — Sabato -->
+  <article class="card">
+    <div class="card-media"><img class="bw" src="/media/crowd-night-portrait.jpg" alt="Ritratto nella folla notturna sabato"></div>
+    <div class="card-inner">
+      <div class="card-top">
+        <span class="card-index">03</span>
+        <span class="card-kind">Festival</span>
+      </div>
+      <div>
+        <div class="card-day">Sabato 1 agosto</div>
+        <div class="card-date display">Sab 01</div>
+        <div class="card-lineup">
+          <span>Ex-Otago</span>
+          <span>Vendredi sur Mer</span>
+          <span>Jesse The Faccio</span>
+          <span class="exp">+ workshop</span>
+        </div>
+      </div>
+      <div class="card-foot">
+        <p class="card-note">La notte grande. Headliner, ballo e il punto di vista che si capovolge.</p>
+        <a href="https://dice.fm/?utm_source=sito&utm_medium=programma&utm_content=sabato" class="card-tix">Biglietti Sabato</a>
+      </div>
+    </div>
+  </article>
+
+  <!-- Card 4 — Domenica -->
+  <article class="card">
+    <div class="card-media"><img class="bw" src="/media/archive-innesta.jpg" alt="Edizione passata, atmosfera domenicale"></div>
+    <div class="card-inner">
+      <div class="card-top">
+        <span class="card-index">04</span>
+        <span class="card-kind">Festival</span>
+      </div>
+      <div>
+        <div class="card-day">Domenica 2 agosto</div>
+        <div class="card-date display">Dom 02</div>
+        <div class="card-lineup">
+          <span>Alberto Ferrari</span>
+          <span class="exp">Brunch domenicale</span>
+          <span class="exp">Libri per piccolɜ</span>
+          <span class="exp">Ceramica</span>
+        </div>
+      </div>
+      <div class="card-foot">
+        <p class="card-note">Chiusura lenta: brunch, laboratori, l'ultimo concerto al tramonto.</p>
+        <a href="https://dice.fm/?utm_source=sito&utm_medium=programma&utm_content=domenica" class="card-tix">Biglietti Domenica</a>
+      </div>
+    </div>
+  </article>
+
+  <!-- Card 5 — FULL PASS (CTA) -->
+  <article class="card card-pass">
+    <div class="card-media"><img class="bw" src="/media/crowd-night-wide.jpg" alt="Tutto il festival"></div>
+    <div class="card-inner">
+      <div class="card-top">
+        <span class="card-index">★</span>
+        <span class="card-kind">Tutte le serate</span>
+      </div>
+      <div>
+        <div class="card-day">Il mazzo completo</div>
+        <div class="pass-title display">Full Pass</div>
+        <p class="pass-sub">Tre giorni, tutte le carte in mano. Un solo biglietto per vivere Sottosopra dall'inizio alla fine.</p>
+        <a href="https://dice.fm/?utm_source=sito&utm_medium=programma&utm_content=fullpass" class="cta-primary">Prendi il Full Pass → DICE</a>
+      </div>
+      <div class="card-foot">
+        <p class="card-note">31 luglio — 2 agosto 2026 · Giardini del Castello, Castelfranco Veneto</p>
+      </div>
+    </div>
+  </article>
+
+</div>
+
+<!-- ============ ARTISTS ============ -->
+<section class="section-head artists" id="lineup">
+  <div class="wrap">
+    <div class="label">Line-up 2026</div>
+    <h2 class="display">Chi suona</h2>
+  </div>
+  <div class="wrap">
+    <div class="artist-grid">
+      <div class="artist"><span class="a-meta">Ven · Headliner</span><span class="a-name display">Generic Animal</span></div>
+      <div class="artist"><span class="a-meta">Sab · Headliner</span><span class="a-name display">Ex-Otago</span></div>
+      <div class="artist"><span class="a-meta">Sab · Live</span><span class="a-name display">Vendredi sur Mer</span></div>
+      <div class="artist"><span class="a-meta">Dom · Live</span><span class="a-name display">Alberto Ferrari</span></div>
+      <div class="artist"><span class="a-meta">Ven · Live</span><span class="a-name display">Auroro Borealo</span></div>
+      <div class="artist"><span class="a-meta">Ven · Live</span><span class="a-name display">Popa</span></div>
+      <div class="artist"><span class="a-meta">Gio · DJ set</span><span class="a-name display">Krano</span></div>
+      <div class="artist"><span class="a-meta">Sab · Live</span><span class="a-name display">Jesse The Faccio</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EXPERIENCES ============ -->
+<section class="section-head exp-section" id="info">
+  <div class="wrap">
+    <div class="label">Non solo musica</div>
+    <h2 class="display">Le esperienze</h2>
+  </div>
+  <div class="wrap">
+    <div class="exp-grid">
+      <div class="exp-photo">
+        <img class="bw" src="/media/garden-day.jpg" alt="Giardino di giorno con sdraio e persone">
+        <span class="exp-cap">Giardini del Castello · giorno</span>
+      </div>
+      <div class="exp-list">
+        <div class="exp-item"><h3>Workshop</h3><p>Ceramica, stampa, suono. Mani in pasta per tuttɜ.</p></div>
+        <div class="exp-item"><h3>Talk</h3><p>Incontri civici e culturali tra un concerto e l'altro.</p></div>
+        <div class="exp-item"><h3>Libri</h3><p>Presentazioni e un angolo lettura per i più piccolɜ.</p></div>
+        <div class="exp-item"><h3>Brunch domenicale</h3><p>La chiusura lenta del festival, sotto le mura.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ARCHIVE ============ -->
+<section class="section-head archive" id="about">
+  <div class="wrap">
+    <div class="label">Dal 2017</div>
+    <h2 class="display">Otto edizioni</h2>
+    <p class="sub">Un festival che cambia il punto di vista da otto anni. Lo storico, in breve.</p>
+  </div>
+  <div class="wrap">
+    <div class="archive-row">
+      <a class="arch-card" href="#"><img class="bw" src="/media/archive-2017.jpg" alt="Edizione 2017"><span class="arch-year display">2017</span></a>
+      <a class="arch-card" href="#"><img class="bw" src="/media/archive-2019.jpg" alt="Edizione 2019"><span class="arch-year display">2019</span></a>
+      <a class="arch-card" href="#"><img class="bw" src="/media/archive-2022.jpg" alt="Edizione 2022"><span class="arch-year display">2022</span></a>
+      <a class="arch-card" href="#"><img class="bw" src="/media/archive-innesta.jpg" alt="Edizione Innesta"><span class="arch-year display">2024</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SPONSORS ============ -->
+<section class="sponsors">
+  <div class="label">Con il sostegno di</div>
+  <div class="marquee">
+    <div class="marquee-track">
+      <span>Azimut</span><span>Ceccato</span><span>Prodeco</span><span>CNA</span><span>Banca Terre Venete</span>
+      <span>Azimut</span><span>Ceccato</span><span>Prodeco</span><span>CNA</span><span>Banca Terre Venete</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SIGNUP / VOLUNTEERS ============ -->
+<section class="signup" id="news">
+  <div class="wrap">
+    <div class="signup-grid">
+      <div>
+        <div class="label">Resta nel giro</div>
+        <h2 class="display">Sempre<br>Sottosopra</h2>
+        <p>News, date, line-up e dietro le quinte. Le novità dell'8ª edizione, prima di tutti.</p>
+        <a href="#" class="vol-link">Diventa volontariə → entra nel team</a>
+      </div>
+      <div class="signup-box">
+        <div class="label">Newsletter</div>
+        <h3>Iscriviti</h3>
+        <p style="color:var(--muted);font-size:.95rem">Una mail ogni tanto, zero spam.</p>
+        <form class="field" onsubmit="return false">
+          <input type="email" placeholder="la-tua@email.it" aria-label="Email" required>
+          <button type="submit">Iscriviti</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <a href="#top" class="logo"><img src="/brand/sottosopra-logo-white.png" alt="Sottosopra"></a>
+        <p style="color:var(--muted);margin-top:18px;max-width:30ch;font-size:.9rem">Festival culturale interdisciplinare. Castelfranco Veneto, dal 2017.</p>
+      </div>
+      <div class="foot-links">
+        <div class="foot-col">
+          <h4>Festival</h4>
+          <a href="#deck">Programma</a>
+          <a href="#info">Info</a>
+          <a href="#about">About</a>
+          <a href="#news">News</a>
+        </div>
+        <div class="foot-col">
+          <h4>Contatti</h4>
+          <a href="mailto:info@sottosopra.com">info@sottosopra.com</a>
+          <a href="https://instagram.com/sottosoprafestival">IG @sottosoprafestival</a>
+          <a href="#">Facebook</a>
+        </div>
+        <div class="foot-col">
+          <h4>Biglietti</h4>
+          <a href="https://dice.fm/?utm_source=sito&utm_medium=footer">DICE →</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 APS Sottosopra · Cambia il punto di vista</span>
+      <span><a href="/privacy">Privacy</a> · <a href="/cookie">Cookie</a></span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ MOTION ENHANCEMENT (progressive, non-blocking) ============ -->
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* 1. Enable scroll-driven scale/blur on the deck only if not reduced */
+  if(!reduce){
+    var deck = document.getElementById('deckStack');
+    if(deck) deck.classList.add('sd');
+  }
+
+  /* 2. Hero dates mask-reveal — pure JS/CSS, GSAP if available */
+  function runDates(useGsap){
+    var lines = document.querySelectorAll('#heroDates .inner');
+    if(reduce){ lines.forEach(function(l){ l.style.transform='translateY(0)'; }); return; }
+
+    if(useGsap && window.gsap){
+      window.gsap.set(lines, {yPercent:115});
+      window.gsap.to(lines, {
+        yPercent:0, duration:1.05, ease:'power4.out',
+        stagger:0.11, delay:0.15
+      });
+    } else {
+      lines.forEach(function(l,i){
+        l.style.transform='translateY(115%)';
+        l.style.transition='transform 1s cubic-bezier(.22,1,.36,1)';
+        l.style.transitionDelay=(0.12 + i*0.11)+'s';
+      });
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){
+          lines.forEach(function(l){ l.style.transform='translateY(0)'; });
+        });
+      });
+    }
+  }
+
+  /* try to load GSAP for a richer SplitText-style reveal; fall back to CSS */
+  var loaded=false;
+  var s=document.createElement('script');
+  s.src='https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js';
+  s.onload=function(){ loaded=true; runDates(true); };
+  s.onerror=function(){ if(!loaded) runDates(false); };
+  document.head.appendChild(s);
+  /* safety: if GSAP is slow, run CSS fallback after 600ms */
+  setTimeout(function(){ if(!loaded && !window.gsap) runDates(false); }, 600);
+
+  /* 3. Mobile burger toggles nav */
+  var burger=document.querySelector('.burger');
+  var nav=document.querySelector('nav.main');
+  if(burger&&nav){
+    burger.addEventListener('click',function(){
+      var open = nav.style.display==='flex';
+      nav.style.display = open ? 'none' : 'flex';
+      if(!open){
+        nav.style.position='absolute';nav.style.top='var(--header-h)';nav.style.left='0';
+        nav.style.right='0';nav.style.flexDirection='column';nav.style.background='#000';
+        nav.style.padding='20px 24px';nav.style.borderBottom='1px solid var(--line)';nav.style.gap='18px';
+      }
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SOTTOSOPRA — Sempre Sottosopra 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+@font-face{
+  font-family:"SoSo26";
+  src:url("/fonts/SoSo26.woff") format("woff");
+  font-weight:normal;
+  font-style:normal;
+  font-display:swap;
+}
+
+:root{
+  --black:#000;
+  --c141:#141414;
+  --c262:#262626;
+  --c6b:#6b6b6b;
+  --c9a:#9a9a9a;
+  --ce4:#e4e4e4;
+  --cf4:#f4f4f4;
+  --white:#fff;
+
+  --maxw:1180px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;}
+
+body{
+  font-family:"Inter",system-ui,sans-serif;
+  background:var(--white);
+  color:var(--black);
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  line-height:1.5;
+}
+
+/* display font helper — SoSo26 only, with required stylistic sets */
+.soso{
+  font-family:"SoSo26","Inter",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  font-weight:normal;
+}
+
+.eyebrow{
+  font-family:"Inter",sans-serif;
+  text-transform:uppercase;
+  letter-spacing:.16em;
+  font-weight:600;
+  font-size:.72rem;
+  color:var(--c6b);
+}
+
+a{color:inherit;text-decoration:none;}
+
+img{display:block;max-width:100%;}
+
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px;}
+
+/* ============ HEADER ============ */
+header{
+  position:sticky;
+  top:0;
+  z-index:200;
+  background:var(--white);
+  border-bottom:1px solid var(--black);
+}
+.header-inner{
+  max-width:var(--maxw);margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;height:66px;
+}
+.logo img{height:19px;width:auto;}
+
+nav.main-nav{display:flex;gap:30px;align-items:center;}
+nav.main-nav a{
+  font-size:.86rem;font-weight:500;letter-spacing:.01em;
+  position:relative;padding:4px 0;
+}
+nav.main-nav a::after{
+  content:"";position:absolute;left:0;bottom:0;width:0;height:1px;background:var(--black);
+  transition:width .25s ease;
+}
+nav.main-nav a:hover::after{width:100%;}
+
+.btn-tickets{
+  background:var(--black);color:var(--white);
+  font-weight:600;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;
+  padding:12px 24px;border:1px solid var(--black);
+  transition:background .25s ease,color .25s ease;
+}
+.btn-tickets:hover{background:var(--white);color:var(--black);}
+
+/* hamburger */
+.menu-toggle{
+  display:none;background:none;border:none;cursor:pointer;
+  width:40px;height:40px;flex-direction:column;justify-content:center;gap:6px;align-items:flex-end;
+}
+.menu-toggle span{display:block;height:2px;width:26px;background:var(--black);transition:transform .25s ease,opacity .2s ease;}
+.menu-toggle[aria-expanded="true"] span:nth-child(1){transform:translateY(8px) rotate(45deg);}
+.menu-toggle[aria-expanded="true"] span:nth-child(2){opacity:0;}
+.menu-toggle[aria-expanded="true"] span:nth-child(3){transform:translateY(-8px) rotate(-45deg);}
+
+/* mobile dropdown menu */
+.mobile-menu{
+  display:none;flex-direction:column;
+  background:var(--black);color:var(--white);
+  padding:8px 32px 28px;
+  border-bottom:1px solid var(--black);
+}
+.mobile-menu.open{display:flex;}
+.mobile-menu a{padding:16px 0;font-size:1.15rem;font-weight:500;border-bottom:1px solid var(--c262);letter-spacing:.01em;}
+.mobile-menu .btn-tickets{
+  display:block;margin-top:22px;text-align:center;
+  background:var(--white);color:var(--black);border-color:var(--white);
+  padding:18px 24px;font-size:.9rem;border-bottom:1px solid var(--white);
+}
+
+/* ============ HERO ============ */
+.hero{
+  border-bottom:1px solid var(--black);
+  padding:clamp(48px,9vw,104px) 0 clamp(44px,7vw,80px);
+}
+.hero-inner{max-width:var(--maxw);margin:0 auto;padding:0 32px;}
+.hero .eyebrow{margin-bottom:clamp(20px,4vw,34px);display:inline-block;}
+.hero h1{
+  font-size:clamp(3.6rem,15vw,12rem);
+  line-height:.86;
+  letter-spacing:-.005em;
+  margin-bottom:clamp(26px,5vw,46px);
+}
+.hero h1 .line{display:block;}
+.hero-tag{
+  font-size:clamp(1.05rem,2.4vw,1.7rem);
+  letter-spacing:.01em;
+  color:var(--c141);
+  max-width:24ch;
+  margin-bottom:clamp(30px,5vw,46px);
+}
+.hero-meta{
+  display:flex;flex-wrap:wrap;gap:clamp(20px,4vw,52px);
+  padding-top:clamp(22px,3vw,28px);
+  border-top:1px solid var(--ce4);
+}
+.hero-meta .item{display:flex;flex-direction:column;gap:5px;}
+.hero-meta .k{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--c6b);font-weight:600;}
+.hero-meta .v{font-size:clamp(1.1rem,2vw,1.4rem);font-weight:500;letter-spacing:.005em;}
+.hero-cta{display:flex;flex-wrap:wrap;gap:14px;margin-top:clamp(30px,5vw,42px);}
+
+.btn-solid,.btn-ghost{
+  display:inline-flex;align-items:center;gap:10px;
+  font-weight:600;font-size:.86rem;letter-spacing:.06em;text-transform:uppercase;
+  padding:16px 28px;border:1px solid var(--black);
+  transition:background .25s ease,color .25s ease;
+}
+.btn-solid{background:var(--black);color:var(--white);}
+.btn-solid:hover{background:var(--white);color:var(--black);}
+.btn-ghost{background:var(--white);color:var(--black);}
+.btn-ghost:hover{background:var(--black);color:var(--white);}
+
+/* ============ SINGLE MARQUEE (lineup) — the one ribbon ============ */
+.band{
+  width:100%;overflow:hidden;white-space:nowrap;
+  background:var(--black);color:var(--white);
+  border-bottom:1px solid var(--black);
+}
+.track{display:inline-flex;align-items:center;white-space:nowrap;will-change:transform;}
+.track > span{display:inline-block;}
+.run{animation:marq 38s linear infinite;}
+@keyframes marq{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+.band:hover .run{animation-play-state:paused;}
+.band .lineup{
+  font-size:clamp(1.9rem,4.6vw,3.6rem);
+  line-height:1;padding:18px 0;letter-spacing:.01em;
+}
+.band .lineup .name{padding:0 .35em;}
+.band .lineup .sep{opacity:.4;}
+
+/* ============ SECTION SHELL ============ */
+.section{border-bottom:1px solid var(--black);}
+.section-head{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;
+  padding:clamp(48px,7vw,84px) 0 clamp(26px,3vw,34px);
+}
+.section-head h2{font-size:clamp(2.2rem,6vw,4.6rem);line-height:.9;letter-spacing:-.005em;}
+.section-head .idx{font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--c6b);font-weight:600;}
+
+/* ============ PROGRAMMA LEDGER (kept clear — team liked it) ============ */
+.ledger{padding-bottom:clamp(40px,6vw,72px);}
+.day-block{padding-top:clamp(30px,4vw,44px);}
+.day-label{
+  display:flex;align-items:baseline;gap:18px;
+  padding:0 0 14px;border-bottom:1px solid var(--black);
+}
+.day-label .num{
+  font-size:clamp(2.6rem,7vw,5.4rem);line-height:.8;
+  font-variant-numeric:tabular-nums;letter-spacing:-.01em;
+}
+.day-label .meta{display:flex;flex-direction:column;gap:3px;padding-bottom:6px;}
+.day-label .meta .d{font-weight:600;font-size:1.05rem;letter-spacing:.005em;}
+.day-label .meta .e{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--c6b);font-weight:600;}
+
+.slot-row{
+  display:grid;
+  grid-template-columns:74px 1fr 150px 110px;
+  align-items:center;gap:18px;
+  padding:17px 14px;
+  border-bottom:1px solid var(--ce4);
+  margin:0 -14px;
+  transition:background .18s ease,color .18s ease;
+}
+.slot-row:hover,.slot-row:focus-visible{background:var(--black);color:var(--white);outline:none;}
+.slot-row .time{font-size:.9rem;font-weight:500;letter-spacing:.02em;font-variant-numeric:tabular-nums;}
+.slot-row .title{font-size:clamp(1.25rem,2vw,1.8rem);letter-spacing:.005em;}
+.slot-row .type{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:var(--c6b);}
+.slot-row:hover .type,.slot-row:focus-visible .type{color:var(--c9a);}
+.slot-row .go{text-align:right;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;font-weight:600;opacity:.4;transition:opacity .18s ease;}
+.slot-row:hover .go,.slot-row:focus-visible .go{opacity:1;}
+
+/* esperienze — calm row of plain labels */
+.exp{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  background:var(--black);border:1px solid var(--black);
+  margin-bottom:clamp(48px,7vw,80px);
+}
+.exp .cell{
+  background:var(--white);padding:30px 24px 36px;
+  display:flex;flex-direction:column;gap:8px;min-height:150px;
+  transition:background .2s,color .2s;
+}
+.exp .cell:hover{background:var(--black);color:var(--white);}
+.exp .cell .n{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--c6b);font-weight:600;}
+.exp .cell:hover .n{color:var(--c9a);}
+.exp .cell h3{font-size:clamp(1.5rem,2.4vw,2.1rem);line-height:.95;margin-top:auto;}
+
+/* ============ CTA SPLIT (intentional S-flip micro-effect lives here) ============ */
+.cta-split{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--black);}
+.cta-split > div{padding:clamp(44px,6vw,72px) 32px;}
+.cta-split .a{background:var(--black);color:var(--white);}
+.cta-split .b{background:var(--white);color:var(--black);border-left:1px solid var(--black);}
+.cta-split .eyebrow{margin-bottom:20px;}
+.cta-split .a .eyebrow{color:var(--c9a);}
+.cta-split h3{font-size:clamp(1.9rem,3.8vw,3.2rem);line-height:.95;margin-bottom:16px;}
+.cta-split p{font-size:1rem;line-height:1.55;max-width:32ch;margin-bottom:28px;}
+.cta-split .a p{color:var(--c9a);}
+.cta-split .b p{color:var(--c6b);}
+.inline-btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-weight:600;font-size:.84rem;letter-spacing:.06em;text-transform:uppercase;
+  border:1px solid currentColor;padding:15px 26px;transition:background .25s,color .25s;
+}
+.cta-split .a .inline-btn:hover{background:var(--white);color:var(--black);}
+.cta-split .b .inline-btn:hover{background:var(--black);color:var(--white);}
+
+/* newsletter inline form */
+.nl-form{display:flex;border:1px solid var(--black);max-width:400px;}
+.nl-form input{flex:1;border:none;padding:15px 16px;font-family:inherit;font-size:.95rem;background:transparent;color:inherit;outline:none;}
+.nl-form input::placeholder{color:var(--c6b);}
+.nl-form input:focus-visible{outline:2px solid var(--black);outline-offset:-2px;}
+.nl-form button{background:var(--black);color:var(--white);border:none;padding:0 22px;font-weight:600;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:opacity .2s;}
+.nl-form button:hover{opacity:.75;}
+
+/* ============ SPONSOR (static, calm, no marquee here) ============ */
+.sponsor{padding:clamp(48px,7vw,80px) 0;}
+.sponsor .eyebrow{margin-bottom:30px;display:block;}
+.sponsor-list{
+  display:flex;flex-wrap:wrap;align-items:center;gap:clamp(28px,5vw,64px);
+}
+.sponsor-list .s{
+  font-size:clamp(1.6rem,3.4vw,2.6rem);letter-spacing:.005em;
+  color:var(--c141);transition:color .2s;
+}
+.sponsor-list .s:hover{color:var(--c9a);}
+
+/* ============ FOOTER ============ */
+footer{background:var(--black);color:var(--white);padding:clamp(56px,7vw,80px) 0 44px;}
+.foot-inner{max-width:var(--maxw);margin:0 auto;padding:0 32px;}
+.foot-wordmark{
+  font-size:clamp(3rem,14vw,11rem);line-height:.82;letter-spacing:-.005em;
+  padding-bottom:42px;border-bottom:1px solid var(--c262);
+}
+.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:36px;padding-top:40px;}
+.foot-grid .col h4{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--c9a);margin-bottom:16px;font-weight:600;}
+.foot-grid .col a,.foot-grid .col span{display:block;font-size:.94rem;line-height:1.95;color:var(--white);}
+.foot-grid .col a:hover{color:var(--c9a);}
+.foot-bottom{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;padding-top:42px;margin-top:38px;border-top:1px solid var(--c262);font-size:.76rem;letter-spacing:.03em;color:var(--c9a);}
+.foot-bottom a{border-bottom:1px solid var(--c262);}
+.foot-bottom a:hover{color:var(--white);}
+.foot-bottom kbd{
+  font-family:inherit;background:var(--white);color:var(--black);
+  padding:1px 7px;font-weight:600;border-radius:2px;
+}
+
+/* flip control (intentional gesture, not scroll-driven) */
+.flip-btn{
+  position:fixed;right:18px;bottom:18px;z-index:300;
+  background:var(--black);color:var(--white);
+  font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;
+  padding:11px 14px;display:inline-flex;align-items:center;gap:9px;
+  border:1px solid var(--c262);cursor:pointer;transition:transform .2s;
+}
+.flip-btn:hover{transform:translateY(-2px);}
+.flip-btn kbd{
+  font-family:inherit;background:var(--white);color:var(--black);
+  padding:2px 7px;font-weight:600;border-radius:2px;
+}
+
+/* ===== INTENTIONAL FLIP (tasto S / bottone) — full-page invert, user-triggered only ===== */
+body.flipped{
+  background:var(--black);color:var(--white);
+  transform:rotate(180deg);
+  transition:transform .7s cubic-bezier(.7,0,.2,1);
+}
+body:not(.flipped){transition:transform .7s cubic-bezier(.7,0,.2,1);}
+body.flipped header{position:static;}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:900px){
+  .cta-split{grid-template-columns:1fr;}
+  .cta-split .b{border-left:none;border-top:1px solid var(--black);}
+  .exp{grid-template-columns:repeat(2,1fr);}
+  .foot-grid{grid-template-columns:1fr 1fr;}
+  .slot-row{grid-template-columns:64px 1fr 110px;}
+  .slot-row .go{display:none;}
+}
+
+@media (max-width:680px){
+  nav.main-nav{display:none;}
+  .header-inner .btn-tickets{display:none;}
+  .menu-toggle{display:flex;}
+  .header-inner{padding:0 20px;height:60px;}
+  .wrap,.hero-inner,.foot-inner,.cta-split > div{padding-left:20px;padding-right:20px;}
+  .mobile-menu{padding-left:20px;padding-right:20px;}
+  .exp{grid-template-columns:1fr;}
+  .foot-grid{grid-template-columns:1fr;gap:30px;}
+  .slot-row{grid-template-columns:56px 1fr;gap:12px;}
+  .slot-row .type{display:none;}
+  .day-label{flex-wrap:wrap;gap:12px;}
+  .flip-btn{display:none;}
+  .hero-meta{gap:22px;}
+}
+
+/* ============ REDUCED MOTION ============ */
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  .run{animation:none !important;transform:none !important;white-space:normal;flex-wrap:wrap;}
+  .band{white-space:normal;overflow:visible;}
+  .track > span[data-dup]{display:none;}
+  body.flipped{transform:none;}
+  body{transition:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header>
+  <div class="header-inner">
+    <a class="logo" href="#top" aria-label="Sottosopra — home">
+      <img id="logo" src="/brand/sottosopra-logo-black.png" alt="SOTTOSOPRA">
+    </a>
+    <nav class="main-nav" aria-label="Principale">
+      <a href="#programma">Programma</a>
+      <a href="#info">Info</a>
+      <a href="#about">About</a>
+      <a href="#news">News</a>
+    </nav>
+    <a class="btn-tickets" href="#" rel="noopener">Biglietti</a>
+    <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="mobileMenu" aria-label="Apri menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#programma">Programma</a>
+    <a href="#info">Info</a>
+    <a href="#about">About</a>
+    <a href="#news">News</a>
+    <a class="btn-tickets" href="#">Biglietti → DICE</a>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="top" aria-label="Sempre Sottosopra 2026">
+  <div class="hero-inner">
+    <span class="eyebrow">8ª Edizione · Castelfranco Veneto</span>
+    <h1 class="soso">
+      <span class="line">Sempre</span>
+      <span class="line">Sottosopra</span>
+    </h1>
+    <p class="hero-tag">Cambia il punto di vista. Tre serate ai Giardini del Castello.</p>
+
+    <div class="hero-cta">
+      <a class="btn-solid" href="#">Biglietti → DICE</a>
+      <a class="btn-ghost" href="#programma">Programma</a>
+    </div>
+
+    <div class="hero-meta">
+      <div class="item">
+        <span class="k">Date</span>
+        <span class="v">Ven 31 Lug · Sab 1 · Dom 2 Ago 2026</span>
+      </div>
+      <div class="item">
+        <span class="k">Luogo</span>
+        <span class="v">Giardini del Castello</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SINGLE MARQUEE: lineup ============ -->
+<div class="band" aria-label="Lineup 2026">
+  <div class="track run soso lineup">
+    <span aria-hidden="false">
+      <span class="name">Generic Animal</span><span class="sep">·</span><span class="name">Ex-Otago</span><span class="sep">·</span><span class="name">Vendredi sur Mer</span><span class="sep">·</span><span class="name">Alberto Ferrari</span><span class="sep">·</span><span class="name">Auroro Borealo</span><span class="sep">·</span><span class="name">Popa</span><span class="sep">·</span><span class="name">Krano</span><span class="sep">·</span><span class="name">Jesse The Faccio</span><span class="sep">·&nbsp;</span>
+    </span>
+    <span data-dup aria-hidden="true">
+      <span class="name">Generic Animal</span><span class="sep">·</span><span class="name">Ex-Otago</span><span class="sep">·</span><span class="name">Vendredi sur Mer</span><span class="sep">·</span><span class="name">Alberto Ferrari</span><span class="sep">·</span><span class="name">Auroro Borealo</span><span class="sep">·</span><span class="name">Popa</span><span class="sep">·</span><span class="name">Krano</span><span class="sep">·</span><span class="name">Jesse The Faccio</span><span class="sep">·&nbsp;</span>
+    </span>
+  </div>
+</div>
+
+<!-- ============ PROGRAMMA ============ -->
+<section class="section" id="programma">
+  <div class="wrap">
+    <div class="section-head">
+      <h2 class="soso">Programma</h2>
+      <span class="idx">Tre giorni · Giardini del Castello</span>
+    </div>
+
+    <div class="ledger">
+
+      <!-- DAY 1 -->
+      <div class="day-block">
+        <div class="day-label">
+          <span class="num soso">31</span>
+          <span class="meta">
+            <span class="d">Venerdì 31 Luglio</span>
+            <span class="e">Apertura · Main Stage</span>
+          </span>
+        </div>
+        <a class="slot-row" href="#" tabindex="0">
+          <span class="time">19:30</span>
+          <span class="title soso">Popa</span>
+          <span class="type">Musica</span>
+          <span class="go">Biglietti →</span>
+        </a>
+        <a class="slot-row" href="#" tabindex="0">
+          <span class="time">21:00</span>
+          <span class="title soso">Vendredi sur Mer</span>
+          <span class="type">Headliner</span>
+          <span class="go">Biglietti →</span>
+        </a>
+        <a class="slot-row" href="#" tabindex="0">
+          <span class="time">23:00</span>
+          <span class="title soso">Generic Animal</span>
+          <span class="type">Headliner</span>
+          <span class="go">Biglietti →</span>
+        </a>
+      </div>
+
+      <!-- DAY 2 -->
+      <div class="day-block">
+        <div class="day-label">
+          <span class="num soso">01</span>
+          <span class="meta">
+            <span class="d">Sabato 1 Agosto</span>
+            <span class="e">Workshop · Talk · Main Stage</span>
+          </span>
+        </div>
+        <a class="slot-row" href="#" tabindex="0">
+          <span class="time">17:00</span>
+          <span class="title soso">Talk: Cambiare prospettiva</span>
+          <span class="type">Talk</span>
+          <span class="go">Info →</span>
+        </a>
+        <a class="slot-row" href="#" tabindex="0">
+          <span class="time">19:30</span>
+          <span class="title soso">Krano</span>
+          <span class="type">Musica</span>
+          <span class="go">Biglietti →</span>
+        </a>
+        <a class="slot-row" href="#" tabindex="0">
+          <span class="time">21:00</span>
+          <span class="title soso">Auroro Borealo</span>
+          <span class="type">Musica</span>
+          <span class="go">Biglietti →</span>
+        </a>
+        <a class="slot-row" href="#" tabindex="0">
+          <span class="time">22:45</span>
+          <span class="title soso">Ex-Otago</span>
+          <span class="type">Headliner</span>
+          <span class="go">Biglietti →</span>
+        </a>
+      </div>
+
+      <!-- DAY 3 -->
+      <div class="day-block">
+        <div class="day-label">
+          <span class="num soso">02</span>
+          <span class="meta">
+            <span class="d">Domenica 2 Agosto</span>
+            <span class="e">Brunch · Libri · Chiusura</span>
+          </span>
+        </div>
+        <a class="slot-row" href="#" tabindex="0">
+          <span class="time">11:00</span>
+          <span class="title soso">Brunch domenicale</span>
+          <span class="type">Food</span>
+          <span class="go">Info →</span>
+        </a>
+        <a class="slot-row" href="#" tabindex="0">
+          <span class="time">16:00</span>
+          <span class="title soso">Presentazione libri</span>
+          <span class="type">Libri</span>
+          <span class="go">Info →</span>
+        </a>
+        <a class="slot-row" href="#" tabindex="0">
+          <span class="time">19:00</span>
+          <span class="title soso">Jesse The Faccio</span>
+          <span class="type">Musica</span>
+          <span class="go">Biglietti →</span>
+        </a>
+        <a class="slot-row" href="#" tabindex="0">
+          <span class="time">21:30</span>
+          <span class="title soso">Alberto Ferrari</span>
+          <span class="type">Closing</span>
+          <span class="go">Biglietti →</span>
+        </a>
+      </div>
+
+    </div>
+
+    <!-- ESPERIENZE -->
+    <div class="exp" id="info">
+      <div class="cell">
+        <span class="n">A</span>
+        <h3 class="soso">Workshop</h3>
+      </div>
+      <div class="cell">
+        <span class="n">B</span>
+        <h3 class="soso">Talk</h3>
+      </div>
+      <div class="cell">
+        <span class="n">C</span>
+        <h3 class="soso">Libri</h3>
+      </div>
+      <div class="cell">
+        <span class="n">D</span>
+        <h3 class="soso">Brunch</h3>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ CTA SPLIT (about anchor) ============ -->
+<section class="cta-split" id="about">
+  <div class="a">
+    <span class="eyebrow">Entra</span>
+    <h3 class="soso">Diventa<br>volontario</h3>
+    <p>C'è posto anche per te, dietro le quinte dei Giardini.</p>
+    <a class="inline-btn" href="#">Iscriviti al team →</a>
+  </div>
+  <div class="b">
+    <span class="eyebrow">Resta</span>
+    <h3 class="soso">Newsletter</h3>
+    <p>Date, line-up e biglietti, prima degli altri.</p>
+    <form class="nl-form" onsubmit="return false;">
+      <input type="email" placeholder="la-tua@email.it" aria-label="Email" required>
+      <button type="submit">Iscrivimi</button>
+    </form>
+  </div>
+</section>
+
+<!-- ============ SPONSOR (static, calm) ============ -->
+<section class="section" id="news">
+  <div class="wrap sponsor">
+    <span class="eyebrow">Con il sostegno di</span>
+    <div class="sponsor-list soso">
+      <span class="s">Azimut</span>
+      <span class="s">Ceccato</span>
+      <span class="s">Prodeco</span>
+      <span class="s">CNA</span>
+      <span class="s">Banca Terre Venete</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="foot-inner">
+    <div class="foot-wordmark soso">SOTTOSOPRA</div>
+    <div class="foot-grid">
+      <div class="col">
+        <h4>Il festival</h4>
+        <span>8ª edizione · 2026</span>
+        <span>Giardini del Castello</span>
+        <span>Castelfranco Veneto (TV)</span>
+        <span>Ven 31 Lug — Dom 2 Ago</span>
+      </div>
+      <div class="col">
+        <h4>Naviga</h4>
+        <a href="#programma">Programma</a>
+        <a href="#info">Info</a>
+        <a href="#about">About</a>
+        <a href="#news">News</a>
+      </div>
+      <div class="col">
+        <h4>Contatti</h4>
+        <a href="mailto:info@sottosopra.com">info@sottosopra.com</a>
+        <a href="#">Instagram</a>
+        <a href="#">Facebook</a>
+        <a href="#">Biglietti → DICE</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 APS Sottosopra · Sempre Sottosopra</span>
+      <span><a href="#">Privacy</a> · <a href="#">Cookie</a> · Premi <kbd>S</kbd> per capovolgere</span>
+    </div>
+  </div>
+</footer>
+
+<!-- intentional flip control -->
+<button class="flip-btn" id="flipBtn" aria-label="Capovolgi la pagina">
+  Capovolgi <kbd>S</kbd>
+</button>
+
+<script>
+(function(){
+  // ---- INTENTIONAL flip (tasto S o bottone). Mai allo scroll. ----
+  var flipped=false;
+  function flip(){
+    flipped=!flipped;
+    document.body.classList.toggle('flipped',flipped);
+    var logo=document.getElementById('logo');
+    if(logo) logo.src = flipped ? '/brand/sottosopra-logo-white.png' : '/brand/sottosopra-logo-black.png';
+  }
+  document.addEventListener('keydown',function(e){
+    if(e.target.matches('input,textarea')) return;
+    if((e.key==='s'||e.key==='S') && !e.metaKey && !e.ctrlKey && !e.altKey){ flip(); }
+  });
+  var fb=document.getElementById('flipBtn');
+  if(fb) fb.addEventListener('click',flip);
+
+  // ---- mobile hamburger ----
+  var mt=document.getElementById('menuToggle');
+  var mm=document.getElementById('mobileMenu');
+  if(mt&&mm){
+    mt.addEventListener('click',function(){
+      var open=mm.classList.toggle('open');
+      mt.setAttribute('aria-expanded',open?'true':'false');
+      mt.setAttribute('aria-label',open?'Chiudi menu':'Apri menu');
+    });
+    mm.querySelectorAll('a').forEach(function(a){
+      a.addEventListener('click',function(){
+        mm.classList.remove('open');
+        mt.setAttribute('aria-expanded','false');
+        mt.setAttribute('aria-label','Apri menu');
+      });
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

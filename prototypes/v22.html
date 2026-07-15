@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sottosopra Festival — Sempre Sottosopra · 8ª edizione</title>
+<meta name="description" content="Sottosopra Festival, 8ª edizione. Giardini del Castello, Castelfranco Veneto. 31 luglio · 1 · 2 agosto 2026. Cambia il punto di vista." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+  /* ============================================================
+     FONT
+  ============================================================ */
+  @font-face {
+    font-family: "SoSo26";
+    src: url("/fonts/SoSo26.woff") format("woff");
+    font-weight: 100 900;
+    font-display: swap;
+  }
+
+  /* ============================================================
+     TOKENS — bianco e nero invertibile (qui: dark-mode default)
+  ============================================================ */
+  :root {
+    --bg: #000000;
+    --fg: #ffffff;
+    --muted: #9a9a9a;
+    --line: #262626;
+    --bg-elev: #0d0d0d;
+
+    --photo: grayscale(1) contrast(1.12) brightness(1.02);
+
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --pad: clamp(20px, 5vw, 96px);
+    --maxw: 1600px;
+  }
+
+  *,
+  *::before,
+  *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  .display {
+    font-family: "SoSo26", "Inter", sans-serif;
+    font-feature-settings: "ss07", "ss08", "liga", "calt";
+    font-weight: 400;
+    line-height: 0.92;
+    letter-spacing: -0.01em;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  ::selection { background: var(--fg); color: var(--bg); }
+
+  .label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding-inline: var(--pad); }
+
+  :focus-visible { outline: 2px solid var(--fg); outline-offset: 3px; }
+
+  /* ============================================================
+     HEADER
+  ============================================================ */
+  header {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px var(--pad);
+    mix-blend-mode: difference; /* logo+nav restano leggibili su foto chiare */
+  }
+  .brand-logo { height: 26px; width: auto; display: block; }
+  .nav { display: flex; gap: clamp(16px, 2vw, 36px); align-items: center; }
+  .nav a { font-size: 0.8rem; font-weight: 500; letter-spacing: 0.04em; }
+  .nav a.cta {
+    border: 1px solid currentColor;
+    padding: 9px 18px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    transition: background 0.25s var(--ease), color 0.25s var(--ease);
+  }
+  .nav .link-min { display: none; }
+  @media (max-width: 720px) {
+    .nav a:not(.cta) { display: none; }
+    .nav .link-min { display: inline; }
+  }
+
+  /* ============================================================
+     HERO — type-only su nero + ritratto ancorato a destra
+  ============================================================ */
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 var(--pad) clamp(28px, 5vh, 64px);
+    overflow: hidden;
+  }
+
+  /* ritratto ancorato destra — stato statico: VISIBILE */
+  .hero-portrait {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: clamp(280px, 40vw, 620px);
+    z-index: 0;
+    will-change: transform;
+  }
+  .hero-portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 60% 40%;
+    filter: var(--photo);
+    /* sfuma a sinistra dentro al nero per fondere con la tipografia */
+    -webkit-mask-image: linear-gradient(to left, #000 55%, transparent 100%);
+            mask-image: linear-gradient(to left, #000 55%, transparent 100%);
+  }
+  /* velo per leggibilità del claim sopra la foto */
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(
+      to top,
+      rgba(0,0,0,0.9) 0%,
+      rgba(0,0,0,0.35) 38%,
+      rgba(0,0,0,0) 70%
+    );
+    pointer-events: none;
+  }
+
+  .hero-top {
+    position: relative;
+    z-index: 2;
+    padding-top: clamp(110px, 16vh, 200px);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  .hero-eyebrow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    align-items: baseline;
+    margin-bottom: clamp(20px, 5vh, 60px);
+  }
+  .hero-eyebrow .label { white-space: nowrap; }
+
+  .hero-claim {
+    position: relative;
+    z-index: 2;
+    font-size: clamp(3rem, 15vw, 16rem);
+    text-transform: uppercase;
+    margin-bottom: clamp(20px, 4vh, 44px);
+    word-break: keep-all;
+  }
+  .hero-claim .l1 { display: block; }
+  .hero-claim .l2 { display: block; transform: translateX(0.04em); }
+  /* "SOTTOSOPRA" capovolta: il gesto di brand, leggibile comunque */
+  .flip { display: inline-block; transform: rotate(180deg); }
+
+  .hero-foot {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px 48px;
+    align-items: flex-end;
+    justify-content: space-between;
+    border-top: 1px solid var(--line);
+    padding-top: 22px;
+  }
+  .hero-dates {
+    display: flex;
+    gap: clamp(16px, 2.4vw, 40px);
+    flex-wrap: wrap;
+  }
+  .hero-date { line-height: 1.15; }
+  .hero-date b {
+    font-family: "SoSo26", sans-serif;
+    font-feature-settings: "ss07", "ss08", "liga", "calt";
+    font-weight: 400;
+    font-size: clamp(1.5rem, 3vw, 2.4rem);
+    display: block;
+  }
+  .hero-date span { font-size: 0.78rem; color: var(--muted); letter-spacing: 0.05em; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--fg);
+    color: var(--bg);
+    padding: 16px 30px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-size: 0.82rem;
+    border: 1px solid var(--fg);
+    transition: background 0.28s var(--ease), color 0.28s var(--ease);
+    white-space: nowrap;
+  }
+  .btn:hover { background: transparent; color: var(--fg); }
+  .btn .arr { transition: transform 0.28s var(--ease); }
+  .btn:hover .arr { transform: translate(4px, -4px); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--fg);
+    border: 1px solid var(--line);
+  }
+  .btn-ghost:hover { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+
+  /* ============================================================
+     MARQUEE — nastro firma (tagline che corre)
+  ============================================================ */
+  .marquee {
+    border-block: 1px solid var(--line);
+    overflow: hidden;
+    white-space: nowrap;
+    padding-block: clamp(14px, 2.2vh, 26px);
+  }
+  .marquee-track {
+    display: inline-flex;
+    gap: 0.6em;
+    will-change: transform;
+    animation: marquee 30s linear infinite;
+  }
+  .marquee span {
+    font-family: "SoSo26", sans-serif;
+    font-feature-settings: "ss07", "ss08", "liga", "calt";
+    font-size: clamp(1.6rem, 4vw, 3.4rem);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .marquee .dot { color: var(--muted); }
+  @keyframes marquee { to { transform: translateX(-50%); } }
+
+  /* ============================================================
+     SECTION SHELL
+  ============================================================ */
+  section { position: relative; }
+  .sec-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding-block: clamp(48px, 8vh, 110px) clamp(20px, 4vh, 44px);
+  }
+  .sec-head h2 {
+    font-family: "SoSo26", sans-serif;
+    font-feature-settings: "ss07", "ss08", "liga", "calt";
+    font-weight: 400;
+    font-size: clamp(2.1rem, 5vw, 4rem);
+    line-height: 0.95;
+    text-transform: uppercase;
+  }
+
+  /* ============================================================
+     LINEUP — lista verticale + reveal che insegue il cursore
+  ============================================================ */
+  .lineup-wrap { padding-bottom: clamp(40px, 8vh, 96px); }
+  .lineup {
+    list-style: none;
+    border-top: 1px solid var(--line);
+  }
+  .lineup li {
+    border-bottom: 1px solid var(--line);
+  }
+  .lineup a.name {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 24px;
+    padding-block: clamp(10px, 2vh, 22px);
+    cursor: pointer;
+    transition: opacity 0.4s var(--ease), color 0.4s var(--ease), padding-left 0.4s var(--ease);
+  }
+  .lineup .name-txt {
+    font-family: "SoSo26", sans-serif;
+    font-feature-settings: "ss07", "ss08", "liga", "calt";
+    font-weight: 400;
+    font-size: clamp(2.2rem, 8vw, 7.5rem);
+    line-height: 0.9;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    transition: transform 0.45s var(--ease);
+    transform-origin: left center;
+  }
+  .lineup .name-meta {
+    font-size: 0.74rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: opacity 0.4s var(--ease);
+  }
+  /* HOVER ATTIVO */
+  @media (hover: hover) and (pointer: fine) {
+    .lineup:hover a.name { opacity: 0.28; }
+    .lineup a.name:hover { opacity: 1; padding-left: clamp(8px, 1.5vw, 28px); }
+    .lineup a.name:hover .name-txt { transform: translateX(6px); }
+  }
+  .lineup a.name.is-dim { opacity: 0.28; }
+
+  /* immagine inline (touch fallback) — nascosta di default */
+  .name-inline {
+    overflow: hidden;
+    height: 0;
+    transition: height 0.45s var(--ease);
+  }
+  .name-inline img {
+    width: 100%;
+    max-width: 420px;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    filter: var(--photo);
+    display: block;
+    margin: 0 0 18px;
+  }
+  .name-inline.open { height: auto; }
+
+  /* il div unico che insegue il cursore */
+  .cursor-img {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 300px;
+    height: 380px;
+    z-index: 40;
+    pointer-events: none;
+    background-size: cover;
+    background-position: center;
+    filter: var(--photo);
+    transform: translate(-50%, -50%) scale(0.1);
+    clip-path: inset(100% 0 0 0);
+    opacity: 0;
+    will-change: transform, clip-path;
+  }
+  .cursor-img.show {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transition: clip-path 0.42s var(--ease), opacity 0.25s linear, transform 0.42s var(--ease);
+    transform: translate(-50%, -50%) scale(1);
+  }
+  .cursor-img.hide {
+    transition: clip-path 0.3s var(--ease), opacity 0.3s linear, transform 0.3s var(--ease);
+    clip-path: inset(0 0 100% 0);
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6);
+  }
+
+  /* ============================================================
+     PROGRAMMA / GIORNATE
+  ============================================================ */
+  .days {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid var(--line);
+    border-left: 1px solid var(--line);
+  }
+  .day {
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: clamp(24px, 3vw, 48px);
+    min-height: clamp(220px, 28vh, 340px);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: background 0.3s var(--ease);
+  }
+  .day:hover { background: var(--bg-elev); }
+  .day .num {
+    font-family: "SoSo26", sans-serif;
+    font-feature-settings: "ss07", "ss08", "liga", "calt";
+    font-weight: 400;
+    font-size: clamp(3rem, 7vw, 6.5rem);
+    line-height: 0.85;
+  }
+  .day .dow { font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+  .day .day-acts { font-size: 0.92rem; color: var(--fg); line-height: 1.5; }
+  .day .day-acts span { color: var(--muted); }
+  @media (max-width: 860px) { .days { grid-template-columns: 1fr; } }
+
+  /* ============================================================
+     ESPERIENZE
+  ============================================================ */
+  .exp {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 14px;
+    padding-bottom: clamp(40px, 8vh, 96px);
+  }
+  .exp .chip {
+    border: 1px solid var(--line);
+    padding: 12px 22px;
+    border-radius: 2px;
+    font-size: 0.95rem;
+    transition: background 0.25s var(--ease), color 0.25s var(--ease), border-color 0.25s var(--ease);
+  }
+  .exp .chip:hover { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+
+  /* ============================================================
+     ARCHIVIO
+  ============================================================ */
+  .archive { padding-bottom: clamp(40px, 8vh, 96px); }
+  .archive-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(8px, 1vw, 16px);
+  }
+  .arc {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+  }
+  .arc img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: var(--photo);
+    transition: transform 0.6s var(--ease);
+  }
+  .arc:hover img { transform: scale(1.06); }
+  .arc figcaption {
+    position: absolute;
+    left: 0; bottom: 0;
+    padding: 10px 14px;
+    font-family: "SoSo26", sans-serif;
+    font-feature-settings: "ss07","ss08","liga","calt";
+    font-size: 1.6rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+    width: 100%;
+  }
+  @media (max-width: 860px) { .archive-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  /* ============================================================
+     CTA / NEWSLETTER
+  ============================================================ */
+  .cta-block {
+    border-top: 1px solid var(--line);
+    padding-block: clamp(56px, 10vh, 140px);
+  }
+  .cta-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: clamp(36px, 6vw, 96px);
+    align-items: end;
+  }
+  .cta-grid h2 {
+    font-family: "SoSo26", sans-serif;
+    font-feature-settings: "ss07","ss08","liga","calt";
+    font-weight: 400;
+    font-size: clamp(2.4rem, 6vw, 5.2rem);
+    line-height: 0.92;
+    text-transform: uppercase;
+  }
+  .cta-grid p { color: var(--muted); margin-top: 18px; max-width: 44ch; }
+  .cta-actions { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 28px; }
+  .news-form { display: flex; flex-direction: column; gap: 14px; }
+  .news-form label { font-size: 0.78rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+  .field { display: flex; border: 1px solid var(--line); }
+  .field input {
+    flex: 1;
+    background: transparent;
+    border: 0;
+    color: var(--fg);
+    padding: 16px 18px;
+    font: inherit;
+    font-size: 0.95rem;
+  }
+  .field input::placeholder { color: var(--muted); }
+  .field input:focus { outline: none; }
+  .field button {
+    background: var(--fg);
+    color: var(--bg);
+    border: 0;
+    padding: 0 24px;
+    font: inherit;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .field button:hover { opacity: 0.82; }
+  .vol-line { font-size: 0.92rem; color: var(--muted); }
+  .vol-line a { color: var(--fg); border-bottom: 1px solid var(--fg); }
+  @media (max-width: 860px) { .cta-grid { grid-template-columns: 1fr; } }
+
+  /* ============================================================
+     FOOTER
+  ============================================================ */
+  footer { border-top: 1px solid var(--line); padding-block: clamp(40px, 6vh, 72px); }
+  .foot-grid {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .foot-logo img { height: 34px; width: auto; }
+  .foot-col { display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; }
+  .foot-col a:hover { color: var(--muted); }
+  .foot-bottom {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: clamp(40px, 6vh, 72px);
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+    font-size: 0.78rem;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+  .foot-bottom a:hover { color: var(--fg); }
+
+  /* ============================================================
+     REVEAL ON SCROLL (enhancement; default = visibile)
+  ============================================================ */
+  .reveal { opacity: 1; transform: none; }
+  body.js .reveal { opacity: 0; transform: translateY(24px); }
+  body.js .reveal.in { opacity: 1; transform: none; transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
+
+  /* ============================================================
+     MOBILE
+  ============================================================ */
+  @media (max-width: 640px) {
+    .hero-portrait { width: 62%; opacity: 0.85; }
+    .hero-portrait img {
+      object-position: 50% 30%;
+      -webkit-mask-image: linear-gradient(to left, #000 30%, transparent 100%);
+              mask-image: linear-gradient(to left, #000 30%, transparent 100%);
+    }
+    .hero-eyebrow { gap: 6px 16px; }
+    .hero-eyebrow .label { font-size: 0.66rem; letter-spacing: 0.12em; }
+    .hero-eyebrow .label:nth-child(3) { display: none; }
+    .hero-foot { flex-direction: column; align-items: stretch; gap: 20px; }
+    .hero-foot .btn { justify-content: center; width: 100%; }
+    .hero-dates { gap: 18px; }
+    .cta-actions .btn, .cta-actions .btn-ghost { flex: 1; justify-content: center; }
+    .lineup a.name { flex-direction: column; align-items: flex-start; gap: 4px; }
+    .lineup .name-meta { font-size: 0.66rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    html { scroll-behavior: auto; }
+    body.js .reveal { opacity: 1; transform: none; }
+    .cursor-img { display: none !important; }
+  }
+</style>
+</head>
+
+<body>
+
+  <!-- ============ HEADER ============ -->
+  <header>
+    <a href="/" aria-label="Sottosopra — home">
+      <img class="brand-logo" src="/brand/sottosopra-logo-white.png" alt="Sottosopra Festival" />
+    </a>
+    <nav class="nav" aria-label="Navigazione principale">
+      <a href="/programma">Programma</a>
+      <a href="/info">Info</a>
+      <a href="/about">About</a>
+      <a href="/news">News</a>
+      <a class="link-min" href="/programma">Menu</a>
+      <a class="cta" href="https://dice.fm/" target="_blank" rel="noopener" data-utm="header">Biglietti</a>
+    </nav>
+  </header>
+
+  <!-- ============ HERO ============ -->
+  <section class="hero" aria-label="Sottosopra Festival 2026">
+    <!-- foto ancorata destra: micro-parallax (enhancement). Stato statico = visibile -->
+    <div class="hero-portrait" id="heroPortrait" aria-hidden="true">
+      <img src="/media/crowd-night-portrait.jpg" alt="" loading="eager" decoding="async" />
+    </div>
+
+    <div class="hero-top">
+      <div class="hero-eyebrow">
+        <span class="label">8ª Edizione</span>
+        <span class="label">Castelfranco Veneto</span>
+        <span class="label">Giardini del Castello</span>
+        <span class="label">Cambia il punto di vista</span>
+      </div>
+
+      <h1 class="hero-claim display">
+        <span class="l1">Sempre</span>
+        <span class="l2">Sottosop<span class="flip">ra</span></span>
+      </h1>
+    </div>
+
+    <div class="hero-foot">
+      <div class="hero-dates">
+        <div class="hero-date"><b>VEN 31</b><span>Luglio 2026</span></div>
+        <div class="hero-date"><b>SAB 01</b><span>Agosto 2026</span></div>
+        <div class="hero-date"><b>DOM 02</b><span>Agosto 2026</span></div>
+      </div>
+      <a class="btn" href="https://dice.fm/" target="_blank" rel="noopener" data-utm="hero">
+        Biglietti su DICE <span class="arr">↗</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ MARQUEE ============ -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span>Sempre Sottosopra</span><span class="dot">●</span>
+      <span>Cambia il punto di vista</span><span class="dot">●</span>
+      <span>31 · 1 · 2 — Estate 2026</span><span class="dot">●</span>
+      <span>Sempre Sottosopra</span><span class="dot">●</span>
+      <span>Cambia il punto di vista</span><span class="dot">●</span>
+      <span>31 · 1 · 2 — Estate 2026</span><span class="dot">●</span>
+    </div>
+  </div>
+
+  <!-- ============ LINEUP ============ -->
+  <section class="wrap lineup-wrap" id="lineup" aria-label="Lineup 2026">
+    <div class="sec-head reveal">
+      <h2 class="display">Lineup<br />2026</h2>
+      <p class="label">Passa sopra un nome ·<br />La foto ti segue</p>
+    </div>
+
+    <ul class="lineup" id="lineupList">
+      <li>
+        <a class="name" data-img="/media/crowd-night-portrait.jpg">
+          <span class="name-txt">Generic Animal</span>
+          <span class="name-meta">Ven 31 · Live</span>
+        </a>
+        <div class="name-inline"><img src="/media/crowd-night-portrait.jpg" alt="Generic Animal" loading="lazy" /></div>
+      </li>
+      <li>
+        <a class="name" data-img="/media/crowd-night-wide.jpg">
+          <span class="name-txt">Ex-Otago</span>
+          <span class="name-meta">Ven 31 · Live</span>
+        </a>
+        <div class="name-inline"><img src="/media/crowd-night-wide.jpg" alt="Ex-Otago" loading="lazy" /></div>
+      </li>
+      <li>
+        <a class="name" data-img="/media/archive-2022.jpg">
+          <span class="name-txt">Vendredi sur Mer</span>
+          <span class="name-meta">Sab 01 · Live</span>
+        </a>
+        <div class="name-inline"><img src="/media/archive-2022.jpg" alt="Vendredi sur Mer" loading="lazy" /></div>
+      </li>
+      <li>
+        <a class="name" data-img="/media/garden-day.jpg">
+          <span class="name-txt">Alberto Ferrari</span>
+          <span class="name-meta">Sab 01 · DJ Set</span>
+        </a>
+        <div class="name-inline"><img src="/media/garden-day.jpg" alt="Alberto Ferrari" loading="lazy" /></div>
+      </li>
+      <li>
+        <a class="name" data-img="/media/archive-innesta.jpg">
+          <span class="name-txt">Auroro Borealo</span>
+          <span class="name-meta">Sab 01 · Live</span>
+        </a>
+        <div class="name-inline"><img src="/media/archive-innesta.jpg" alt="Auroro Borealo" loading="lazy" /></div>
+      </li>
+      <li>
+        <a class="name" data-img="/media/archive-2019.jpg">
+          <span class="name-txt">Popa</span>
+          <span class="name-meta">Dom 02 · Live</span>
+        </a>
+        <div class="name-inline"><img src="/media/archive-2019.jpg" alt="Popa" loading="lazy" /></div>
+      </li>
+      <li>
+        <a class="name" data-img="/media/archive-2017.jpg">
+          <span class="name-txt">Krano</span>
+          <span class="name-meta">Dom 02 · DJ Set</span>
+        </a>
+        <div class="name-inline"><img src="/media/archive-2017.jpg" alt="Krano" loading="lazy" /></div>
+      </li>
+      <li>
+        <a class="name" data-img="/media/crowd-night-portrait.jpg">
+          <span class="name-txt">Jesse The Faccio</span>
+          <span class="name-meta">Dom 02 · Live</span>
+        </a>
+        <div class="name-inline"><img src="/media/crowd-night-portrait.jpg" alt="Jesse The Faccio" loading="lazy" /></div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ============ PROGRAMMA / GIORNATE ============ -->
+  <section class="wrap" id="programma" aria-label="Le tre giornate">
+    <div class="sec-head reveal">
+      <h2 class="display">Tre giorni,<br />un punto di vista capovolto</h2>
+      <a class="label" href="/programma" style="border-bottom:1px solid var(--muted); padding-bottom:2px;">Programma completo →</a>
+    </div>
+    <div class="days reveal">
+      <div class="day">
+        <div>
+          <span class="dow">Venerdì</span>
+          <div class="num display">31</div>
+        </div>
+        <p class="day-acts">Generic Animal · Ex-Otago<br /><span>Apertura cancelli ore 18 — opening + cena.</span></p>
+      </div>
+      <div class="day">
+        <div>
+          <span class="dow">Sabato</span>
+          <div class="num display">01</div>
+        </div>
+        <p class="day-acts">Vendredi sur Mer · Alberto Ferrari · Auroro Borealo<br /><span>Talk e workshop dal pomeriggio.</span></p>
+      </div>
+      <div class="day">
+        <div>
+          <span class="dow">Domenica</span>
+          <div class="num display">02</div>
+        </div>
+        <p class="day-acts">Popa · Krano · Jesse The Faccio<br /><span>Brunch domenicale + libri nel giardino.</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ESPERIENZE ============ -->
+  <section class="wrap" id="esperienze" aria-label="Esperienze">
+    <div class="sec-head reveal">
+      <h2 class="display">Non solo musica</h2>
+      <p class="label">Workshop · Talk · Libri · Brunch</p>
+    </div>
+    <div class="exp reveal">
+      <span class="chip">Workshop di ceramica</span>
+      <span class="chip">Talk &amp; incontri</span>
+      <span class="chip">Presentazioni di libri</span>
+      <span class="chip">Brunch domenicale</span>
+      <span class="chip">Arte nei Giardini</span>
+      <span class="chip">Food &amp; drink locali</span>
+      <span class="chip">Letture per i più piccoli</span>
+    </div>
+  </section>
+
+  <!-- ============ ARCHIVIO ============ -->
+  <section class="wrap archive" id="archivio" aria-label="Archivio edizioni passate">
+    <div class="sec-head reveal">
+      <h2 class="display">Otto anni<br />Sottosopra</h2>
+      <p class="label">Dal 2017 · Castelfranco Veneto</p>
+    </div>
+    <div class="archive-grid reveal">
+      <figure class="arc"><img src="/media/archive-2017.jpg" alt="Edizione 2017" loading="lazy" /><figcaption class="display">’17</figcaption></figure>
+      <figure class="arc"><img src="/media/archive-2019.jpg" alt="Edizione 2019" loading="lazy" /><figcaption class="display">’19</figcaption></figure>
+      <figure class="arc"><img src="/media/archive-2022.jpg" alt="Edizione 2022" loading="lazy" /><figcaption class="display">’22</figcaption></figure>
+      <figure class="arc"><img src="/media/archive-innesta.jpg" alt="Edizione Innesta" loading="lazy" /><figcaption class="display">Innesta</figcaption></figure>
+    </div>
+  </section>
+
+  <!-- ============ CTA / NEWSLETTER ============ -->
+  <section class="wrap cta-block" id="newsletter" aria-label="Biglietti, volontari e newsletter">
+    <div class="cta-grid reveal">
+      <div>
+        <h2 class="display">Vieni a<br />cambiare punto di vista</h2>
+        <p>I biglietti per le tre serate sono su DICE. Posti limitati nei Giardini del Castello.</p>
+        <div class="cta-actions">
+          <a class="btn" href="https://dice.fm/" target="_blank" rel="noopener" data-utm="cta">Biglietti su DICE <span class="arr">↗</span></a>
+          <a class="btn btn-ghost" href="/programma">Vedi il programma</a>
+        </div>
+      </div>
+      <div>
+        <form class="news-form" onsubmit="return false;" aria-label="Iscrizione newsletter">
+          <label for="nl-email">Resta aggiornatə</label>
+          <div class="field">
+            <input id="nl-email" type="email" name="email" placeholder="la-tua@email.it" autocomplete="email" />
+            <button type="submit">Iscriviti</button>
+          </div>
+          <p class="vol-line">Vuoi entrare nel team? <a href="/about">Diventa volontariə →</a></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer>
+    <div class="wrap">
+      <div class="foot-grid">
+        <a class="foot-logo" href="/" aria-label="Sottosopra — home">
+          <img src="/brand/sottosopra-logo-white.png" alt="Sottosopra Festival" />
+        </a>
+        <div class="foot-col">
+          <span class="label">Festival</span>
+          <a href="/programma">Programma</a>
+          <a href="/info">Info pratiche</a>
+          <a href="/about">About &amp; storia</a>
+          <a href="/news">News</a>
+        </div>
+        <div class="foot-col">
+          <span class="label">Resta in contatto</span>
+          <a href="mailto:info@sottosopra.com">info@sottosopra.com</a>
+          <a href="https://instagram.com/sottosoprafestival" target="_blank" rel="noopener">Instagram @sottosoprafestival</a>
+          <a href="https://facebook.com/" target="_blank" rel="noopener">Facebook</a>
+        </div>
+        <div class="foot-col">
+          <span class="label">Partner</span>
+          <span style="color:var(--muted)">Azimut · Ceccato · Prodeco</span>
+          <span style="color:var(--muted)">CNA · Banca Terre Venete</span>
+        </div>
+      </div>
+      <div class="foot-bottom">
+        <span>© 2026 Sottosopra APS — Castelfranco Veneto (TV)</span>
+        <span><a href="/privacy">Privacy</a> · <a href="/cookie">Cookie</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- div unico che insegue il cursore -->
+  <div class="cursor-img" id="cursorImg" aria-hidden="true"></div>
+
+  <!-- ============ JS (enhancement) ============ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+  <script>
+    window.addEventListener("DOMContentLoaded", function () {
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+      document.body.classList.add("js");
+
+      var hasGSAP = typeof window.gsap !== "undefined";
+
+      /* ---------- preload immagini reveal ---------- */
+      var items = Array.prototype.slice.call(document.querySelectorAll("#lineupList .name"));
+      items.forEach(function (a) {
+        var src = a.getAttribute("data-img");
+        if (src) { var im = new Image(); im.src = src; }
+      });
+
+      /* ============================================================
+         SIGNATURE MOTION — reveal che insegue il cursore
+      ============================================================ */
+      var cImg = document.getElementById("cursorImg");
+      var list = document.getElementById("lineupList");
+
+      if (fine && !reduce && cImg && list) {
+        var xTo, yTo;
+        if (hasGSAP) {
+          // quickTo = follow morbido con lag (lerp ~0.15 reso via duration+expo)
+          xTo = gsap.quickTo(cImg, "left", { duration: 0.5, ease: "expo" });
+          yTo = gsap.quickTo(cImg, "top",  { duration: 0.5, ease: "expo" });
+        }
+        var fbX = 0, fbY = 0, curX = 0, curY = 0, rafId = null;
+        function fbLoop() {
+          curX += (fbX - curX) * 0.15;
+          curY += (fbY - curY) * 0.15;
+          cImg.style.left = curX + "px";
+          cImg.style.top = curY + "px";
+          rafId = requestAnimationFrame(fbLoop);
+        }
+
+        function move(e) {
+          if (hasGSAP) { xTo(e.clientX); yTo(e.clientY); }
+          else { fbX = e.clientX; fbY = e.clientY; }
+        }
+
+        items.forEach(function (a) {
+          a.addEventListener("mouseenter", function () {
+            var src = a.getAttribute("data-img");
+            cImg.style.backgroundImage = "url('" + src + "')";
+            cImg.classList.remove("hide");
+            cImg.classList.add("show");
+            document.addEventListener("mousemove", move);
+            if (!hasGSAP && rafId === null) rafId = requestAnimationFrame(fbLoop);
+          });
+          a.addEventListener("mouseleave", function () {
+            cImg.classList.remove("show");
+            cImg.classList.add("hide");
+          });
+        });
+
+        // posiziona subito al primo movimento per evitare scatto dall'angolo
+        document.addEventListener("mousemove", function init(e) {
+          if (hasGSAP) { gsap.set(cImg, { left: e.clientX, top: e.clientY }); }
+          else { fbX = curX = e.clientX; fbY = curY = e.clientY; }
+          document.removeEventListener("mousemove", init);
+        }, { once: true });
+
+        list.addEventListener("mouseleave", function () {
+          document.removeEventListener("mousemove", move);
+        });
+      }
+
+      /* ---------- touch fallback: immagine inline al tap ---------- */
+      if (!fine) {
+        items.forEach(function (a) {
+          var inline = a.parentElement.querySelector(".name-inline");
+          a.addEventListener("click", function (e) {
+            e.preventDefault();
+            // chiudi le altre
+            document.querySelectorAll(".name-inline.open").forEach(function (n) {
+              if (n !== inline) { n.classList.remove("open"); n.parentElement.querySelector(".name").classList.remove("is-dim"); }
+            });
+            inline.classList.toggle("open");
+            a.classList.toggle("is-dim");
+          });
+        });
+      }
+
+      /* ============================================================
+         HERO micro-parallax (mouse) — enhancement
+      ============================================================ */
+      var portrait = document.getElementById("heroPortrait");
+      if (portrait && fine && !reduce) {
+        var pX, pY;
+        if (hasGSAP) {
+          pX = gsap.quickTo(portrait, "x", { duration: 0.9, ease: "power2" });
+          pY = gsap.quickTo(portrait, "y", { duration: 0.9, ease: "power2" });
+        }
+        window.addEventListener("mousemove", function (e) {
+          var dx = (e.clientX / window.innerWidth - 0.5) * -26;
+          var dy = (e.clientY / window.innerHeight - 0.5) * -18;
+          if (hasGSAP) { pX(dx); pY(dy); }
+          else { portrait.style.transform = "translate(" + dx + "px," + dy + "px)"; }
+        });
+      }
+
+      /* ============================================================
+         REVEAL ON SCROLL — enhancement
+      ============================================================ */
+      var reveals = document.querySelectorAll(".reveal");
+      if (reduce) {
+        reveals.forEach(function (el) { el.classList.add("in"); });
+      } else if (hasGSAP && window.ScrollTrigger) {
+        gsap.registerPlugin(ScrollTrigger);
+        reveals.forEach(function (el) {
+          ScrollTrigger.create({
+            trigger: el,
+            start: "top 88%",
+            onEnter: function () { el.classList.add("in"); }
+          });
+        });
+      } else if ("IntersectionObserver" in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (en) {
+            if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
+          });
+        }, { threshold: 0.12, rootMargin: "0px 0px -10% 0px" });
+        reveals.forEach(function (el) { io.observe(el); });
+      } else {
+        reveals.forEach(function (el) { el.classList.add("in"); });
+      }
+    });
+  </script>
+</body>
+</html>

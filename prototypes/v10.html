@@ -1,0 +1,626 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SOTTOSOPRA — Capovolta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+@font-face{
+  font-family:"SoSo26";
+  src:url("/fonts/SoSo26.woff") format("woff");
+  font-weight:normal;
+  font-style:normal;
+  font-display:swap;
+}
+
+:root{
+  --black:#000;
+  --ink:#111;
+  --c2:#262626;
+  --c4:#6b6b6b;
+  --c5:#9a9a9a;
+  --c6:#e4e4e4;
+  --c7:#f4f4f4;
+  --white:#fff;
+
+  /* token semantici invertibili — il flip li scambia */
+  --bg:var(--white);
+  --fg:var(--black);
+  --line:var(--black);
+  --muted:var(--c4);
+
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  --flip-ms:0.65s;
+}
+
+/* INVERSIONE PALETTE — gesto firma, NON è movimento (resta sotto reduced-motion) */
+html[data-theme="dark"]{
+  --bg:var(--black);
+  --fg:var(--white);
+  --line:var(--white);
+  --muted:var(--c5);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+
+body{
+  background:var(--bg);
+  color:var(--fg);
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:16px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  transition:background var(--flip-ms) ease,color var(--flip-ms) ease;
+}
+
+/* ===== il contenitore che si CAPOVOLGE (rotate 180) ===== */
+#world{
+  position:relative;
+  transform-origin:center center;
+  transition:transform var(--flip-ms) cubic-bezier(.7,0,.3,1);
+}
+html[data-flipped="true"] #world{ transform:rotate(180deg); }
+
+/* grana da stampa */
+.grain{
+  position:fixed;inset:0;z-index:9000;pointer-events:none;
+  opacity:.05;mix-blend-mode:multiply;
+}
+html[data-theme="dark"] .grain{mix-blend-mode:screen;opacity:.06}
+
+.display{
+  font-family:"SoSo26","Inter",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  font-weight:normal;
+  line-height:0.86;
+  letter-spacing:-0.015em;
+}
+.mono{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+.eyebrow{font-family:"Inter";font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase}
+
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+
+.wrap{max-width:1280px;margin:0 auto;padding:0 32px}
+
+/* ============ HEADER ============ */
+header{
+  position:sticky;top:0;z-index:100;
+  background:var(--bg);
+  border-bottom:1px solid var(--line);
+  transition:background var(--flip-ms) ease;
+}
+.bar{
+  max-width:1280px;margin:0 auto;padding:0 32px;
+  height:64px;display:flex;align-items:center;justify-content:space-between;gap:24px;
+}
+.logo{display:flex;align-items:center;height:20px}
+.logo img{height:20px;width:auto}
+.logo .dark-only{display:none}
+html[data-theme="dark"] .logo .light-only{display:none}
+html[data-theme="dark"] .logo .dark-only{display:block}
+
+nav.main{display:flex;gap:28px;align-items:center}
+nav.main a{font-size:13px;font-weight:500;letter-spacing:.02em;position:relative;padding:4px 0}
+nav.main a::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:1px;background:var(--fg);transition:right .25s ease}
+nav.main a:hover::after{right:0}
+
+.header-right{display:flex;align-items:center;gap:14px}
+
+/* tasto S — il perno del gioco */
+.flipbtn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  height:34px;padding:0 12px;
+  border:1px solid var(--fg);
+  background:var(--bg);color:var(--fg);
+  font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  cursor:pointer;
+  transition:background .2s ease,color .2s ease;
+}
+.flipbtn .key{
+  font-family:"SoSo26";font-feature-settings:"ss07","ss08";
+  font-size:16px;line-height:1;display:inline-block;
+}
+.flipbtn:hover{background:var(--fg);color:var(--bg)}
+.flipbtn[aria-pressed="true"] .key{transform:rotate(180deg)}
+.flipbtn .key{transition:transform var(--flip-ms) cubic-bezier(.7,0,.3,1)}
+
+.btn-tickets{
+  display:inline-flex;align-items:center;height:34px;padding:0 18px;
+  background:var(--fg);color:var(--bg);
+  border:1px solid var(--fg);
+  font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase;
+  transition:background .2s ease,color .2s ease;
+}
+.btn-tickets:hover{background:var(--bg);color:var(--fg)}
+
+/* ============ HERO — l'asse di specchiatura ============ */
+.hero{position:relative;border-bottom:1px solid var(--line)}
+.hero-half{position:relative;overflow:hidden;height:50vh;min-height:340px;display:flex;flex-direction:column;justify-content:center}
+
+/* metà superiore: SOTTO, fondo come il tema */
+.hero-top{
+  background:var(--bg);color:var(--fg);
+  border-bottom:none;
+  padding:32px 0 0;
+  justify-content:flex-end;
+}
+/* metà inferiore: SOPRA, invertita e ribaltata 180 — è il riflesso */
+.hero-bottom{
+  background:var(--fg);color:var(--bg);
+  padding:0 0 32px;
+  justify-content:flex-start;
+}
+
+.giant{
+  font-family:"SoSo26";font-feature-settings:"ss07","ss08","liga","calt";
+  font-size:clamp(5rem,22vw,19rem);
+  line-height:.78;
+  letter-spacing:-0.02em;
+  text-align:center;
+  width:100%;
+}
+.hero-bottom .giant{transform:rotate(180deg)}
+
+/* l'asse: barra orizzontale con date bivalenti + logo perno */
+.axis{
+  position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);
+  z-index:5;
+  display:flex;align-items:center;justify-content:center;gap:0;
+  pointer-events:none;
+}
+.axis-rail{
+  width:100%;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  background:var(--bg);
+  height:64px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;
+  transition:background var(--flip-ms) ease;
+}
+.axis-dates{
+  font-family:"SoSo26";font-feature-settings:"ss07","ss08";
+  font-size:clamp(1.1rem,2.6vw,2rem);
+  letter-spacing:.02em;
+  font-variant-numeric:tabular-nums;
+  display:flex;gap:18px;align-items:center;
+}
+.axis-dates .sep{opacity:.4}
+.axis-logo{display:flex;align-items:center;height:26px}
+.axis-logo img{height:26px;width:auto}
+.axis-logo .dark-only{display:none}
+html[data-theme="dark"] .axis-logo .light-only{display:none}
+html[data-theme="dark"] .axis-logo .dark-only{display:block}
+
+/* micro-meta agli angoli dell'hero */
+.hero-meta{position:absolute;z-index:6;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+.meta-tl{top:18px;left:32px}
+.meta-tr{top:18px;right:32px;text-align:right}
+.hero-bottom .bm{position:absolute;z-index:6;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+.bm-bl{bottom:18px;left:32px;transform:rotate(180deg);transform-origin:left center}
+.bm-br{bottom:18px;right:32px;transform:rotate(180deg);transform-origin:right center;text-align:left}
+
+/* riga claim sotto hero */
+.claimrow{
+  border-bottom:1px solid var(--line);
+  display:grid;grid-template-columns:1fr auto 1fr;
+}
+.claimrow > *{padding:18px 32px}
+.claimrow .c-mid{border-left:1px solid var(--line);border-right:1px solid var(--line);text-align:center}
+.claimrow .eyebrow{color:var(--muted)}
+.claimrow .big{font-family:"SoSo26";font-feature-settings:"ss07","ss08";font-size:18px;letter-spacing:.01em;margin-top:4px}
+.claimrow .right{text-align:right}
+
+/* ============ LINEUP — colata tipografica ============ */
+.section{border-bottom:1px solid var(--line);padding:0}
+.sec-head{
+  display:flex;justify-content:space-between;align-items:baseline;
+  padding:22px 32px;border-bottom:1px solid var(--line);
+  max-width:1280px;margin:0 auto;
+}
+.sec-head h2{font-family:"SoSo26";font-feature-settings:"ss07","ss08","liga","calt";font-size:clamp(1.6rem,3vw,2.4rem);line-height:1}
+.sec-head .mono{color:var(--muted)}
+
+.lineup{max-width:1280px;margin:0 auto}
+.act{
+  display:grid;grid-template-columns:88px 1fr auto;align-items:center;
+  border-bottom:1px solid var(--line);
+  padding:0 32px;min-height:96px;
+  position:relative;cursor:pointer;
+  transition:background .2s ease,color .2s ease;
+}
+.act:last-child{border-bottom:none}
+.act .idx{font-family:var(--mono);font-size:13px;color:var(--muted);transition:color .2s ease}
+.act .name{
+  font-family:"SoSo26";font-feature-settings:"ss07","ss08","liga","calt";
+  font-size:clamp(2rem,5.4vw,4.4rem);line-height:.9;letter-spacing:-0.02em;
+}
+.act .tag{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:right;transition:color .2s ease}
+.act:hover{background:var(--fg);color:var(--bg)}
+.act:hover .idx,.act:hover .tag{color:var(--bg)}
+/* echo capovolto del nome appare su hover (gioco sottosopra) */
+.act .echo{
+  position:absolute;left:120px;bottom:8px;
+  font-family:"SoSo26";font-feature-settings:"ss07","ss08";
+  font-size:clamp(2rem,5.4vw,4.4rem);line-height:.9;letter-spacing:-0.02em;
+  transform:rotate(180deg);transform-origin:left bottom;
+  opacity:0;pointer-events:none;transition:opacity .25s ease;
+  color:var(--bg);
+}
+.act:hover .echo{opacity:.12}
+
+.lineup-foot{padding:20px 32px;display:flex;justify-content:space-between;align-items:center;max-width:1280px;margin:0 auto}
+.txtlink{font-weight:600;font-size:14px;border-bottom:1px solid var(--fg);padding-bottom:2px}
+
+/* ============ NASTRO / MARQUEE ============ */
+.ribbon{
+  background:var(--fg);color:var(--bg);
+  overflow:hidden;white-space:nowrap;
+  border-bottom:1px solid var(--line);
+  display:flex;
+}
+.ribbon-track{
+  display:inline-flex;gap:0;
+  font-family:"SoSo26";font-feature-settings:"ss07","ss08","liga","calt";
+  font-size:clamp(2rem,4vw,3.2rem);
+  letter-spacing:.04em;text-transform:uppercase;
+  padding:18px 0;
+  animation:slide 26s linear infinite;
+  will-change:transform;
+}
+.ribbon:hover .ribbon-track{animation-play-state:paused}
+.ribbon-track span{padding:0 .5em;display:inline-block}
+.ribbon-track .star{transform:rotate(180deg);opacity:.5;display:inline-block;padding:0 .35em}
+@keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ============ GRAVITÀ INVERTITA — coppia speculare ============ */
+.paired{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--line);max-width:1280px;margin:0 auto}
+.pane{padding:56px 32px;min-height:360px;display:flex;flex-direction:column;justify-content:center}
+.pane.left{border-right:1px solid var(--line)}
+.pane h3{font-family:"SoSo26";font-feature-settings:"ss07","ss08","liga","calt";font-size:clamp(2rem,4vw,3.4rem);line-height:.92;margin:12px 0 16px}
+.pane p{color:var(--muted);max-width:42ch;font-size:15px;line-height:1.6;margin-bottom:24px}
+.pane .eyebrow{color:var(--muted)}
+.pane.right{background:var(--fg);color:var(--bg)}
+.pane.right .eyebrow,.pane.right p{color:var(--bg);opacity:.72}
+/* la pane destra è progettata anche per essere letta a testa in giù: contenuto ribaltato */
+.pane.right .inner{transform:rotate(180deg)}
+
+.cta{
+  display:inline-flex;align-items:center;align-self:flex-start;height:46px;padding:0 24px;
+  border:1px solid currentColor;font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase;
+  transition:background .2s ease,color .2s ease;
+}
+.pane.left .cta:hover{background:var(--fg);color:var(--bg)}
+.pane.right .cta{border-color:var(--bg)}
+.pane.right .cta:hover{background:var(--bg);color:var(--fg)}
+
+/* reveal capovolto -> si raddrizza */
+.rise{opacity:0;transform:rotate(180deg) translateY(-30px)}
+.rise.in{opacity:1;transform:none;transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
+
+/* ============ EXPERIENCES tape ============ */
+.exp{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line)}
+.exp .cell{padding:36px 24px;border-right:1px solid var(--line);min-height:170px;display:flex;flex-direction:column;justify-content:space-between}
+.exp .cell:last-child{border-right:none}
+.exp .num{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.exp .lab{font-family:"SoSo26";font-feature-settings:"ss07","ss08";font-size:clamp(1.3rem,2.4vw,2rem);line-height:.95}
+
+/* ============ SPONSOR strip ============ */
+.sponsor{max-width:1280px;margin:0 auto;padding:40px 32px;border-bottom:1px solid var(--line)}
+.sponsor .eyebrow{color:var(--muted);margin-bottom:24px;display:block}
+.sponsor-row{display:flex;flex-wrap:wrap;gap:14px 0;align-items:stretch;border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.sponsor-row .s{
+  flex:1 1 20%;min-width:180px;
+  border-right:1px solid var(--line);border-bottom:1px solid var(--line);
+  padding:26px 20px;display:flex;align-items:center;justify-content:center;
+  font-family:"SoSo26";font-feature-settings:"ss07","ss08";font-size:1.4rem;letter-spacing:.01em;
+  transition:background .2s ease,color .2s ease;
+}
+.sponsor-row .s:hover{background:var(--fg);color:var(--bg)}
+
+/* ============ NEWSLETTER / FOOTER ============ */
+.nl{max-width:1280px;margin:0 auto;border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr}
+.nl .l{padding:48px 32px;border-right:1px solid var(--line)}
+.nl .l h3{font-family:"SoSo26";font-feature-settings:"ss07","ss08","liga","calt";font-size:clamp(1.8rem,3.4vw,2.8rem);line-height:.95;margin-bottom:12px}
+.nl .l p{color:var(--muted);font-size:14px;max-width:36ch}
+.nl .r{padding:48px 32px;display:flex;flex-direction:column;justify-content:center;gap:14px}
+.nl form{display:flex;border:1px solid var(--fg)}
+.nl input{flex:1;border:none;background:transparent;color:var(--fg);padding:14px 16px;font-family:var(--mono);font-size:13px;letter-spacing:.04em;outline:none}
+.nl input::placeholder{color:var(--muted);text-transform:uppercase}
+.nl button{border:none;background:var(--fg);color:var(--bg);padding:0 22px;font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:opacity .2s}
+.nl button:hover{opacity:.82}
+.nl .vol{font-family:var(--mono);font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.nl .vol a{color:var(--fg);border-bottom:1px solid var(--fg);padding-bottom:1px}
+
+footer{max-width:1280px;margin:0 auto;padding:40px 32px 80px}
+.foot-top{display:flex;justify-content:space-between;align-items:flex-start;gap:32px;flex-wrap:wrap}
+.foot-logo img{height:18px;width:auto}
+.foot-logo .dark-only{display:none}
+html[data-theme="dark"] .foot-logo .light-only{display:none}
+html[data-theme="dark"] .foot-logo .dark-only{display:block}
+.foot-col{font-family:var(--mono);font-size:12px;letter-spacing:.04em;line-height:2}
+.foot-col a:hover{text-decoration:underline}
+.foot-big{
+  font-family:"SoSo26";font-feature-settings:"ss07","ss08","liga","calt";
+  font-size:clamp(3rem,13vw,11rem);line-height:.82;margin-top:48px;letter-spacing:-0.02em;
+}
+.foot-big .flip{display:inline-block;transform:rotate(180deg)}
+.foot-legal{margin-top:32px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+
+/* ============ RESPONSIVE 375 ============ */
+@media (max-width:880px){
+  nav.main{display:none}
+  .claimrow{grid-template-columns:1fr}
+  .claimrow .c-mid{border-left:none;border-right:none;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .claimrow .right{text-align:left}
+  .paired{grid-template-columns:1fr}
+  .pane.left{border-right:none;border-bottom:1px solid var(--line)}
+  .pane.right .inner{transform:none}  /* su mobile non capovolgiamo il contenuto leggibile */
+  .exp{grid-template-columns:1fr 1fr}
+  .exp .cell:nth-child(2){border-right:none}
+  .exp .cell{border-bottom:1px solid var(--line)}
+  .nl{grid-template-columns:1fr}
+  .nl .l{border-right:none;border-bottom:1px solid var(--line)}
+}
+@media (max-width:560px){
+  .wrap,.bar,.sec-head{padding-left:18px;padding-right:18px}
+  .axis-rail{padding:0 16px;height:auto;flex-direction:column;gap:8px;padding-top:10px;padding-bottom:10px}
+  .axis-dates{font-size:1rem;gap:10px}
+  .act{grid-template-columns:44px 1fr;padding:0 18px;min-height:74px}
+  .act .tag{display:none}
+  .act .echo{display:none}
+  .exp{grid-template-columns:1fr}
+  .exp .cell{border-right:none}
+  .sponsor-row .s{flex:1 1 100%}
+  .header-right .flipbtn span.lbl{display:none}
+}
+
+/* ============ REDUCED MOTION ============ */
+@media (prefers-reduced-motion:reduce){
+  #world,.flipbtn .key{transition:none}
+  .ribbon-track{animation:none;transform:none;white-space:normal;display:block;text-align:center}
+  .ribbon-track span{padding:0 .3em}
+  .rise{opacity:1;transform:none;transition:none}
+  /* palette resta invertibile: NON è movimento */
+}
+</style>
+</head>
+<body>
+
+<!-- grana stampa -->
+<svg class="grain" xmlns="http://www.w3.org/2000/svg">
+  <filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" stitchTiles="stitch"/></filter>
+  <rect width="100%" height="100%" filter="url(#n)"/>
+</svg>
+
+<div id="world">
+
+<header>
+  <div class="bar">
+    <a class="logo" href="#" aria-label="Sottosopra — home">
+      <img class="light-only" src="/brand/sottosopra-logo-black.png" alt="SOTTOSOPRA">
+      <img class="dark-only" src="/brand/sottosopra-logo-white.png" alt="SOTTOSOPRA">
+    </a>
+    <nav class="main" aria-label="Principale">
+      <a href="#">Programma</a>
+      <a href="#">Info</a>
+      <a href="#">About</a>
+      <a href="#">News</a>
+    </nav>
+    <div class="header-right">
+      <button class="flipbtn" id="flip" aria-pressed="false" aria-label="Capovolgi la pagina (tasto S)">
+        <span class="key">S</span><span class="lbl">Capovolgi</span>
+      </button>
+      <a class="btn-tickets" href="#">Biglietti</a>
+    </div>
+  </div>
+</header>
+
+<!-- ============ HERO specchiato sull'asse ============ -->
+<section class="hero" aria-label="Sottosopra 2026">
+  <div class="hero-half hero-top">
+    <span class="hero-meta meta-tl">8ª edizione · 2026</span>
+    <span class="hero-meta meta-tr">Castelfranco V.to<br>Giardini del Castello</span>
+    <div class="giant">SOTTO</div>
+  </div>
+
+  <div class="hero-half hero-bottom">
+    <div class="giant">SOPRA</div>
+    <span class="bm bm-bl">Sempre Sottosopra</span>
+    <span class="bm bm-br">Musica & cultura</span>
+  </div>
+
+  <!-- l'asse di specchiatura: date bivalenti + logo perno -->
+  <div class="axis" aria-hidden="false">
+    <div class="axis-rail">
+      <div class="axis-dates">
+        <span>31</span><span class="sep">·</span><span>01</span><span class="sep">·</span><span>02</span>
+      </div>
+      <div class="axis-logo">
+        <img class="light-only" src="/brand/sottosopra-logo-black.png" alt="">
+        <img class="dark-only" src="/brand/sottosopra-logo-white.png" alt="">
+      </div>
+      <div class="axis-dates"><span>AGO</span><span class="sep">·</span><span>2026</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- riga claim -->
+<div class="claimrow">
+  <div class="c-left">
+    <span class="eyebrow">Tagline storica</span>
+    <div class="big display">Cambia il punto di vista</div>
+  </div>
+  <div class="c-mid">
+    <span class="eyebrow">Tre serate</span>
+    <div class="big display">VEN · SAB · DOM</div>
+  </div>
+  <div class="c-right right">
+    <span class="eyebrow">Claim 2026</span>
+    <div class="big display">Sempre Sottosopra</div>
+  </div>
+</div>
+
+<!-- ============ LINEUP — colata tipografica ============ -->
+<section class="section" aria-label="Lineup 2026">
+  <div class="sec-head">
+    <h2>Lineup</h2>
+    <span class="mono">08 nomi · in aggiornamento</span>
+  </div>
+  <div class="lineup">
+    <a class="act" href="#"><span class="idx">01</span><span class="name display">Generic Animal</span><span class="echo display">Generic Animal</span><span class="tag">Headliner · Ven</span></a>
+    <a class="act" href="#"><span class="idx">02</span><span class="name display">Ex-Otago</span><span class="echo display">Ex-Otago</span><span class="tag">Headliner · Sab</span></a>
+    <a class="act" href="#"><span class="idx">03</span><span class="name display">Vendredi sur Mer</span><span class="echo display">Vendredi sur Mer</span><span class="tag">Live · Dom</span></a>
+    <a class="act" href="#"><span class="idx">04</span><span class="name display">Alberto Ferrari</span><span class="echo display">Alberto Ferrari</span><span class="tag">Live · Ven</span></a>
+    <a class="act" href="#"><span class="idx">05</span><span class="name display">Auroro Borealo</span><span class="echo display">Auroro Borealo</span><span class="tag">Live · Sab</span></a>
+    <a class="act" href="#"><span class="idx">06</span><span class="name display">Popa</span><span class="echo display">Popa</span><span class="tag">DJ set · Sab</span></a>
+    <a class="act" href="#"><span class="idx">07</span><span class="name display">Krano</span><span class="echo display">Krano</span><span class="tag">Live · Dom</span></a>
+    <a class="act" href="#"><span class="idx">08</span><span class="name display">Jesse The Faccio</span><span class="echo display">Jesse The Faccio</span><span class="tag">DJ set · Ven</span></a>
+  </div>
+  <div class="lineup-foot">
+    <span class="mono" style="color:var(--muted)">Programma completo + orari</span>
+    <a class="txtlink" href="#">Vedi tutto il programma →</a>
+  </div>
+</section>
+
+<!-- ============ NASTRO ============ -->
+<div class="ribbon" aria-hidden="true">
+  <div class="ribbon-track">
+    <span>SEMPRE SOTTOSOPRA</span><span class="star">✱</span>
+    <span>31 · 01 · 02 AGOSTO 2026</span><span class="star">✱</span>
+    <span>GIARDINI DEL CASTELLO</span><span class="star">✱</span>
+    <span>CAMBIA IL PUNTO DI VISTA</span><span class="star">✱</span>
+    <span>SEMPRE SOTTOSOPRA</span><span class="star">✱</span>
+    <span>31 · 01 · 02 AGOSTO 2026</span><span class="star">✱</span>
+    <span>GIARDINI DEL CASTELLO</span><span class="star">✱</span>
+    <span>CAMBIA IL PUNTO DI VISTA</span><span class="star">✱</span>
+  </div>
+</div>
+
+<!-- ============ COPPIA SPECULARE — gravità invertita ============ -->
+<section class="paired" aria-label="Biglietti e community">
+  <div class="pane left rise" data-rise>
+    <div>
+      <span class="eyebrow">Azione #1</span>
+      <h3 class="display">Prendi<br>i biglietti</h3>
+      <p>Pass giornalieri e full pass su DICE. Tre serate nei Giardini del Castello, dal venerdì alla domenica.</p>
+      <a class="cta" href="#">Biglietti su DICE →</a>
+    </div>
+  </div>
+  <div class="pane right rise" data-rise>
+    <div class="inner">
+      <span class="eyebrow">Entra nel team</span>
+      <h3 class="display">Diventa<br>volontariɜ</h3>
+      <p>~80 persone fanno succedere Sottosopra ogni anno. Workshop, palco, accoglienza: c'è un posto anche per te.</p>
+      <a class="cta" href="#">Candidati ora →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ESPERIENZE ============ -->
+<section class="section" aria-label="Esperienze">
+  <div class="sec-head">
+    <h2>Non solo concerti</h2>
+    <span class="mono">esperienze · diurno + serale</span>
+  </div>
+  <div class="exp">
+    <div class="cell"><span class="num">/01</span><span class="lab display">Workshop</span></div>
+    <div class="cell"><span class="num">/02</span><span class="lab display">Talk</span></div>
+    <div class="cell"><span class="num">/03</span><span class="lab display">Libri</span></div>
+    <div class="cell"><span class="num">/04</span><span class="lab display">Brunch<br>domenicale</span></div>
+  </div>
+</section>
+
+<!-- ============ SPONSOR ============ -->
+<section class="sponsor" aria-label="Partner">
+  <span class="eyebrow">Con il sostegno di</span>
+  <div class="sponsor-row">
+    <div class="s display">Azimut</div>
+    <div class="s display">Ceccato</div>
+    <div class="s display">Prodeco</div>
+    <div class="s display">CNA</div>
+    <div class="s display">Banca Terre Venete</div>
+  </div>
+</section>
+
+<!-- ============ NEWSLETTER ============ -->
+<section class="nl" aria-label="Newsletter e volontari">
+  <div class="l">
+    <h3 class="display">Resta<br>sottosopra</h3>
+    <p>Date, lineup e aperture biglietti prima di tutti. Niente spam, solo festival.</p>
+  </div>
+  <div class="r">
+    <form onsubmit="return false">
+      <input type="email" placeholder="la-tua@email.it" aria-label="Email">
+      <button type="submit">Iscrivimi</button>
+    </form>
+    <span class="vol">Vuoi dare una mano? <a href="#">Diventa volontariɜ</a></span>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="foot-top">
+    <div class="foot-logo">
+      <img class="light-only" src="/brand/sottosopra-logo-black.png" alt="SOTTOSOPRA">
+      <img class="dark-only" src="/brand/sottosopra-logo-white.png" alt="SOTTOSOPRA">
+    </div>
+    <div class="foot-col">
+      <div>Programma</div><div>Info pratiche</div><div>About</div><div>News</div>
+    </div>
+    <div class="foot-col">
+      <div><a href="mailto:info@sottosopra.com">info@sottosopra.com</a></div>
+      <div><a href="#">Instagram @sottosoprafestival</a></div>
+      <div><a href="#">Facebook</a></div>
+    </div>
+  </div>
+
+  <div class="foot-big display">SOTT<span class="flip">OSOPRA</span></div>
+
+  <div class="foot-legal">
+    <span>© 2026 APS Sottosopra · Castelfranco Veneto</span>
+    <span><a href="#">Privacy</a> · <a href="#">Cookie</a> · Premi S per capovolgere</span>
+  </div>
+</footer>
+
+</div><!-- /#world -->
+
+<script>
+(function(){
+  var root=document.documentElement;
+  var btn=document.getElementById('flip');
+
+  function setFlip(on){
+    root.setAttribute('data-flipped', on?'true':'false');
+    root.setAttribute('data-theme', on?'dark':'light');
+    btn.setAttribute('aria-pressed', on?'true':'false');
+  }
+  var flipped=false;
+  function toggle(){ flipped=!flipped; setFlip(flipped); }
+
+  btn.addEventListener('click',toggle);
+  document.addEventListener('keydown',function(e){
+    if(e.target && (e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')) return;
+    if(e.key==='s'||e.key==='S'){ e.preventDefault(); toggle(); }
+  });
+
+  // reveal: sezioni entrano capovolte e si raddrizzano (gravità invertita)
+  var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var rises=document.querySelectorAll('[data-rise]');
+  if(reduce || !('IntersectionObserver' in window)){
+    rises.forEach(function(el){el.classList.add('in')});
+  } else {
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); }
+      });
+    },{threshold:0.25});
+    rises.forEach(function(el){io.observe(el)});
+  }
+})();
+</script>
+</body>
+</html>

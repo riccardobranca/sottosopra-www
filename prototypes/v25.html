@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOTTOSOPRA · Sempre Sottosopra · 8ª edizione · Castelfranco Veneto</title>
+<meta name="description" content="Festival SOTTOSOPRA 2026 — Sempre Sottosopra. 8ª edizione ai Giardini del Castello, Castelfranco Veneto. 31 luglio, 1 e 2 agosto.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   SOTTOSOPRA — v25 "Montaggio Sticky"
+   Pinned cinematic mosaic that assembles, zooms, converges on claim.
+   Static state is fully valid; GSAP scrub is enhancement only.
+   ============================================================ */
+
+@font-face {
+  font-family: "SoSo26";
+  src: url("/fonts/SoSo26.woff") format("woff");
+  font-weight: 400 900;
+  font-display: swap;
+}
+
+:root{
+  --bg:#000000;
+  --fg:#FFFFFF;
+  --muted:#9A9A9A;
+  --line:#262626;
+  --elev:#0d0d0d;
+  --maxw:1280px;
+  --pad:clamp(20px,5vw,72px);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg);
+  color:var(--fg);
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:17px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+
+.display{
+  font-family:"SoSo26","Inter",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  font-weight:400;
+  line-height:0.92;
+  letter-spacing:-0.01em;
+  text-transform:uppercase;
+}
+.label{
+  font-family:"Inter",sans-serif;
+  font-size:0.75rem;
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  font-weight:500;
+  color:var(--muted);
+}
+
+/* ---------- duotone / B&W photo treatment ---------- */
+.bw{
+  filter:grayscale(1) contrast(1.18) brightness(0.92);
+}
+
+/* =================== HEADER =================== */
+.site-header{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px var(--pad);
+  mix-blend-mode:difference; /* stays legible over photos */
+}
+.site-header .logo{height:26px;width:auto}
+.nav{display:flex;gap:28px;align-items:center}
+.nav a{font-size:0.82rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:500;opacity:0.85;transition:opacity .2s ease}
+.nav a:hover{opacity:1}
+.btn-tickets{
+  font-family:"Inter",sans-serif;font-weight:700;font-size:0.8rem;
+  letter-spacing:0.12em;text-transform:uppercase;
+  background:var(--fg);color:var(--bg);
+  padding:11px 20px;border:1px solid var(--fg);
+  transition:transform .2s ease;
+}
+.btn-tickets:hover{transform:translateY(-2px)}
+.nav-links{display:flex;gap:26px}
+@media(max-width:780px){
+  .nav-links{display:none}
+  .site-header{padding:14px 20px}
+}
+
+/* =================== PINNED HERO SCENE =================== */
+.scene{
+  position:relative;
+  height:420vh;            /* scroll distance that drives the timeline */
+}
+.scene-pin{
+  position:sticky;top:0;
+  height:100vh;
+  overflow:hidden;
+  display:grid;
+  place-items:center;
+  background:var(--bg);
+}
+
+/* The mosaic stage. In static (no-JS) state tiles sit in a real grid.
+   GSAP repositions them to a "scattered columns" start, then plays. */
+.mosaic{
+  position:relative;
+  width:min(96vw,1280px);
+  height:min(86vh,820px);
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  grid-template-rows:repeat(8,1fr);
+  gap:10px;
+  will-change:transform;
+}
+.tile{
+  position:relative;
+  overflow:hidden;
+  background:var(--elev);
+  will-change:transform,opacity;
+}
+.tile img{
+  width:100%;height:100%;object-fit:cover;
+}
+.tile .cap{
+  position:absolute;left:8px;bottom:7px;z-index:2;
+  font-size:0.62rem;letter-spacing:0.18em;text-transform:uppercase;
+  font-weight:600;color:#fff;
+  text-shadow:0 1px 6px rgba(0,0,0,0.9);
+  opacity:0.85;
+}
+
+/* tile grid placement — central window = garden-day */
+.t-center{grid-column:4 / 10;grid-row:3 / 7;z-index:3}
+.t-a{grid-column:1 / 4;grid-row:1 / 4}     /* crowd-night-portrait */
+.t-b{grid-column:1 / 4;grid-row:4 / 9}     /* archive-2017 */
+.t-c{grid-column:4 / 10;grid-row:1 / 3}    /* crowd-night-wide */
+.t-d{grid-column:10 / 13;grid-row:1 / 5}   /* archive-2019 */
+.t-e{grid-column:10 / 13;grid-row:5 / 9}   /* archive-2022 */
+.t-f{grid-column:4 / 7;grid-row:7 / 9}     /* archive-innesta */
+.t-g{grid-column:7 / 10;grid-row:7 / 9}    /* garden recap small */
+
+/* The converging claim — sits over the mosaic, hidden until focus.
+   In static state it is visible (see .no-js / reduced rules below). */
+.claim-layer{
+  position:absolute;inset:0;z-index:10;
+  display:grid;place-items:center;
+  pointer-events:none;
+}
+.claim-box{
+  text-align:center;
+  background:rgba(0,0,0,0.0);
+  padding:0 16px;
+  opacity:0;                 /* JS path fades it in */
+}
+.claim-box .kicker{
+  display:block;margin-bottom:14px;
+  font-size:0.78rem;letter-spacing:0.34em;text-transform:uppercase;
+  color:#fff;font-weight:500;
+}
+.claim-box h1{
+  font-size:clamp(3.2rem,13vw,12rem);
+  color:#fff;
+  text-shadow:0 4px 40px rgba(0,0,0,0.55);
+}
+.claim-box .dates{
+  margin-top:18px;display:flex;gap:16px;justify-content:center;flex-wrap:wrap;
+  font-size:0.92rem;letter-spacing:0.06em;color:#fff;font-weight:500;
+}
+.claim-box .dates span{border:1px solid rgba(255,255,255,0.4);padding:6px 14px}
+.claim-cta{
+  pointer-events:auto;
+  margin-top:26px;display:inline-block;
+  font-family:"Inter";font-weight:700;font-size:0.86rem;
+  letter-spacing:0.14em;text-transform:uppercase;
+  background:#fff;color:#000;padding:14px 34px;
+  transition:transform .2s ease;
+}
+.claim-cta:hover{transform:translateY(-2px)}
+
+/* scroll hint */
+.scroll-hint{
+  position:absolute;left:50%;bottom:26px;transform:translateX(-50%);z-index:20;
+  font-size:0.68rem;letter-spacing:0.28em;text-transform:uppercase;color:var(--muted);
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+}
+.scroll-hint .bar{width:1px;height:34px;background:linear-gradient(var(--muted),transparent);animation:drop 1.8s infinite ease-in-out}
+@keyframes drop{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* ============ STATIC FALLBACK (the contract) ============
+   Without JS (.no-js) OR with reduced motion: show the FINAL state.
+   Mosaic assembled + claim fully visible + readable.            */
+html.no-js .claim-box{opacity:1}
+html.no-js .scene{height:100vh}            /* collapse the scroll distance */
+html.no-js .scene-pin{position:relative;height:100vh}
+html.no-js .scroll-hint{display:none}
+html.no-js .mosaic .tile{opacity:1}
+
+@media (prefers-reduced-motion: reduce){
+  .claim-box{opacity:1}
+  .scene{height:100vh}
+  .scene-pin{position:relative;height:100vh}
+  .scroll-hint{display:none}
+  .bar{animation:none}
+}
+
+/* =================== STANDARD SECTIONS =================== */
+.section{
+  max-width:var(--maxw);
+  margin:0 auto;
+  padding:clamp(80px,11vw,160px) var(--pad);
+  border-top:1px solid var(--line);
+}
+.sec-head{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  gap:24px;margin-bottom:48px;flex-wrap:wrap;
+}
+.sec-head h2{font-size:clamp(2.4rem,7vw,6rem)}
+.sec-head .meta{max-width:340px;color:var(--muted);font-size:0.96rem}
+
+/* ---- LINEUP ---- */
+.lineup-list{display:flex;flex-direction:column}
+.act{
+  display:flex;align-items:baseline;justify-content:space-between;gap:20px;
+  padding:22px 0;border-bottom:1px solid var(--line);
+  position:relative;
+}
+.act .name{
+  font-family:"SoSo26","Inter";font-feature-settings:"ss07","ss08","liga","calt";
+  text-transform:uppercase;line-height:0.95;
+  font-size:clamp(2rem,6vw,4.5rem);
+  transition:transform .25s ease, color .25s ease;
+}
+.act:hover .name{transform:translateX(14px)}
+.act .tag{font-size:0.74rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+
+/* ---- DATE / PROGRAMMA ---- */
+.days{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.day{background:var(--bg);padding:36px 28px;display:flex;flex-direction:column;gap:14px;min-height:260px}
+.day .num{font-family:"SoSo26";font-feature-settings:"ss07","ss08","liga","calt";font-size:clamp(3rem,8vw,6rem);line-height:0.85}
+.day .dow{font-size:0.78rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted)}
+.day .acts{margin-top:auto;font-size:0.92rem;color:#ddd;line-height:1.55}
+@media(max-width:760px){.days{grid-template-columns:1fr}}
+
+/* ---- ESPERIENZE strip ---- */
+.exp{display:flex;flex-wrap:wrap;gap:12px}
+.exp span{border:1px solid var(--line);padding:12px 22px;font-size:0.86rem;letter-spacing:0.06em;transition:background .2s ease,color .2s ease}
+.exp span:hover{background:#fff;color:#000}
+
+/* ---- ARCHIVIO ---- */
+.archive{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.arch-card{position:relative;aspect-ratio:3/4;overflow:hidden;background:var(--elev)}
+.arch-card img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
+.arch-card:hover img{transform:scale(1.06)}
+.arch-card .yr{position:absolute;left:14px;bottom:12px;font-family:"SoSo26";font-feature-settings:"ss07","ss08";font-size:2rem;text-shadow:0 2px 12px rgba(0,0,0,.8)}
+@media(max-width:760px){.archive{grid-template-columns:repeat(2,1fr)}}
+
+/* ---- CTA / NEWSLETTER ---- */
+.cta-band{
+  position:relative;overflow:hidden;
+  border-top:1px solid var(--line);
+}
+.cta-photo{position:absolute;inset:0;z-index:0}
+.cta-photo img{width:100%;height:100%;object-fit:cover;opacity:0.28}
+.cta-inner{position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:clamp(90px,12vw,170px) var(--pad);display:grid;grid-template-columns:1.2fr 1fr;gap:60px;align-items:center}
+.cta-inner h2{font-size:clamp(2.4rem,7vw,5.5rem)}
+.cta-inner p{color:#d6d6d6;margin:18px 0 8px;max-width:420px}
+.signup{display:flex;gap:10px;margin-top:22px;max-width:440px}
+.signup input{flex:1;background:transparent;border:1px solid var(--fg);color:#fff;padding:14px 16px;font-family:inherit;font-size:0.95rem}
+.signup input::placeholder{color:var(--muted)}
+.signup button{background:#fff;color:#000;border:none;padding:0 22px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;font-size:0.8rem;cursor:pointer;transition:transform .2s ease}
+.signup button:hover{transform:translateY(-2px)}
+.vol-box{border:1px solid var(--line);padding:30px}
+.vol-box h3{font-family:"SoSo26";font-feature-settings:"ss07","ss08";font-size:1.6rem;text-transform:uppercase;margin-bottom:10px}
+.vol-box p{color:var(--muted);font-size:0.92rem;margin-bottom:18px}
+.vol-box a{display:inline-block;border-bottom:1px solid #fff;padding-bottom:3px;font-weight:600;font-size:0.9rem;letter-spacing:0.04em}
+@media(max-width:820px){.cta-inner{grid-template-columns:1fr;gap:40px}}
+
+/* ---- SPONSOR marquee ---- */
+.sponsors{border-top:1px solid var(--line);padding:32px 0;overflow:hidden}
+.spon-track{display:flex;gap:64px;white-space:nowrap;width:max-content;animation:marq 26s linear infinite}
+.spon-track span{font-family:"SoSo26";font-feature-settings:"ss07","ss08";font-size:1.4rem;text-transform:uppercase;color:var(--muted);letter-spacing:0.04em}
+@keyframes marq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){.spon-track{animation:none}}
+
+/* ---- FOOTER ---- */
+.site-footer{border-top:1px solid var(--line);padding:clamp(60px,9vw,120px) var(--pad)}
+.foot-grid{max-width:var(--maxw);margin:0 auto;display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap;align-items:flex-start}
+.foot-logo{height:34px;margin-bottom:18px}
+.foot-grid .col h4{font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.foot-grid .col a,.foot-grid .col p{display:block;font-size:0.95rem;margin-bottom:8px;color:#ddd}
+.foot-grid .col a:hover{color:#fff}
+.foot-bottom{max-width:var(--maxw);margin:46px auto 0;padding-top:24px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:0.78rem;color:var(--muted);letter-spacing:0.04em}
+.foot-claim{font-family:"SoSo26";font-feature-settings:"ss07","ss08";font-size:clamp(2.2rem,9vw,7rem);text-transform:uppercase;line-height:0.85;margin-top:50px;color:#fff}
+
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="site-header">
+  <a href="/" aria-label="Sottosopra home">
+    <img class="logo" src="/brand/sottosopra-logo-white.png" alt="Sottosopra">
+  </a>
+  <nav class="nav" aria-label="Principale">
+    <div class="nav-links">
+      <a href="/programma">Programma</a>
+      <a href="/info">Info</a>
+      <a href="/about">About</a>
+      <a href="/news">News</a>
+    </div>
+    <a class="btn-tickets" href="https://dice.fm/?utm_source=sito&utm_medium=header" target="_blank" rel="noopener">Biglietti</a>
+  </nav>
+</header>
+
+<!-- ============ PINNED HERO: MONTAGGIO STICKY ============ -->
+<section class="scene" id="hero">
+  <div class="scene-pin">
+
+    <div class="mosaic" id="mosaic" aria-label="Montaggio fotografico Sottosopra">
+      <!-- central window -->
+      <figure class="tile t-center" data-tile="center">
+        <img class="bw" src="/media/garden-day.jpg" alt="Giardini del Castello di giorno, pubblico del festival" loading="eager">
+        <figcaption class="cap">Giardini del Castello</figcaption>
+      </figure>
+      <figure class="tile t-a" data-tile="a">
+        <img class="bw" src="/media/crowd-night-portrait.jpg" alt="Ragazza tra la folla di notte" loading="eager">
+        <figcaption class="cap">Notte</figcaption>
+      </figure>
+      <figure class="tile t-b" data-tile="b">
+        <img class="bw" src="/media/archive-2017.jpg" alt="Edizione 2017" loading="eager">
+        <figcaption class="cap">2017</figcaption>
+      </figure>
+      <figure class="tile t-c" data-tile="c">
+        <img class="bw" src="/media/crowd-night-wide.jpg" alt="Folla del festival di notte" loading="eager">
+        <figcaption class="cap">Live</figcaption>
+      </figure>
+      <figure class="tile t-d" data-tile="d">
+        <img class="bw" src="/media/archive-2019.jpg" alt="Edizione 2019" loading="eager">
+        <figcaption class="cap">2019</figcaption>
+      </figure>
+      <figure class="tile t-e" data-tile="e">
+        <img class="bw" src="/media/archive-2022.jpg" alt="Edizione 2022" loading="eager">
+        <figcaption class="cap">2022</figcaption>
+      </figure>
+      <figure class="tile t-f" data-tile="f">
+        <img class="bw" src="/media/archive-innesta.jpg" alt="Progetto Innesta" loading="eager">
+        <figcaption class="cap">Innesta</figcaption>
+      </figure>
+      <figure class="tile t-g" data-tile="g">
+        <img class="bw" src="/media/garden-day.jpg" alt="Pubblico nei giardini" loading="lazy">
+        <figcaption class="cap">Brunch</figcaption>
+      </figure>
+    </div>
+
+    <div class="claim-layer">
+      <div class="claim-box" id="claimBox">
+        <span class="kicker">8ª edizione · Castelfranco Veneto</span>
+        <h1 class="display">Sempre<br>Sottosopra</h1>
+        <div class="dates">
+          <span>Ven 31 LUG</span><span>Sab 1 AGO</span><span>Dom 2 AGO</span>
+        </div>
+        <a class="claim-cta" href="https://dice.fm/?utm_source=sito&utm_medium=home" target="_blank" rel="noopener">Biglietti →</a>
+      </div>
+    </div>
+
+    <div class="scroll-hint" aria-hidden="true">
+      <span>Scorri · si monta</span>
+      <span class="bar"></span>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ TAGLINE BAND ============ -->
+<div class="sponsors" aria-hidden="true">
+  <div class="spon-track">
+    <span>Cambia il punto di vista —</span><span>Musica</span><span>Workshop</span><span>Talk</span><span>Arte</span><span>Cibo</span><span>Cambia il punto di vista —</span><span>Musica</span><span>Workshop</span><span>Talk</span><span>Arte</span><span>Cibo</span>
+  </div>
+</div>
+
+<!-- ============ LINEUP ============ -->
+<section class="section" id="lineup">
+  <div class="sec-head">
+    <h2 class="display">Lineup</h2>
+    <p class="meta">Tre serate ai Giardini del Castello. Musica dal vivo, voci e corpi che cambiano il punto di vista.</p>
+  </div>
+  <div class="lineup-list">
+    <div class="act"><span class="name display">Generic Animal</span><span class="tag">Ven 31 / Headliner</span></div>
+    <div class="act"><span class="name display">Ex-Otago</span><span class="tag">Sab 1 / Headliner</span></div>
+    <div class="act"><span class="name display">Vendredi sur Mer</span><span class="tag">Dom 2 / Headliner</span></div>
+    <div class="act"><span class="name display">Alberto Ferrari</span><span class="tag">Live</span></div>
+    <div class="act"><span class="name display">Auroro Borealo</span><span class="tag">Live</span></div>
+    <div class="act"><span class="name display">Popa</span><span class="tag">Live</span></div>
+    <div class="act"><span class="name display">Krano</span><span class="tag">Dj set</span></div>
+    <div class="act"><span class="name display">Jesse The Faccio</span><span class="tag">Live</span></div>
+  </div>
+</section>
+
+<!-- ============ DATE / PROGRAMMA ============ -->
+<section class="section" id="programma">
+  <div class="sec-head">
+    <h2 class="display">Tre giorni</h2>
+    <p class="meta">Luglio diventa agosto. Dal tramonto alla notte, più il brunch della domenica.</p>
+  </div>
+  <div class="days">
+    <div class="day">
+      <div class="dow">Venerdì</div>
+      <div class="num display">31</div>
+      <div class="acts">Generic Animal · Krano<br>Talk d'apertura · Food</div>
+    </div>
+    <div class="day">
+      <div class="dow">Sabato</div>
+      <div class="num display">01</div>
+      <div class="acts">Ex-Otago · Auroro Borealo · Popa<br>Workshop · Libri</div>
+    </div>
+    <div class="day">
+      <div class="dow">Domenica</div>
+      <div class="num display">02</div>
+      <div class="acts">Vendredi sur Mer · Alberto Ferrari · Jesse The Faccio<br>Brunch · Arte</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ESPERIENZE ============ -->
+<section class="section" id="esperienze">
+  <div class="sec-head">
+    <h2 class="display">Non solo musica</h2>
+    <p class="meta">Il festival è un programma intero: si ascolta, si fa, si parla, si mangia insieme.</p>
+  </div>
+  <div class="exp">
+    <span>Workshop</span><span>Talk</span><span>Presentazioni libri</span><span>Brunch domenicale</span><span>Arte &amp; installazioni</span><span>Food locale</span><span>Spazio bimb*</span>
+  </div>
+</section>
+
+<!-- ============ ARCHIVIO ============ -->
+<section class="section" id="archivio">
+  <div class="sec-head">
+    <h2 class="display">Archivio</h2>
+    <p class="meta">Dal 2017: otto edizioni che hanno ribaltato Castelfranco una serata alla volta.</p>
+  </div>
+  <div class="archive">
+    <figure class="arch-card"><img class="bw" src="/media/archive-2017.jpg" alt="Edizione 2017" loading="lazy"><figcaption class="yr">17</figcaption></figure>
+    <figure class="arch-card"><img class="bw" src="/media/archive-2019.jpg" alt="Edizione 2019" loading="lazy"><figcaption class="yr">19</figcaption></figure>
+    <figure class="arch-card"><img class="bw" src="/media/archive-2022.jpg" alt="Edizione 2022" loading="lazy"><figcaption class="yr">22</figcaption></figure>
+    <figure class="arch-card"><img class="bw" src="/media/archive-innesta.jpg" alt="Progetto Innesta" loading="lazy"><figcaption class="yr">∞</figcaption></figure>
+  </div>
+</section>
+
+<!-- ============ CTA / NEWSLETTER / VOLONTARI ============ -->
+<section class="cta-band" id="resta">
+  <div class="cta-photo"><img class="bw" src="/media/crowd-night-wide.jpg" alt=""></div>
+  <div class="cta-inner">
+    <div>
+      <h2 class="display">Resta sottosopra</h2>
+      <p>Date, lineup completa e aperture biglietti: te le mandiamo prima che escano da qualsiasi altra parte.</p>
+      <form class="signup" onsubmit="return false;">
+        <input type="email" placeholder="la-tua@email.it" aria-label="Email per la newsletter" required>
+        <button type="submit">Iscrivimi</button>
+      </form>
+    </div>
+    <aside class="vol-box">
+      <h3>Volontari*</h3>
+      <p>Ottanta persone fanno questo festival ogni anno. La prossima potresti essere tu.</p>
+      <a href="mailto:info@sottosopra.com?subject=Volontariato">Entra in Sottosopra →</a>
+    </aside>
+  </div>
+</section>
+
+<!-- ============ SPONSOR ============ -->
+<div class="sponsors" aria-label="Sponsor">
+  <div class="spon-track">
+    <span>Azimut</span><span>Ceccato</span><span>Prodeco</span><span>CNA</span><span>Banca Terre Venete</span><span>Azimut</span><span>Ceccato</span><span>Prodeco</span><span>CNA</span><span>Banca Terre Venete</span>
+  </div>
+</div>
+
+<!-- ============ FOOTER ============ -->
+<footer class="site-footer">
+  <div class="foot-grid">
+    <div class="col">
+      <img class="foot-logo" src="/brand/sottosopra-logo-white.png" alt="Sottosopra">
+      <p>Cambia il punto di vista.</p>
+      <p>Castelfranco Veneto</p>
+    </div>
+    <div class="col">
+      <h4>Festival</h4>
+      <a href="/programma">Programma</a>
+      <a href="/info">Info pratiche</a>
+      <a href="/about">About</a>
+      <a href="/news">News</a>
+    </div>
+    <div class="col">
+      <h4>Contatti</h4>
+      <a href="mailto:info@sottosopra.com">info@sottosopra.com</a>
+      <a href="https://instagram.com/sottosoprafestival" target="_blank" rel="noopener">IG @sottosoprafestival</a>
+    </div>
+    <div class="col">
+      <h4>Biglietti</h4>
+      <a href="https://dice.fm/?utm_source=sito&utm_medium=footer" target="_blank" rel="noopener">Su DICE →</a>
+    </div>
+  </div>
+  <div class="foot-claim display">Sempre Sottosopra</div>
+  <div class="foot-bottom">
+    <span>© 2026 APS Sottosopra · 8ª edizione</span>
+    <span>Privacy · Cookie</span>
+  </div>
+</footer>
+
+<!-- ============ ENHANCEMENT: GSAP ScrollTrigger pin + scrub ============ -->
+<script>
+  /* Mark JS available: the .no-js fallback (final static state) is the default
+     in HTML; we only enter the animated path when JS + motion are OK. */
+  document.documentElement.classList.add("js");
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+(function(){
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var hasGSAP = window.gsap && window.ScrollTrigger;
+
+  // If GSAP failed to load OR reduced motion: keep the strong static final state.
+  if(!hasGSAP || reduce){
+    document.documentElement.classList.add("no-js");
+    return;
+  }
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  var mosaic   = document.getElementById("mosaic");
+  var claimBox = document.getElementById("claimBox");
+  var tiles    = gsap.utils.toArray("#mosaic .tile");
+  var st = null;
+
+  // The surrounding tiles (NOT the centre) fly in from scattered columns.
+  // Map keyed by data-tile -> [x%, y%, rotation]. "center" is the opening window.
+  var START = {
+    a:[ -120, -90, -8 ],
+    b:[ -130,  90, -6 ],
+    c:[    0, -130,  4 ],
+    d:[  130, -90,  8 ],
+    e:[  130, 110,  6 ],
+    f:[  -40, 150, -5 ],
+    g:[   40, 150,  5 ]
+  };
+  var surround = tiles.filter(function(t){return t.getAttribute("data-tile")!=="center";});
+  var center   = document.querySelector('[data-tile="center"]');
+
+  function build(){
+    if(st){ st.kill(); }
+
+    // ---- OPENING STATE (scroll progress 0) ----
+    // Brief: "garden-day come singola foto in piccola finestra centrale".
+    // The centre window is already on screen as a small framed photo, and the
+    // claim is already legible. This is also the valid static no-scroll frame.
+    gsap.set(mosaic, {scale:1, xPercent:0, yPercent:0});
+    gsap.set(center, {scale:0.62, opacity:1, transformOrigin:"50% 50%"});
+    gsap.set(claimBox, {opacity:1, scale:0.86, yPercent:0});
+
+    // surrounding tiles wait offstage, scattered
+    surround.forEach(function(t){
+      var s = START[t.getAttribute("data-tile")] || [0,80,0];
+      gsap.set(t, {xPercent:s[0], yPercent:s[1], rotation:s[2], opacity:0, transformOrigin:"50% 50%"});
+    });
+
+    var tl = gsap.timeline({
+      defaults:{ease:"power2.out"},
+      scrollTrigger:{
+        trigger:"#hero",
+        start:"top top",
+        end:"bottom bottom",
+        scrub:true,
+        pin:".scene-pin",
+        pinSpacing:true,
+        anticipatePin:1
+      }
+    });
+    st = tl.scrollTrigger;
+
+    // PHASE 1 — the central window grows to its grid slot while the
+    // surrounding tiles fly in to assemble the full mosaic (staggered columns).
+    tl.addLabel("assemble")
+      .to(center, {scale:1, duration:1, ease:"power2.inOut"}, "assemble")
+      .to(claimBox, {opacity:0, scale:0.82, duration:0.5}, "assemble")
+      .to(surround, {
+        xPercent:0, yPercent:0, rotation:0, opacity:1,
+        duration:1, stagger:{each:0.06, from:"edges"}
+      }, "assemble");
+
+    // PHASE 2 — the whole mosaic zooms in toward the centre (~2x) + slight drift
+    tl.addLabel("zoom", ">-0.1")
+      .to(mosaic, {scale:2.0, yPercent:-6, duration:1.1, ease:"power2.inOut"}, "zoom")
+      // fade the busy tiles down so the claim reads cleanly
+      .to(tiles, {opacity:0.16, duration:0.8}, "zoom+=0.35");
+
+    // PHASE 3 — claim converges into final focus and holds
+    tl.addLabel("focus", ">-0.2")
+      .to(claimBox, {opacity:1, scale:1, yPercent:0, duration:0.9, ease:"power3.out"}, "focus")
+      .to({}, {duration:0.4});
+  }
+
+  build();
+
+  // kill()+rebuild on resize (debounced) — devices spec
+  var rt;
+  window.addEventListener("resize", function(){
+    clearTimeout(rt);
+    rt = setTimeout(function(){
+      if(st) st.kill();
+      ScrollTrigger.refresh();
+      build();
+    }, 200);
+  });
+
+  // refresh once fonts are ready (layout shift safety)
+  if(document.fonts && document.fonts.ready){
+    document.fonts.ready.then(function(){ ScrollTrigger.refresh(); });
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sottosopra 2026 — Giorni Perno</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+@font-face{
+  font-family:"SoSo26";
+  src:url("/fonts/SoSo26.woff") format("woff");
+  font-display:swap;
+}
+:root{
+  --bg:#FFFFFF; --fg:#000000; --muted:#6B6B6B; --line:#E4E4E4; --bg-elev:#F4F4F4;
+  --display:"SoSo26","Arial Narrow",system-ui,sans-serif;
+  --body:"Inter",system-ui,-apple-system,sans-serif;
+  --barh:64px;
+}
+[data-theme="dark"]{
+  --bg:#000000; --fg:#FFFFFF; --muted:#9A9A9A; --line:#262626; --bg-elev:#141414;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{ -webkit-text-size-adjust:100%; }
+body{ background:var(--bg); color:var(--fg); font-family:var(--body);
+  font-size:17px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  transition:background .35s ease, color .35s ease; overflow-x:hidden; }
+.display{ font-family:var(--display); font-feature-settings:"ss07","ss08","liga","calt";
+  line-height:.95; letter-spacing:-.01em; text-transform:uppercase; }
+.eyebrow{ font-size:.8125rem; letter-spacing:.18em; text-transform:uppercase; font-weight:500; color:var(--muted); }
+a{ color:inherit; text-decoration:none; }
+img{ display:block; max-width:100%; filter:grayscale(1) contrast(1.08); }
+:focus-visible{ outline:2px solid var(--fg); outline-offset:3px; }
+button{ font:inherit; color:inherit; background:none; border:none; cursor:pointer; }
+
+.skip{ position:absolute; left:-9999px; top:0; z-index:200; background:var(--fg); color:var(--bg); padding:12px 18px; font-weight:700; }
+.skip:focus{ left:8px; top:8px; }
+
+/* ---------- HEADER ---------- */
+.hdr{ position:fixed; top:0; left:0; right:0; z-index:120;
+  height:var(--barh); display:flex; align-items:center; gap:18px;
+  padding:0 clamp(16px,4vw,40px);
+  background:color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter:saturate(1.2) blur(8px);
+  border-bottom:1px solid var(--line); }
+.hdr .logo{ height:20px; width:auto; }
+.hdr nav{ display:flex; gap:26px; margin-left:8px; }
+.hdr nav a{ font-size:.9rem; font-weight:500; padding:8px 0; position:relative; }
+.hdr nav a::after{ content:""; position:absolute; left:0; bottom:2px; height:1px; width:0; background:var(--fg); transition:width .2s ease; }
+.hdr nav a:hover::after{ width:100%; }
+.spacer{ flex:1; }
+.btn-tix{ display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:0 20px;
+  background:var(--fg); color:var(--bg); font-weight:700; font-size:.9rem;
+  border:1px solid var(--fg); transition:opacity .2s ease; }
+.btn-tix:hover{ opacity:.82; }
+.hamb{ display:none; width:44px; height:44px; align-items:center; justify-content:center; }
+.hamb span{ display:block; width:22px; height:2px; background:var(--fg); position:relative; }
+.hamb span::before,.hamb span::after{ content:""; position:absolute; left:0; width:22px; height:2px; background:var(--fg); }
+.hamb span::before{ top:-7px; } .hamb span::after{ top:7px; }
+
+/* date-bar that day-numbers FLIP into */
+.datebar{ position:absolute; left:0; right:0; bottom:0; height:0; overflow:hidden;
+  display:grid; grid-template-columns:repeat(4,1fr); }
+.datebar.live{ height:38px; border-top:1px solid var(--line); }
+.datebar a{ display:flex; align-items:center; justify-content:center; gap:6px;
+  font-size:.78rem; letter-spacing:.04em; font-weight:600; border-right:1px solid var(--line); min-height:38px; }
+.datebar a:last-child{ border-right:none; }
+.datebar a:hover{ background:var(--bg-elev); }
+.datebar .dn{ font-family:var(--display); font-feature-settings:"ss07","ss08","liga","calt"; font-size:1.05rem; }
+
+/* ---------- DRAWER ---------- */
+.drawer{ position:fixed; inset:0; z-index:150; background:var(--bg);
+  transform:translateY(-100%); transition:transform .35s cubic-bezier(.2,.7,.2,1);
+  display:flex; flex-direction:column; padding:24px clamp(16px,6vw,40px); }
+.drawer.open{ transform:translateY(0); }
+.drawer-top{ display:flex; align-items:center; justify-content:space-between; height:var(--barh); margin:-24px 0 0; }
+.drawer-close{ width:44px; height:44px; font-size:1.6rem; }
+.drawer nav{ display:flex; flex-direction:column; gap:6px; margin-top:24px; }
+.drawer nav a{ font-family:var(--display); font-feature-settings:"ss07","ss08","liga","calt";
+  text-transform:uppercase; font-size:clamp(2.4rem,11vw,4rem); line-height:1; padding:6px 0; }
+.drawer .d-bottom{ margin-top:auto; display:flex; flex-direction:column; gap:14px; }
+.flip-btn{ display:inline-flex; align-items:center; gap:10px; min-height:48px; align-self:flex-start;
+  padding:0 18px; border:1px solid var(--fg); font-weight:600; }
+
+/* ---------- STAGE (pinned chapters) ---------- */
+#stage{ position:relative; }
+.chapters{ position:sticky; top:0; height:100vh; height:100svh; overflow:hidden; }
+.chapter{ position:absolute; inset:0; display:grid; opacity:0;
+  grid-template-columns:1fr; align-items:center;
+  padding:calc(var(--barh) + 14px) clamp(16px,5vw,56px) max(20px,env(safe-area-inset-bottom)); }
+.chapter.is-active{ opacity:1; }
+.ch-photo{ display:none; }
+.ch-num{ font-family:var(--display); font-feature-settings:"ss07","ss08","liga","calt";
+  text-transform:uppercase; line-height:.82; letter-spacing:-.02em;
+  font-size:clamp(6rem,40vw,18rem); }
+.ch-meta{ display:flex; flex-direction:column; gap:6px; }
+.ch-tag{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+.pill{ display:inline-flex; align-items:center; min-height:30px; padding:0 12px;
+  border:1.5px solid var(--fg); border-radius:999px; font-size:.74rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+.ch-head{ font-family:var(--display); font-feature-settings:"ss07","ss08","liga","calt";
+  text-transform:uppercase; font-size:clamp(1.6rem,6vw,3rem); line-height:.95; }
+.ch-sub{ color:var(--muted); font-size:.96rem; max-width:34ch; }
+.ch-cta{ display:flex; gap:12px; flex-wrap:wrap; margin-top:14px; }
+.ch-cta .btn-tix{ min-height:48px; }
+.ch-cta .ghost{ display:inline-flex; align-items:center; min-height:48px; padding:0 20px; border:1px solid var(--fg); font-weight:600; font-size:.9rem; }
+.ch-index{ position:absolute; top:calc(var(--barh) + 10px); right:clamp(16px,5vw,56px);
+  font-size:.78rem; letter-spacing:.16em; color:var(--muted); font-weight:600; }
+
+/* scrub progress hint */
+.scrub-line{ position:absolute; left:clamp(16px,5vw,56px); right:clamp(16px,5vw,56px); bottom:18px; height:1px; background:var(--line); }
+.scrub-line i{ display:block; height:1px; background:var(--fg); width:0; }
+
+/* reduced-motion / no-JS static stack */
+.static-days{ display:none; }
+.sd{ border-top:1px solid var(--line); padding:clamp(28px,6vw,52px) clamp(16px,5vw,56px); display:grid; gap:8px; }
+.sd .ch-num{ font-size:clamp(4.5rem,26vw,12rem); }
+
+/* ---------- generic section ---------- */
+.sect{ padding:clamp(48px,8vw,110px) clamp(16px,5vw,56px); border-top:1px solid var(--line); }
+.sect-h{ font-family:var(--display); font-feature-settings:"ss07","ss08","liga","calt";
+  text-transform:uppercase; font-size:clamp(1.8rem,5vw,3rem); line-height:.95; margin-bottom:28px; }
+.num-label{ font-size:.78rem; letter-spacing:.16em; color:var(--muted); font-weight:600; margin-bottom:10px; }
+
+/* lineup ledger */
+.ledger{ display:grid; gap:0; border-top:1px solid var(--fg); }
+.lrow{ display:grid; grid-template-columns:90px 1fr auto; gap:14px; align-items:baseline;
+  padding:16px 4px; border-bottom:1px solid var(--line); }
+.lrow .ld{ font-size:.78rem; letter-spacing:.1em; font-weight:700; color:var(--muted); padding-top:4px; }
+.lrow .ln{ font-family:var(--display); font-feature-settings:"ss07","ss08","liga","calt";
+  text-transform:uppercase; font-size:clamp(1.4rem,4.5vw,2.4rem); line-height:.95; }
+.lrow .ln .star{ font-family:var(--body); font-size:.8rem; vertical-align:super; margin-left:6px; color:var(--muted); }
+.lrow .lsupport{ display:block; font-family:var(--body); font-size:.82rem; color:var(--muted); margin-top:4px; letter-spacing:0; text-transform:none; line-height:1.4; }
+.lrow .lcta{ font-size:.84rem; font-weight:600; white-space:nowrap; border-bottom:1px solid var(--fg); padding-bottom:2px; align-self:center; }
+.allprog{ margin-top:26px; display:inline-flex; align-items:center; gap:8px; font-weight:600; border-bottom:1px solid var(--fg); padding-bottom:3px; }
+
+.exp{ font-family:var(--display); font-feature-settings:"ss07","ss08","liga","calt";
+  text-transform:uppercase; font-size:clamp(1.4rem,4.6vw,2.6rem); line-height:1; }
+.exp small{ display:block; font-family:var(--body); text-transform:none; font-size:.95rem; color:var(--muted); margin-top:12px; letter-spacing:0; }
+
+/* partecipa */
+.partecipa{ display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line); border:1px solid var(--line); }
+.pcard{ background:var(--bg); padding:clamp(24px,4vw,40px); display:flex; flex-direction:column; gap:14px; }
+.pcard h3{ font-family:var(--display); font-feature-settings:"ss07","ss08","liga","calt"; text-transform:uppercase; font-size:clamp(1.5rem,4vw,2.2rem); line-height:.95; }
+.pcard p{ color:var(--muted); font-size:.96rem; }
+.btn-ghost{ display:inline-flex; align-items:center; min-height:48px; padding:0 22px; border:1px solid var(--fg); font-weight:600; align-self:flex-start; font-size:.9rem; }
+.nl-form{ display:flex; flex-direction:column; gap:12px; margin-top:2px; }
+.nl-row{ display:flex; gap:8px; }
+.nl-row input[type=email]{ flex:1; min-height:48px; padding:0 14px; font-size:16px; background:var(--bg); color:var(--fg); border:1px solid var(--fg); font-family:var(--body); }
+.nl-row button{ min-height:48px; padding:0 18px; border:1px solid var(--fg); font-weight:700; }
+.consent{ display:flex; gap:10px; align-items:flex-start; font-size:.8rem; color:var(--muted); }
+.consent input{ width:18px; height:18px; margin-top:2px; flex:none; }
+.consent a{ border-bottom:1px solid currentColor; }
+
+/* sponsor */
+.tier{ margin-bottom:26px; }
+.tier .num-label{ margin-bottom:12px; }
+.tier-row{ display:flex; flex-wrap:wrap; gap:14px 26px; align-items:center; }
+.tier-main .sp{ font-size:clamp(1.6rem,6vw,3rem); }
+.sp{ font-family:var(--display); font-feature-settings:"ss07","ss08","liga","calt"; text-transform:uppercase; font-size:clamp(1.05rem,3vw,1.5rem); line-height:1; }
+.tier-sup .sp{ font-size:clamp(.95rem,2.4vw,1.2rem); color:var(--muted); }
+.sponsor-cta{ margin-top:14px; color:var(--muted); font-size:.92rem; }
+.sponsor-cta a{ color:var(--fg); border-bottom:1px solid var(--fg); }
+
+/* footer */
+.ftr{ border-top:1px solid var(--fg); padding:clamp(40px,7vw,80px) clamp(16px,5vw,56px) calc(96px + env(safe-area-inset-bottom)); }
+.ftr-grid{ display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:32px; margin-bottom:40px; }
+.ftr-grid h4{ font-size:.78rem; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); margin-bottom:14px; font-weight:600; }
+.ftr-grid a, .ftr-grid p{ display:block; font-size:.95rem; margin-bottom:8px; }
+.ftr-grid a:hover{ text-decoration:underline; }
+.ftr .big{ font-family:var(--display); font-feature-settings:"ss07","ss08","liga","calt"; text-transform:uppercase; font-size:clamp(2.4rem,11vw,7rem); line-height:.85; margin-bottom:34px; }
+.legal{ font-size:.78rem; color:var(--muted); border-top:1px solid var(--line); padding-top:18px; display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center; }
+.legal .links a{ border-bottom:1px solid currentColor; }
+
+/* sticky mobile bar */
+.mbar{ display:none; position:fixed; left:0; right:0; bottom:0; z-index:130;
+  grid-template-columns:1fr auto; gap:0;
+  padding-bottom:env(safe-area-inset-bottom);
+  background:var(--bg); border-top:1px solid var(--fg); }
+.mbar a{ display:flex; align-items:center; justify-content:center; min-height:54px; font-weight:700; font-size:.95rem; }
+.mbar .m-tix{ background:var(--fg); color:var(--bg); }
+.mbar .m-prog{ padding:0 22px; border-left:1px solid var(--fg); }
+body.drawer-open .mbar{ display:none !important; }
+
+@media (min-width:900px){
+  .chapter{ grid-template-columns:1.15fr .85fr; gap:clamp(24px,5vw,72px); align-items:center; }
+  .chapter.has-photo .ch-photo{ display:block; height:78vh; align-self:center; }
+  .ch-photo img{ width:100%; height:100%; object-fit:cover; }
+  .chapter .ch-body{ order:-1; }
+}
+@media (max-width:899px){
+  .hdr nav{ display:none; }
+  .hamb{ display:flex; }
+  .mbar{ display:grid; }
+  .partecipa{ grid-template-columns:1fr; }
+  .ftr-grid{ grid-template-columns:1fr 1fr; }
+  .ch-num{ font-size:clamp(6rem,42vw,12rem); }
+  .lrow{ grid-template-columns:64px 1fr; }
+  .lrow .lcta{ grid-column:2; justify-self:start; margin-top:4px; }
+}
+@media (prefers-reduced-motion:reduce){
+  .chapters{ display:none !important; }
+  .static-days{ display:block !important; }
+  .scrub-line, .ch-index{ display:none; }
+}
+.no-js .chapters{ display:none; }
+.no-js .static-days{ display:block; }
+</style>
+</head>
+<body class="no-js">
+<a href="#main" class="skip">Salta al contenuto</a>
+
+<header class="hdr">
+  <a href="/" aria-label="Sottosopra — home"><img class="logo" id="logoImg" src="/brand/sottosopra-logo-black.png" alt="Sottosopra"></a>
+  <nav aria-label="Principale">
+    <a href="/programma">Programma</a>
+    <a href="/info">Info</a>
+    <a href="/about">About</a>
+    <a href="/news">News</a>
+  </nav>
+  <span class="spacer"></span>
+  <a class="btn-tix" href="https://dice.fm/bundles/sottosopra-2026?utm_source=sito&utm_medium=header" target="_blank" rel="noopener">Biglietti</a>
+  <button class="hamb" id="hamb" aria-label="Apri menu" aria-expanded="false" aria-controls="drawer"><span></span></button>
+
+  <!-- the four day-numbers FLIP into this bar -->
+  <div class="datebar" id="datebar" aria-hidden="true">
+    <a href="https://dice.fm/event/sottosopra-GIO30-free?utm_source=sito&utm_medium=home&day=30" target="_blank" rel="noopener"><span class="dn">30</span> GIO · Free</a>
+    <a href="https://dice.fm/event/sottosopra-VEN31?utm_source=sito&utm_medium=home&day=31" target="_blank" rel="noopener"><span class="dn">31</span> VEN</a>
+    <a href="https://dice.fm/event/sottosopra-SAB01?utm_source=sito&utm_medium=home&day=01" target="_blank" rel="noopener"><span class="dn">01</span> SAB</a>
+    <a href="https://dice.fm/event/sottosopra-DOM02?utm_source=sito&utm_medium=home&day=02" target="_blank" rel="noopener"><span class="dn">02</span> DOM</a>
+  </div>
+</header>
+
+<!-- DRAWER -->
+<div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Menu" hidden>
+  <div class="drawer-top">
+    <span class="eyebrow">Menu</span>
+    <button class="drawer-close" id="drawerClose" aria-label="Chiudi menu">&times;</button>
+  </div>
+  <nav aria-label="Menu mobile">
+    <a href="/programma">Programma</a>
+    <a href="/info">Info</a>
+    <a href="/about">About</a>
+    <a href="/news">News</a>
+  </nav>
+  <div class="d-bottom">
+    <button class="flip-btn" id="flipDrawer">Capovolgi ⟳ <span class="eyebrow" style="color:inherit">Inverti i colori</span></button>
+    <a class="btn-tix" style="justify-content:center" href="https://dice.fm/bundles/sottosopra-2026?utm_source=sito&utm_medium=header" target="_blank" rel="noopener">Biglietti → DICE</a>
+  </div>
+</div>
+
+<main id="main">
+
+  <!-- ============ PINNED STAGE: GIORNI PERNO ============ -->
+  <section id="stage" aria-label="Edizione 2026 — i quattro giorni">
+    <h1 class="display" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);">Sempre Sottosopra — Sottosopra 2026, Giardini del Castello, Castelfranco Veneto. 30 luglio–2 agosto.</h1>
+    <div class="chapters" id="chapters">
+
+      <article class="chapter has-photo" data-day="0">
+        <div class="ch-body">
+          <span class="ch-index" aria-hidden="true">01 / 04 · SEMPRE SOTTOSOPRA</span>
+          <div class="ch-tag">
+            <span class="pill">Giovedì 30 luglio</span>
+            <span class="pill">Ingresso libero</span>
+          </div>
+          <div class="ch-num" aria-hidden="true">30</div>
+          <div class="ch-meta">
+            <p class="ch-head">Adrian Fartade</p>
+            <p class="ch-sub">Talk di apertura. Giardini del Castello, Castelfranco Veneto. La sera che apre il festival — e non costa niente.</p>
+          </div>
+          <div class="ch-cta">
+            <a class="btn-tix" href="https://dice.fm/event/sottosopra-GIO30-free?utm_source=sito&utm_medium=home&day=30" target="_blank" rel="noopener">Ingresso libero →</a>
+            <a class="ghost" href="/programma">Programma giovedì</a>
+          </div>
+        </div>
+        <div class="ch-photo"><img src="/media/garden-day.jpg" alt="Giardini del Castello di Castelfranco Veneto di giorno"></div>
+      </article>
+
+      <article class="chapter has-photo" data-day="1">
+        <div class="ch-body">
+          <span class="ch-index" aria-hidden="true">02 / 04 · SEMPRE SOTTOSOPRA</span>
+          <div class="ch-tag">
+            <span class="pill">Venerdì 31 luglio</span>
+            <span class="pill">Headliner</span>
+          </div>
+          <div class="ch-num" aria-hidden="true">31</div>
+          <div class="ch-meta">
+            <p class="ch-head">Generic Animal</p>
+            <p class="ch-sub">Con Degheio · Krano · Cavalli Mongoli. Talk: Paolo Bosca, “Fare Utopia”.</p>
+          </div>
+          <div class="ch-cta">
+            <a class="btn-tix" href="https://dice.fm/event/sottosopra-VEN31?utm_source=sito&utm_medium=home&day=31" target="_blank" rel="noopener">Biglietti venerdì →</a>
+            <a class="ghost" href="/programma">Programma venerdì</a>
+          </div>
+        </div>
+        <div class="ch-photo"><img src="/media/crowd-night-wide.jpg" alt="Folla notturna al festival Sottosopra"></div>
+      </article>
+
+      <article class="chapter has-photo" data-day="2">
+        <div class="ch-body">
+          <span class="ch-index" aria-hidden="true">03 / 04 · SEMPRE SOTTOSOPRA</span>
+          <div class="ch-tag">
+            <span class="pill">Sabato 1 agosto</span>
+            <span class="pill">Headliner</span>
+          </div>
+          <div class="ch-num" aria-hidden="true">01</div>
+          <div class="ch-meta">
+            <p class="ch-head">Vendredi sur Mer</p>
+            <p class="ch-sub">Con Popa · Faccianuvola. Talk: Gianni Montieri · workshop.</p>
+          </div>
+          <div class="ch-cta">
+            <a class="btn-tix" href="https://dice.fm/event/sottosopra-SAB01?utm_source=sito&utm_medium=home&day=01" target="_blank" rel="noopener">Biglietti sabato →</a>
+            <a class="ghost" href="/programma">Programma sabato</a>
+          </div>
+        </div>
+        <div class="ch-photo"><img src="/media/crowd-night-portrait.jpg" alt="Ritratto di folla notturna al festival"></div>
+      </article>
+
+      <article class="chapter has-photo" data-day="3">
+        <div class="ch-body">
+          <span class="ch-index" aria-hidden="true">04 / 04 · SEMPRE SOTTOSOPRA</span>
+          <div class="ch-tag">
+            <span class="pill">Domenica 2 agosto</span>
+            <span class="pill">Headliner</span>
+          </div>
+          <div class="ch-num" aria-hidden="true">02</div>
+          <div class="ch-meta">
+            <p class="ch-head">Ex-Otago</p>
+            <p class="ch-sub">Con Auroro Borealo · Jesse the Faccio. Domenica sportiva · soft clubbing Elasi dj set · Treviso Comic · libri brutti.</p>
+          </div>
+          <div class="ch-cta">
+            <a class="btn-tix" href="https://dice.fm/event/sottosopra-DOM02?utm_source=sito&utm_medium=home&day=02" target="_blank" rel="noopener">Biglietti domenica →</a>
+            <a class="ghost" href="/programma">Programma domenica</a>
+          </div>
+        </div>
+        <div class="ch-photo"><img src="/media/crowd-night-wide.jpg" alt="Folla notturna al festival Sottosopra"></div>
+      </article>
+
+      <div class="scrub-line" aria-hidden="true"><i id="scrubFill"></i></div>
+    </div>
+  </section>
+
+  <!-- STATIC fallback (reduced-motion / no-JS): four days stacked, date-bar already pinned -->
+  <section class="static-days" aria-label="I quattro giorni (versione statica)">
+    <div class="sd">
+      <span class="eyebrow">Giovedì 30 luglio · Ingresso libero</span>
+      <div class="ch-num">30</div>
+      <p class="ch-head">Adrian Fartade</p>
+      <a class="btn-tix" style="align-self:start;margin-top:10px" href="https://dice.fm/event/sottosopra-GIO30-free?utm_source=sito&utm_medium=home&day=30" target="_blank" rel="noopener">Ingresso libero →</a>
+    </div>
+    <div class="sd">
+      <span class="eyebrow">Venerdì 31 luglio · Headliner</span>
+      <div class="ch-num">31</div>
+      <p class="ch-head">Generic Animal</p>
+      <a class="btn-tix" style="align-self:start;margin-top:10px" href="https://dice.fm/event/sottosopra-VEN31?utm_source=sito&utm_medium=home&day=31" target="_blank" rel="noopener">Biglietti venerdì →</a>
+    </div>
+    <div class="sd">
+      <span class="eyebrow">Sabato 1 agosto · Headliner</span>
+      <div class="ch-num">01</div>
+      <p class="ch-head">Vendredi sur Mer</p>
+      <a class="btn-tix" style="align-self:start;margin-top:10px" href="https://dice.fm/event/sottosopra-SAB01?utm_source=sito&utm_medium=home&day=01" target="_blank" rel="noopener">Biglietti sabato →</a>
+    </div>
+    <div class="sd">
+      <span class="eyebrow">Domenica 2 agosto · Headliner</span>
+      <div class="ch-num">02</div>
+      <p class="ch-head">Ex-Otago</p>
+      <a class="btn-tix" style="align-self:start;margin-top:10px" href="https://dice.fm/event/sottosopra-DOM02?utm_source=sito&utm_medium=home&day=02" target="_blank" rel="noopener">Biglietti domenica →</a>
+    </div>
+  </section>
+
+  <!-- LINEUP LEDGER -->
+  <section class="sect" aria-label="Line-up completa">
+    <p class="num-label">01 — Line-up</p>
+    <h2 class="sect-h">Chi suona, quando</h2>
+    <div class="ledger">
+      <div class="lrow">
+        <span class="ld">GIO 30</span>
+        <span class="ln">Adrian Fartade<span class="star">talk · free</span><span class="lsupport">Serata pre-festival, ingresso libero</span></span>
+        <a class="lcta" href="https://dice.fm/event/sottosopra-GIO30-free?utm_source=sito&utm_medium=home&day=30" target="_blank" rel="noopener">Free →</a>
+      </div>
+      <div class="lrow">
+        <span class="ld">VEN 31</span>
+        <span class="ln">Generic Animal<span class="star">★</span><span class="lsupport">Degheio · Krano · Cavalli Mongoli · talk Paolo Bosca</span></span>
+        <a class="lcta" href="https://dice.fm/event/sottosopra-VEN31?utm_source=sito&utm_medium=home&day=31" target="_blank" rel="noopener">Biglietti →</a>
+      </div>
+      <div class="lrow">
+        <span class="ld">SAB 01</span>
+        <span class="ln">Vendredi sur Mer<span class="star">★</span><span class="lsupport">Popa · Faccianuvola · talk Gianni Montieri · workshop</span></span>
+        <a class="lcta" href="https://dice.fm/event/sottosopra-SAB01?utm_source=sito&utm_medium=home&day=01" target="_blank" rel="noopener">Biglietti →</a>
+      </div>
+      <div class="lrow">
+        <span class="ld">DOM 02</span>
+        <span class="ln">Ex-Otago<span class="star">★</span><span class="lsupport">Auroro Borealo · Jesse the Faccio · domenica sportiva · soft clubbing Elasi · Treviso Comic · libri brutti</span></span>
+        <a class="lcta" href="https://dice.fm/event/sottosopra-DOM02?utm_source=sito&utm_medium=home&day=02" target="_blank" rel="noopener">Biglietti →</a>
+      </div>
+    </div>
+    <a class="allprog" href="/programma">Tutto il programma →</a>
+  </section>
+
+  <!-- ESPERIENZE -->
+  <section class="sect" aria-label="Esperienze">
+    <p class="num-label">02 — Oltre la musica</p>
+    <p class="exp">Non solo concerti.
+      <small>Talk · workshop · libri · sport · food. Quattro giorni nei Giardini del Castello.</small>
+    </p>
+  </section>
+
+  <!-- PARTECIPA -->
+  <section class="sect" id="partecipa" aria-label="Partecipa">
+    <p class="num-label">03 — Partecipa</p>
+    <div class="partecipa">
+      <div class="pcard">
+        <h3>Lo facciamo in ottanta — manchi solo tu.</h3>
+        <p>Volontari* di ogni edizione: palco, ingressi, bar, accoglienza, allestimenti. Entra nel gruppo che fa accadere Sottosopra.</p>
+        <a class="btn-ghost" href="/about#volontari">Diventa volontari*</a>
+      </div>
+      <div class="pcard">
+        <h3>Newsletter</h3>
+        <p>Date, line-up e biglietti prima di tutti. Niente spam.</p>
+        <form class="nl-form" onsubmit="return false">
+          <div class="nl-row">
+            <label for="nl-email" class="eyebrow" style="position:absolute;left:-9999px">Email</label>
+            <input id="nl-email" type="email" placeholder="la-tua@email.it" autocomplete="email" required>
+            <button type="submit">Iscriviti</button>
+          </div>
+          <label class="consent"><input type="checkbox" required>
+            <span>Acconsento al trattamento dei dati per ricevere la newsletter. <a href="/privacy">Privacy</a>.</span>
+          </label>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPONSOR -->
+  <section class="sect" aria-label="Partner">
+    <p class="num-label">04 — Lo rendono possibile</p>
+    <div class="tier tier-main">
+      <p class="num-label">Main partner</p>
+      <div class="tier-row"><span class="sp">Azimut</span></div>
+    </div>
+    <div class="tier">
+      <p class="num-label">Partner</p>
+      <div class="tier-row"><span class="sp">Banca Terre Venete</span><span class="sp">Ceccato Motors</span></div>
+    </div>
+    <div class="tier tier-sup">
+      <p class="num-label">Supporter</p>
+      <div class="tier-row">
+        <span class="sp">Prodeco Pharma</span><span class="sp">CNA</span><span class="sp">Merieux NutriSciences</span><span class="sp">Vudafieri</span><span class="sp">Adriatica Strade</span>
+      </div>
+    </div>
+    <p class="sponsor-cta">Vuoi sostenere l'edizione 2026? <a href="mailto:info@sottosopra.com">info@sottosopra.com</a></p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="ftr">
+    <div class="big">Sempre<br>Sottosopra</div>
+    <div class="ftr-grid">
+      <div>
+        <h4>Quando · Dove</h4>
+        <p>30 lug – 2 ago 2026</p>
+        <p>Giardini del Castello</p>
+        <p>Castelfranco Veneto (TV)</p>
+        <a class="btn-tix" style="margin-top:10px" href="https://dice.fm/bundles/sottosopra-2026?utm_source=sito&utm_medium=footer" target="_blank" rel="noopener">Biglietti → DICE</a>
+      </div>
+      <div>
+        <h4>Naviga</h4>
+        <a href="/programma">Programma</a>
+        <a href="/info">Info</a>
+        <a href="/about">About</a>
+        <a href="/news">News</a>
+        <a href="/about#volontari">Volontari*</a>
+      </div>
+      <div>
+        <h4>Contatti</h4>
+        <a href="mailto:info@sottosopra.com">info@sottosopra.com</a>
+        <a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://facebook.com" target="_blank" rel="noopener">Facebook</a>
+        <p style="color:var(--muted);margin-top:10px">Cambia il punto di vista</p>
+      </div>
+    </div>
+    <div class="legal">
+      <span>SOTTOSOPRA APS · C.F. 92045630263 · P.IVA 05002480266 · Via Verdi 3, 31033 Castelfranco Veneto (TV) · info@sottosopra.com</span>
+      <span class="links"><a href="/privacy">Privacy</a> · <a href="/cookie">Cookie</a></span>
+    </div>
+  </footer>
+</main>
+
+<!-- STICKY MOBILE BAR -->
+<nav class="mbar" aria-label="Azioni rapide">
+  <a class="m-tix" href="https://dice.fm/bundles/sottosopra-2026?utm_source=sito&utm_medium=sticky" target="_blank" rel="noopener">Biglietti → DICE</a>
+  <a class="m-prog" href="/programma">Programma</a>
+</nav>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/Flip.min.js"></script>
+<script>
+document.body.classList.remove('no-js');
+var root=document.documentElement;
+
+/* ---- palette inversion (S key + drawer) ---- */
+function setTheme(dark){
+  root.dataset.theme = dark ? 'dark' : '';
+  document.getElementById('logoImg').src = dark ? '/brand/sottosopra-logo-white.png' : '/brand/sottosopra-logo-black.png';
+}
+function toggleTheme(){ setTheme(root.dataset.theme!=='dark'); }
+document.addEventListener('keydown',function(e){
+  if(e.key==='s'||e.key==='S'){
+    var t=e.target.tagName; if(t==='INPUT'||t==='TEXTAREA') return;
+    toggleTheme();
+  }
+});
+document.getElementById('flipDrawer').addEventListener('click',function(){ toggleTheme(); });
+
+/* ---- drawer + focus trap ---- */
+var drawer=document.getElementById('drawer'), hamb=document.getElementById('hamb'),
+    closeBtn=document.getElementById('drawerClose'), lastFocus=null;
+function openDrawer(){
+  lastFocus=document.activeElement;
+  drawer.hidden=false; requestAnimationFrame(function(){ drawer.classList.add('open'); });
+  document.body.classList.add('drawer-open');
+  hamb.setAttribute('aria-expanded','true');
+  closeBtn.focus();
+  document.addEventListener('keydown',trap);
+}
+function closeDrawer(){
+  drawer.classList.remove('open');
+  document.body.classList.remove('drawer-open');
+  hamb.setAttribute('aria-expanded','false');
+  document.removeEventListener('keydown',trap);
+  setTimeout(function(){ drawer.hidden=true; },350);
+  if(lastFocus) lastFocus.focus();
+}
+function trap(e){
+  if(e.key==='Escape'){ closeDrawer(); return; }
+  if(e.key!=='Tab') return;
+  var f=drawer.querySelectorAll('a[href],button,input,[tabindex]:not([tabindex="-1"])');
+  if(!f.length) return;
+  var first=f[0], last=f[f.length-1];
+  if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+  else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+}
+hamb.addEventListener('click',openDrawer);
+closeBtn.addEventListener('click',closeDrawer);
+drawer.querySelectorAll('nav a').forEach(function(a){ a.addEventListener('click',closeDrawer); });
+
+/* ---- GIORNI PERNO: pinned scrub + FLIP into date-bar ---- */
+gsap.registerPlugin(ScrollTrigger, Flip);
+
+gsap.matchMedia().add({
+  motion: "(prefers-reduced-motion: no-preference)"
+}, function(ctx){
+  var conds = ctx.conditions;
+  if(!conds.motion) return; // reduced motion → CSS fallback handles it
+
+  var chapters = gsap.utils.toArray('.chapter');
+  var stage = document.getElementById('stage');
+  var datebar = document.getElementById('datebar');
+  var scrubFill = document.getElementById('scrubFill');
+  var N = chapters.length;
+
+  // make stage tall enough: ~100vh per chapter + a converge segment
+  var perCh = window.innerHeight;
+  stage.style.height = (perCh * (N + 1)) + 'px';
+
+  // first chapter visible immediately (LCP static)
+  gsap.set(chapters[0], {autoAlpha:1});
+  gsap.set(chapters.slice(1), {autoAlpha:0});
+
+  // cross-fade timeline across chapters, scrubbed
+  var tl = gsap.timeline({
+    scrollTrigger:{
+      trigger: stage,
+      start: "top top",
+      end: "bottom bottom",
+      scrub: 1,
+      anticipatePin: 1,
+      onUpdate: function(self){ scrubFill.style.width = (self.progress*100).toFixed(1) + '%'; }
+    }
+  });
+
+  for(var i=0;i<N-1;i++){
+    var a = chapters[i], b = chapters[i+1];
+    tl.to(a, {autoAlpha:0, yPercent:-6, duration:.5}, i)
+      .fromTo(b, {autoAlpha:0, yPercent:6}, {autoAlpha:1, yPercent:0, duration:.5}, i+0.15);
+  }
+
+  // CONVERGE: at the end, the four numbers shrink and the date-bar appears (FLIP feel)
+  tl.to(chapters[N-1], {autoAlpha:0, yPercent:-6, duration:.4}, N-1)
+    .add(function(){ datebar.classList.add('live'); datebar.setAttribute('aria-hidden','false'); })
+    .to({}, {duration:.2});
+
+  // toggle date-bar on/off depending on whether we've passed the stage
+  ScrollTrigger.create({
+    trigger: stage,
+    start: "bottom 80%",
+    onEnter: function(){ datebar.classList.add('live'); datebar.setAttribute('aria-hidden','false'); },
+    onLeaveBack: function(){ datebar.classList.remove('live'); datebar.setAttribute('aria-hidden','true'); }
+  });
+
+  // mark active chapter for any CSS hooks + keep first ready instantly
+  ScrollTrigger.addEventListener('refresh', function(){ stage.style.height = (window.innerHeight*(N+1))+'px'; });
+
+  return function(){ // cleanup
+    stage.style.height='';
+    datebar.classList.remove('live');
+    chapters.forEach(function(c){ gsap.set(c,{clearProps:'all'}); });
+  };
+});
+
+// sanity: ensure ScrollTrigger recalcs after fonts/images load
+window.addEventListener('load', function(){ ScrollTrigger.refresh(); });
+</script>
+</body>
+</html>

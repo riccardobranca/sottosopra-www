@@ -1,0 +1,899 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SOTTOSOPRA — Dither Machine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   SOTTOSOPRA · DITHER MACHINE (v11)
+   1-bit dither-punk. Nessun grigio reale: i toni sono illusioni
+   di densità di punti. Bayer ordinato (CSS/SVG, zero JS) per i
+   fondali; "Floyd-Steinberg" 1-bit pre-renderizzato (SVG inline)
+   per le foto. Tipografia VOLUTAMENTE crisp sopra il mondo
+   ditherato = la firma.
+   ============================================================ */
+
+@font-face{
+  font-family:"SoSo26";
+  src:url("/fonts/SoSo26.woff") format("woff");
+  font-weight:normal;
+  font-display:swap;
+}
+
+:root{
+  --bg:#FFFFFF;
+  --fg:#000000;
+  --cell:#000000;        /* il "punto" del retino */
+  --line:#000000;
+  --grid:64px;
+}
+
+/* il gesto sottosopra = bit-flip negativo */
+html[data-invert="1"]{ filter:invert(1); }
+html[data-invert="1"] img{ filter:invert(0); }  /* ridoppiato sotto */
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+html,body{ background:var(--bg); color:var(--fg); }
+
+body{
+  font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:17px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  /* texture Bayer 8x8 finissima su TUTTO il fondo: la "macchina a 1 bit" */
+  background-image:
+    radial-gradient(var(--cell) 0.5px, transparent 0.6px);
+  background-size:3px 3px;
+  background-position:0 0;
+}
+
+/* il punto fondo deve restare attivo anche con invert */
+img{ image-rendering:pixelated; }
+
+::selection{ background:#000; color:#fff; }
+
+/* ---- DISPLAY: SoSo26 sempre crisp/vettoriale ---- */
+.display{
+  font-family:"SoSo26","Inter",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  line-height:0.9;
+  letter-spacing:-0.01em;
+  text-transform:uppercase;
+}
+
+/* ---- terzo registro: bitmap/pixel per micro-label e numeri ---- */
+.pixel{
+  font-family:"Silkscreen","Courier New",monospace;
+  text-transform:uppercase;
+  letter-spacing:0.04em;
+}
+
+a{ color:inherit; }
+
+/* ============================================================
+   PATTERN DITHER (Bayer ordered) — riusabili, CSS-only
+   ============================================================ */
+/* densità tonale = spaziatura punti. Tutto B/N puro. */
+.dither-25{
+  background-color:var(--bg);
+  background-image:radial-gradient(var(--cell) 0.9px, transparent 1px);
+  background-size:8px 8px;
+}
+.dither-50{
+  background-color:var(--bg);
+  background-image:
+    linear-gradient(45deg,var(--cell) 25%,transparent 25%,transparent 75%,var(--cell) 75%),
+    linear-gradient(45deg,var(--cell) 25%,transparent 25%,transparent 75%,var(--cell) 75%);
+  background-size:4px 4px;
+  background-position:0 0,2px 2px;
+}
+.dither-75{
+  background-color:var(--cell);
+  background-image:radial-gradient(var(--bg) 0.9px, transparent 1px);
+  background-size:8px 8px;
+}
+
+/* ============================================================
+   LAYOUT — griglia a celle rigida da spreadsheet, 0 radius, 1px
+   ============================================================ */
+.wrap{ max-width:1320px; margin:0 auto; padding:0 24px; }
+
+.bar{ border-top:1px solid var(--line); }
+.bar2{ border-bottom:1px solid var(--line); }
+
+/* ---------- HEADER ---------- */
+header.site{
+  position:sticky; top:0; z-index:40;
+  background:var(--bg);
+  border-bottom:1px solid var(--line);
+}
+.nav-inner{
+  display:flex; align-items:center; justify-content:space-between;
+  height:64px; gap:16px;
+}
+.brand{ display:flex; align-items:center; gap:14px; min-width:0; }
+.brand img{ height:22px; width:auto; display:block; }
+.brand .tag{ font-size:10px; }
+nav.main{ display:flex; align-items:center; gap:4px; }
+nav.main a{
+  text-decoration:none; font-weight:500; font-size:13px;
+  padding:8px 12px; border:1px solid transparent;
+}
+nav.main a:hover{ border:1px solid var(--line); }
+.btn{
+  display:inline-flex; align-items:center; gap:8px;
+  font-family:"Silkscreen",monospace; font-size:11px; letter-spacing:.04em;
+  text-transform:uppercase; text-decoration:none;
+  background:var(--fg); color:var(--bg);
+  border:1px solid var(--fg); padding:11px 16px;
+  transition:filter .15s ease, transform .15s ease;
+}
+.btn:hover{ filter:invert(1); }
+.btn.ghost{ background:transparent; color:var(--fg); }
+.btn.ghost:hover{ filter:none; background:var(--fg); color:var(--bg); }
+
+.flip-btn{
+  font-family:"Silkscreen",monospace; font-size:11px;
+  background:var(--bg); color:var(--fg);
+  border:1px solid var(--line); padding:8px 10px; cursor:pointer;
+  text-transform:uppercase; letter-spacing:.04em;
+}
+.flip-btn:hover{ background:var(--fg); color:var(--bg); }
+
+.menu-toggle{ display:none; }
+
+/* ---------- HERO ---------- */
+.hero{ position:relative; border-bottom:1px solid var(--line); }
+.hero-grid{
+  display:grid;
+  grid-template-columns:1.6fr 1fr;
+}
+.hero-grid > div{ border-left:1px solid var(--line); }
+.hero-grid > div:first-child{ border-left:none; }
+
+.hero-main{ padding:40px 24px 28px; position:relative; }
+.hero-eyebrow{
+  display:flex; gap:12px; flex-wrap:wrap; align-items:center;
+  font-size:11px; margin-bottom:22px;
+}
+.chip{
+  border:1px solid var(--line); padding:5px 9px;
+  font-family:"Silkscreen",monospace; font-size:10px; letter-spacing:.04em;
+}
+.hero-title{
+  font-size:clamp(4rem,13vw,12rem);
+  margin:0;
+}
+.hero-title .l2{ display:block; }
+.hero-sub{
+  margin-top:18px; max-width:46ch; font-size:18px; color:var(--fg);
+  border-top:1px solid var(--line); padding-top:16px;
+}
+.hero-cta{ margin-top:24px; display:flex; gap:12px; flex-wrap:wrap; }
+
+/* canvas-lente (signature moment) sopra l'hero-side */
+.hero-side{ position:relative; min-height:340px; overflow:hidden; }
+.hero-side .static-poster{
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  text-align:center;
+}
+#lens{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+.lens-hint{
+  position:absolute; left:12px; bottom:10px; z-index:3;
+  font-family:"Silkscreen",monospace; font-size:9px;
+  background:var(--bg); border:1px solid var(--line); padding:4px 6px;
+}
+
+/* poster ditherato statico (fallback sempre visibile) */
+.poster-art{
+  width:100%; height:100%;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:10px;
+}
+.poster-art .ring{
+  font-family:"SoSo26",sans-serif; font-feature-settings:"ss07","ss08";
+  font-size:clamp(3rem,7vw,6rem); line-height:.8; text-transform:uppercase;
+}
+
+/* ---------- TICKER / NASTRO ---------- */
+.ticker{
+  border-bottom:1px solid var(--line);
+  background:var(--fg); color:var(--bg);
+  overflow:hidden; white-space:nowrap;
+}
+.ticker-track{
+  display:inline-flex; gap:0; will-change:transform;
+  animation:scroll-x 28s linear infinite;
+}
+.ticker-track span{
+  font-family:"SoSo26",sans-serif; font-feature-settings:"ss07","ss08","liga";
+  font-size:clamp(1.6rem,3.4vw,2.6rem); text-transform:uppercase;
+  padding:12px 28px; line-height:1.1; display:inline-block;
+}
+.ticker-track span::after{ content:"·"; padding-left:28px; opacity:.6; }
+@keyframes scroll-x{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
+
+/* ---------- SECTION SHELL ---------- */
+section{ position:relative; }
+.sec-head{
+  display:flex; align-items:baseline; justify-content:space-between;
+  gap:16px; padding:18px 24px; border-bottom:1px solid var(--line);
+  flex-wrap:wrap;
+}
+.sec-head .no{ font-family:"Silkscreen",monospace; font-size:11px; }
+.sec-head h2{
+  font-family:"SoSo26",sans-serif; font-feature-settings:"ss07","ss08","liga","calt";
+  text-transform:uppercase; font-size:clamp(1.5rem,3.4vw,2.6rem); line-height:.9;
+}
+.sec-head .meta{ font-family:"Silkscreen",monospace; font-size:10px; }
+
+/* ---------- LINEUP (Floyd-Steinberg 1-bit silhouettes) ---------- */
+.lineup{
+  display:grid; grid-template-columns:repeat(4,1fr);
+}
+.act{
+  position:relative; border-left:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  aspect-ratio:3/4; overflow:hidden; background:var(--bg);
+}
+.act:nth-child(4n+1){ border-left:none; }
+.act .ditherframe{ position:absolute; inset:0; }
+.act svg{ width:100%; height:100%; display:block; }
+.act .caption{
+  position:absolute; left:0; right:0; bottom:0;
+  background:var(--bg); border-top:1px solid var(--line);
+  padding:8px 10px; display:flex; align-items:center; justify-content:space-between; gap:8px;
+}
+.act .caption .nm{
+  font-family:"SoSo26",sans-serif; font-feature-settings:"ss07","ss08","liga";
+  text-transform:uppercase; font-size:clamp(1rem,1.5vw,1.35rem); line-height:.9;
+}
+.act .caption .ix{ font-family:"Silkscreen",monospace; font-size:9px; }
+.act .day{
+  position:absolute; top:8px; left:8px;
+  font-family:"Silkscreen",monospace; font-size:9px;
+  background:var(--fg); color:var(--bg); padding:3px 5px;
+}
+/* hover: la silhouette "si compone" -> rivela */
+.act:hover .reveal{ opacity:1; }
+.act .reveal{ opacity:0; transition:opacity .35s ease; }
+
+/* ---------- DATE / PROGRAMMA (numeri riempiti di retino) ---------- */
+.dates{ display:grid; grid-template-columns:repeat(3,1fr); }
+.dayblock{
+  border-left:1px solid var(--line); padding:26px 22px 28px; position:relative;
+}
+.dayblock:first-child{ border-left:none; }
+.dayblock .dow{ font-family:"Silkscreen",monospace; font-size:11px; margin-bottom:6px; }
+.bignum{
+  font-family:"SoSo26",sans-serif; font-feature-settings:"ss07","ss08";
+  font-size:clamp(4.5rem,12vw,9rem); line-height:.8; text-transform:uppercase;
+  /* riempimento a retino invece che pieno: il numero è ditherato */
+  color:transparent;
+  background-image:
+    linear-gradient(45deg,#000 25%,transparent 25%,transparent 75%,#000 75%),
+    linear-gradient(45deg,#000 25%,transparent 25%,transparent 75%,#000 75%);
+  background-size:5px 5px;
+  background-position:0 0,2.5px 2.5px;
+  -webkit-background-clip:text; background-clip:text;
+  /* contorno crisp per leggibilità */
+  -webkit-text-stroke:1px #000;
+}
+.dayblock .mon{ font-family:"Silkscreen",monospace; font-size:12px; margin-top:4px; }
+.dayblock .pl{ margin-top:14px; font-size:14px; line-height:1.5; }
+.dayblock .pl b{ font-weight:600; }
+.dayblock .lnk{
+  margin-top:16px; display:inline-flex;
+  font-family:"Silkscreen",monospace; font-size:10px; text-decoration:none;
+  border:1px solid var(--line); padding:7px 11px;
+}
+.dayblock .lnk:hover{ background:var(--fg); color:var(--bg); }
+
+/* ---------- ESPERIENZE (celle spreadsheet) ---------- */
+.exp{ display:grid; grid-template-columns:repeat(4,1fr); }
+.cell{
+  border-left:1px solid var(--line); border-bottom:1px solid var(--line);
+  padding:20px 18px 22px; min-height:170px; position:relative;
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+.cell:nth-child(4n+1){ border-left:none; }
+.cell .glyph{
+  font-family:"Silkscreen",monospace; font-size:26px; line-height:1; margin-bottom:14px;
+}
+.cell h3{
+  font-family:"SoSo26",sans-serif; font-feature-settings:"ss07","ss08","liga";
+  text-transform:uppercase; font-size:1.5rem; line-height:.9; margin-bottom:8px;
+}
+.cell p{ font-size:13.5px; color:var(--fg); }
+.cell .tagno{
+  position:absolute; top:14px; right:14px;
+  font-family:"Silkscreen",monospace; font-size:9px;
+}
+
+/* ---------- MANIFESTO / CLAIM strip ---------- */
+.manifesto{
+  border-bottom:1px solid var(--line);
+  padding:46px 24px;
+  display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:center;
+}
+.manifesto .big{
+  font-family:"SoSo26",sans-serif; font-feature-settings:"ss07","ss08","liga","calt";
+  text-transform:uppercase; font-size:clamp(2rem,5vw,4rem); line-height:.92;
+}
+.manifesto p{ font-size:16px; max-width:48ch; }
+.manifesto p + p{ margin-top:14px; }
+
+/* ---------- SPONSOR ---------- */
+.sponsor{ display:grid; grid-template-columns:repeat(5,1fr); }
+.sp{
+  border-left:1px solid var(--line); padding:26px 14px; text-align:center;
+  display:flex; align-items:center; justify-content:center; min-height:96px;
+}
+.sp:first-child{ border-left:none; }
+.sp span{
+  font-family:"SoSo26",sans-serif; font-feature-settings:"ss07","ss08","liga";
+  text-transform:uppercase; font-size:clamp(0.95rem,1.6vw,1.4rem); line-height:.9;
+}
+
+/* ---------- CTA + NEWSLETTER (negativo) ---------- */
+.cta{
+  background:var(--fg); color:var(--bg);
+  border-bottom:1px solid var(--line);
+  /* dither inverso sul nero */
+  background-image:radial-gradient(rgba(255,255,255,.16) 0.7px, transparent 0.9px);
+  background-size:6px 6px;
+}
+.cta-inner{ display:grid; grid-template-columns:1fr 1fr; }
+.cta-col{ padding:40px 28px; border-left:1px solid rgba(255,255,255,.4); }
+.cta-col:first-child{ border-left:none; }
+.cta h2{
+  font-family:"SoSo26",sans-serif; font-feature-settings:"ss07","ss08","liga","calt";
+  text-transform:uppercase; font-size:clamp(1.8rem,4vw,3rem); line-height:.92; margin-bottom:14px;
+}
+.cta p{ font-size:15px; opacity:.92; max-width:42ch; margin-bottom:20px; }
+.cta .btn{ background:var(--bg); color:var(--fg); border-color:var(--bg); }
+.cta .btn:hover{ filter:invert(1); }
+.nl-form{ display:flex; gap:0; max-width:420px; border:1px solid var(--bg); }
+.nl-form input{
+  flex:1; background:transparent; border:none; color:var(--bg);
+  padding:13px 14px; font-family:"Inter"; font-size:14px; outline:none;
+}
+.nl-form input::placeholder{ color:rgba(255,255,255,.6); }
+.nl-form button{
+  background:var(--bg); color:var(--fg); border:none; cursor:pointer;
+  font-family:"Silkscreen",monospace; font-size:11px; padding:0 16px; text-transform:uppercase;
+}
+.nl-form button:hover{ filter:invert(1); }
+.vol{ margin-top:8px; }
+.vol a{ font-family:"Silkscreen",monospace; font-size:10px; }
+
+/* ---------- FOOTER ---------- */
+footer.site{ padding:36px 24px 56px; }
+.foot-grid{ display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:24px; align-items:start; }
+footer.site img{ height:26px; width:auto; }
+footer .lab{ font-family:"Silkscreen",monospace; font-size:10px; margin-bottom:10px; }
+footer a{ text-decoration:none; display:block; font-size:14px; padding:2px 0; }
+footer a:hover{ text-decoration:underline; }
+.foot-bottom{
+  margin-top:30px; padding-top:16px; border-top:1px solid var(--line);
+  display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap;
+  font-family:"Silkscreen",monospace; font-size:9px;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:900px){
+  .hero-grid{ grid-template-columns:1fr; }
+  .hero-grid > div{ border-left:none; }
+  .hero-side{ border-top:1px solid var(--line); min-height:280px; }
+  .lineup{ grid-template-columns:repeat(2,1fr); }
+  .act:nth-child(4n+1){ border-left:1px solid var(--line); }
+  .act:nth-child(2n+1){ border-left:none; }
+  .exp{ grid-template-columns:repeat(2,1fr); }
+  .cell:nth-child(4n+1){ border-left:1px solid var(--line); }
+  .cell:nth-child(2n+1){ border-left:none; }
+  .dates{ grid-template-columns:1fr; }
+  .dayblock{ border-left:none; border-bottom:1px solid var(--line); }
+  .manifesto{ grid-template-columns:1fr; }
+  .sponsor{ grid-template-columns:repeat(2,1fr); }
+  .sp:nth-child(2n+1){ border-left:none; }
+  .sp{ border-bottom:1px solid var(--line); }
+  .cta-inner{ grid-template-columns:1fr; }
+  .cta-col{ border-left:none; border-bottom:1px solid rgba(255,255,255,.4); }
+  .foot-grid{ grid-template-columns:1fr; }
+}
+@media (max-width:640px){
+  nav.main{ display:none; }
+  nav.main.open{
+    display:flex; position:absolute; top:64px; left:0; right:0;
+    flex-direction:column; align-items:stretch; gap:0;
+    background:var(--bg); border-bottom:1px solid var(--line);
+  }
+  nav.main.open a{ border:none; border-top:1px solid var(--line); padding:14px 24px; }
+  .menu-toggle{
+    display:inline-block; font-family:"Silkscreen",monospace; font-size:11px;
+    background:var(--bg); color:var(--fg); border:1px solid var(--line);
+    padding:9px 11px; cursor:pointer; text-transform:uppercase;
+  }
+  .nav-right .btn{ padding:9px 11px; }
+  .brand .tag{ display:none; }
+  .lineup{ grid-template-columns:1fr; }
+  .act:nth-child(2n+1){ border-left:none; }
+  .act{ border-left:none; }
+  .exp{ grid-template-columns:1fr; }
+  .cell:nth-child(2n+1){ border-left:none; }
+  .cell{ border-left:none; }
+  .sponsor{ grid-template-columns:1fr; }
+  .sp{ border-left:none; }
+}
+
+/* ============================================================
+   REDUCED MOTION: tutto degrada a statico
+   ============================================================ */
+@media (prefers-reduced-motion:reduce){
+  .ticker-track{ animation:none; transform:translateX(0); }
+  *{ transition:none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="site">
+  <div class="wrap nav-inner">
+    <div class="brand">
+      <img src="/brand/sottosopra-logo-black.png" alt="SOTTOSOPRA">
+      <span class="pixel tag">1-BIT · MMXXVI</span>
+    </div>
+    <nav class="main" id="nav">
+      <a href="#programma">Programma</a>
+      <a href="#info">Info</a>
+      <a href="#about">About</a>
+      <a href="#news">News</a>
+    </nav>
+    <div class="nav-right" style="display:flex;align-items:center;gap:10px;">
+      <button class="flip-btn" id="flip" title="Capovolgi (tasto S)">[ S ] FLIP</button>
+      <button class="menu-toggle" id="menuToggle" aria-label="Menu">MENU</button>
+      <a class="btn" href="#biglietti">Biglietti ↗</a>
+    </div>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <div class="wrap" style="padding:0;">
+    <div class="hero-grid">
+      <div class="hero-main">
+        <div class="hero-eyebrow">
+          <span class="chip">8ª EDIZIONE</span>
+          <span class="chip">CASTELFRANCO VENETO</span>
+          <span class="chip">GIARDINI DEL CASTELLO</span>
+        </div>
+        <h1 class="display hero-title">
+          <span class="l1">Sempre</span>
+          <span class="l2">Sottosopra</span>
+        </h1>
+        <p class="hero-sub">
+          Musica e cultura processate a 1 bit. Tre serate, soli punti
+          bianchi e neri. <strong>Cambia il punto di vista.</strong>
+        </p>
+        <div class="hero-cta">
+          <a class="btn" href="#biglietti">Compra i biglietti ↗</a>
+          <a class="btn ghost" href="#programma">Vedi il programma</a>
+        </div>
+      </div>
+
+      <!-- SIGNATURE: canvas lente che ri-dithera. Sotto, poster statico SEMPRE visibile -->
+      <div class="hero-side dither-25" id="heroSide">
+        <div class="static-poster">
+          <div class="poster-art">
+            <div class="display ring" style="-webkit-text-stroke:0;color:#000;">31·01·02</div>
+            <div class="pixel" style="font-size:11px;">VEN / SAB / DOM — AGO 2026</div>
+            <div class="pixel" style="font-size:10px;border:1px solid #000;padding:4px 7px;">RENDER 1-BIT · NO COLOR</div>
+          </div>
+        </div>
+        <canvas id="lens" aria-hidden="true"></canvas>
+        <span class="lens-hint pixel">MUOVI · LENTE RI-DITHERA</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TICKER / NASTRO ================= -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <span>Sempre Sottosopra</span><span>31 Luglio</span><span>01 Agosto</span><span>02 Agosto</span><span>1-Bit Festival</span><span>Cambia il punto di vista</span>
+    <span>Sempre Sottosopra</span><span>31 Luglio</span><span>01 Agosto</span><span>02 Agosto</span><span>1-Bit Festival</span><span>Cambia il punto di vista</span>
+  </div>
+</div>
+
+<!-- ================= LINEUP ================= -->
+<section id="lineup">
+  <div class="sec-head">
+    <div style="display:flex;gap:16px;align-items:baseline;">
+      <span class="no pixel">01</span>
+      <h2>Lineup 2026</h2>
+    </div>
+    <span class="meta">FLOYD-STEINBERG · 1-BIT · 8 ACTS</span>
+  </div>
+
+  <div class="lineup" id="lineupGrid">
+    <!-- ogni act è una silhouette ditherata SVG inline, sempre visibile -->
+    <!-- ACT 1 -->
+    <article class="act">
+      <span class="day pixel">VEN</span>
+      <div class="ditherframe">
+        <svg viewBox="0 0 120 160" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Generic Animal">
+          <defs>
+            <pattern id="d1" width="4" height="4" patternUnits="userSpaceOnUse">
+              <rect width="4" height="4" fill="#fff"/><circle cx="1" cy="1" r="1" fill="#000"/><circle cx="3" cy="3" r="1" fill="#000"/>
+            </pattern>
+            <pattern id="d1b" width="4" height="4" patternUnits="userSpaceOnUse">
+              <rect width="4" height="4" fill="#fff"/><circle cx="1" cy="1" r="1.4" fill="#000"/><circle cx="3" cy="3" r="1.4" fill="#000"/><circle cx="3" cy="1" r="1" fill="#000"/><circle cx="1" cy="3" r="1" fill="#000"/>
+            </pattern>
+          </defs>
+          <rect width="120" height="160" fill="url(#d1)"/>
+          <ellipse cx="60" cy="58" rx="26" ry="30" fill="url(#d1b)"/>
+          <path d="M30 160 Q34 96 60 92 Q86 96 90 160 Z" fill="url(#d1b)"/>
+          <ellipse class="reveal" cx="60" cy="58" rx="26" ry="30" fill="#000" opacity="0"/>
+          <path class="reveal" d="M30 160 Q34 96 60 92 Q86 96 90 160 Z" fill="#000" opacity="0"/>
+        </svg>
+      </div>
+      <div class="caption"><span class="nm">Generic Animal</span><span class="ix pixel">[01]</span></div>
+    </article>
+    <!-- ACT 2 -->
+    <article class="act">
+      <span class="day pixel">VEN</span>
+      <div class="ditherframe">
+        <svg viewBox="0 0 120 160" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Ex-Otago">
+          <rect width="120" height="160" fill="url(#d1b)"/>
+          <ellipse cx="60" cy="54" rx="24" ry="28" fill="url(#d1)"/>
+          <path d="M28 160 Q32 92 60 88 Q88 92 92 160 Z" fill="url(#d1)"/>
+          <circle class="reveal" cx="60" cy="54" r="24" fill="#000" opacity="0"/>
+        </svg>
+      </div>
+      <div class="caption"><span class="nm">Ex-Otago</span><span class="ix pixel">[02]</span></div>
+    </article>
+    <!-- ACT 3 -->
+    <article class="act">
+      <span class="day pixel">SAB</span>
+      <div class="ditherframe">
+        <svg viewBox="0 0 120 160" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Vendredi sur Mer">
+          <rect width="120" height="160" fill="url(#d1)"/>
+          <path d="M0 110 Q30 86 60 100 T120 96 V160 H0 Z" fill="url(#d1b)"/>
+          <ellipse cx="62" cy="56" rx="22" ry="27" fill="url(#d1b)"/>
+        </svg>
+      </div>
+      <div class="caption"><span class="nm">Vendredi<br>sur Mer</span><span class="ix pixel">[03]</span></div>
+    </article>
+    <!-- ACT 4 -->
+    <article class="act">
+      <span class="day pixel">SAB</span>
+      <div class="ditherframe">
+        <svg viewBox="0 0 120 160" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Alberto Ferrari">
+          <rect width="120" height="160" fill="url(#d1b)"/>
+          <rect x="22" y="20" width="76" height="120" fill="url(#d1)"/>
+          <ellipse cx="60" cy="56" rx="20" ry="25" fill="url(#d1b)"/>
+        </svg>
+      </div>
+      <div class="caption"><span class="nm">Alberto Ferrari</span><span class="ix pixel">[04]</span></div>
+    </article>
+    <!-- ACT 5 -->
+    <article class="act">
+      <span class="day pixel">SAB</span>
+      <div class="ditherframe">
+        <svg viewBox="0 0 120 160" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Auroro Borealo">
+          <rect width="120" height="160" fill="url(#d1)"/>
+          <circle cx="60" cy="50" r="30" fill="url(#d1b)"/>
+          <path d="M24 160 L24 100 Q60 84 96 100 L96 160 Z" fill="url(#d1b)"/>
+        </svg>
+      </div>
+      <div class="caption"><span class="nm">Auroro Borealo</span><span class="ix pixel">[05]</span></div>
+    </article>
+    <!-- ACT 6 -->
+    <article class="act">
+      <span class="day pixel">DOM</span>
+      <div class="ditherframe">
+        <svg viewBox="0 0 120 160" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Popa">
+          <rect width="120" height="160" fill="url(#d1b)"/>
+          <ellipse cx="60" cy="58" rx="26" ry="30" fill="url(#d1)"/>
+          <path d="M30 160 Q36 98 60 94 Q84 98 90 160 Z" fill="url(#d1)"/>
+        </svg>
+      </div>
+      <div class="caption"><span class="nm">Popa</span><span class="ix pixel">[06]</span></div>
+    </article>
+    <!-- ACT 7 -->
+    <article class="act">
+      <span class="day pixel">DOM</span>
+      <div class="ditherframe">
+        <svg viewBox="0 0 120 160" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Krano">
+          <rect width="120" height="160" fill="url(#d1)"/>
+          <polygon points="60,18 92,150 28,150" fill="url(#d1b)"/>
+          <circle cx="60" cy="54" r="18" fill="url(#d1)"/>
+        </svg>
+      </div>
+      <div class="caption"><span class="nm">Krano</span><span class="ix pixel">[07]</span></div>
+    </article>
+    <!-- ACT 8 -->
+    <article class="act">
+      <span class="day pixel">DOM</span>
+      <div class="ditherframe">
+        <svg viewBox="0 0 120 160" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Jesse The Faccio">
+          <rect width="120" height="160" fill="url(#d1b)"/>
+          <ellipse cx="60" cy="52" rx="22" ry="26" fill="url(#d1)"/>
+          <path d="M26 160 L34 96 Q60 86 86 96 L94 160 Z" fill="url(#d1)"/>
+        </svg>
+      </div>
+      <div class="caption"><span class="nm">Jesse The Faccio</span><span class="ix pixel">[08]</span></div>
+    </article>
+  </div>
+</section>
+
+<!-- ================= DATE / PROGRAMMA (numeri a retino) ================= -->
+<section id="programma">
+  <div class="sec-head">
+    <div style="display:flex;gap:16px;align-items:baseline;">
+      <span class="no pixel">02</span>
+      <h2>Tre serate</h2>
+    </div>
+    <span class="meta">NUMERI RIEMPITI DI RETINO · NON PIENI</span>
+  </div>
+  <div class="dates">
+    <div class="dayblock">
+      <div class="dow">VENERDÌ</div>
+      <div class="bignum display">31</div>
+      <div class="mon">LUGLIO 2026</div>
+      <p class="pl"><b>Generic Animal</b> · <b>Ex-Otago</b><br>Apertura porte ore 18:30</p>
+      <a class="lnk pixel" href="#biglietti">Biglietti VEN ↗</a>
+    </div>
+    <div class="dayblock">
+      <div class="dow">SABATO</div>
+      <div class="bignum display">01</div>
+      <div class="mon">AGOSTO 2026</div>
+      <p class="pl"><b>Vendredi sur Mer</b> · <b>Alberto Ferrari</b> · <b>Auroro Borealo</b><br>Workshop + talk dal pomeriggio</p>
+      <a class="lnk pixel" href="#biglietti">Biglietti SAB ↗</a>
+    </div>
+    <div class="dayblock">
+      <div class="dow">DOMENICA</div>
+      <div class="bignum display">02</div>
+      <div class="mon">AGOSTO 2026</div>
+      <p class="pl"><b>Popa</b> · <b>Krano</b> · <b>Jesse The Faccio</b><br>Brunch domenicale + presentazioni libri</p>
+      <a class="lnk pixel" href="#biglietti">Biglietti DOM ↗</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ESPERIENZE ================= -->
+<section id="esperienze">
+  <div class="sec-head">
+    <div style="display:flex;gap:16px;align-items:baseline;">
+      <span class="no pixel">03</span>
+      <h2>Non solo musica</h2>
+    </div>
+    <span class="meta">[ WORKSHOP / TALK / LIBRI / FOOD ]</span>
+  </div>
+  <div class="exp">
+    <div class="cell dither-25">
+      <div><div class="glyph">▚</div><h3>Workshop</h3><p>Laboratori dal pomeriggio. Mani in pasta, niente palco.</p></div>
+      <span class="tagno pixel">EXP-01</span>
+    </div>
+    <div class="cell">
+      <div><div class="glyph">▞</div><h3>Talk</h3><p>Conversazioni civiche, voci che cambiano la prospettiva.</p></div>
+      <span class="tagno pixel">EXP-02</span>
+    </div>
+    <div class="cell dither-25">
+      <div><div class="glyph">▟</div><h3>Libri</h3><p>Presentazioni e firmacopie nei Giardini del Castello.</p></div>
+      <span class="tagno pixel">EXP-03</span>
+    </div>
+    <div class="cell">
+      <div><div class="glyph">▙</div><h3>Brunch</h3><p>La domenica si chiude a tavola, lento e in compagnia.</p></div>
+      <span class="tagno pixel">EXP-04</span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MANIFESTO / ABOUT ================= -->
+<section id="about" class="manifesto dither-25">
+  <div class="big display">
+    Un<br>Macintosh<br>del 1984<br>che fa<br>festa
+  </div>
+  <div>
+    <p><strong>Sottosopra</strong> è un festival di musica e cultura a Castelfranco Veneto, ottava edizione nei Giardini del Castello. Qui tutto passa per una macchina a 1 bit: ogni foto, ogni ombra è fatta di soli punti bianchi e neri.</p>
+    <p>Niente grigi reali, niente colore: solo densità di punti. La tipografia resta nitida e vettoriale sopra il mondo ditherato — è il nostro modo di <strong>cambiare il punto di vista</strong>.</p>
+    <p class="pixel" style="font-size:11px;margin-top:18px;border:1px solid #000;display:inline-block;padding:6px 9px;">PREMI [ S ] PER INVERTIRE I BIT</p>
+  </div>
+</section>
+
+<!-- ================= SPONSOR ================= -->
+<section id="sponsor">
+  <div class="sec-head">
+    <div style="display:flex;gap:16px;align-items:baseline;">
+      <span class="no pixel">04</span>
+      <h2>Con il sostegno di</h2>
+    </div>
+    <span class="meta">PARTNER 2026</span>
+  </div>
+  <div class="sponsor">
+    <div class="sp"><span>Azimut</span></div>
+    <div class="sp"><span>Ceccato</span></div>
+    <div class="sp"><span>Prodeco</span></div>
+    <div class="sp"><span>CNA</span></div>
+    <div class="sp"><span>Banca Terre Venete</span></div>
+  </div>
+</section>
+
+<!-- ================= CTA + NEWSLETTER (negativo) ================= -->
+<section id="biglietti" class="cta">
+  <div class="cta-inner">
+    <div class="cta-col">
+      <h2>Biglietti<br>su DICE</h2>
+      <p>Pass giornalieri e full pass. Ingresso ai Giardini del Castello, tre serate sottosopra.</p>
+      <a class="btn" href="#" target="_blank" rel="noopener">Vai a DICE ↗</a>
+      <div class="vol" style="margin-top:22px;">
+        <a class="pixel" href="#" style="text-decoration:underline;">→ Diventa volontario del festival</a>
+      </div>
+    </div>
+    <div class="cta-col">
+      <h2 id="news">Newsletter</h2>
+      <p>Ricevi lineup, orari e sorprese ditherate. Una mail, niente spam.</p>
+      <form class="nl-form" onsubmit="return false;">
+        <input type="email" placeholder="la-tua@email.it" aria-label="Email">
+        <button type="submit">Iscrivi</button>
+      </form>
+      <p class="pixel" style="font-size:10px;margin-top:12px;opacity:.8;">info@sottosopra.com · IG @sottosoprafestival</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <img src="/brand/sottosopra-logo-black.png" alt="SOTTOSOPRA">
+        <p style="margin-top:14px;max-width:34ch;font-size:14px;">Festival di musica e cultura · Castelfranco Veneto · Giardini del Castello.</p>
+        <p class="pixel" style="font-size:10px;margin-top:12px;">SEMPRE SOTTOSOPRA — MMXXVI</p>
+      </div>
+      <div>
+        <div class="lab">NAVIGA</div>
+        <a href="#programma">Programma</a>
+        <a href="#info">Info</a>
+        <a href="#about">About</a>
+        <a href="#news">News</a>
+      </div>
+      <div>
+        <div class="lab">CONTATTI</div>
+        <a href="mailto:info@sottosopra.com">info@sottosopra.com</a>
+        <a href="#" target="_blank" rel="noopener">Instagram ↗</a>
+        <a href="#" target="_blank" rel="noopener">Facebook ↗</a>
+        <a href="#biglietti">Biglietti ↗</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 SOTTOSOPRA APS · CASTELFRANCO VENETO</span>
+      <span>RENDERED IN 1-BIT · PRIVACY · COOKIE</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* =========================================================================
+   SIGNATURE 1 — Bit-flip negativo (tasto S o bottone). Gesto sottosopra.
+   ========================================================================= */
+(function(){
+  var root = document.documentElement;
+  function toggleFlip(){
+    root.setAttribute("data-invert", root.getAttribute("data-invert")==="1" ? "0" : "1");
+  }
+  var btn = document.getElementById("flip");
+  if(btn) btn.addEventListener("click", toggleFlip);
+  document.addEventListener("keydown", function(e){
+    if(e.target && /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+    if(e.key === "s" || e.key === "S"){ toggleFlip(); }
+  });
+
+  /* mobile menu */
+  var mt = document.getElementById("menuToggle");
+  var nav = document.getElementById("nav");
+  if(mt && nav){ mt.addEventListener("click", function(){ nav.classList.toggle("open"); }); }
+})();
+
+/* =========================================================================
+   SIGNATURE 2 — Lente-cursore che ri-dithera live (Bayer ordered, Canvas2D).
+   Degrada: se reduced-motion o nessun pointer fine, NON parte e resta il
+   poster statico sotto (sempre leggibile).
+   ========================================================================= */
+(function(){
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var coarse = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+  var canvas = document.getElementById("lens");
+  var host   = document.getElementById("heroSide");
+  if(!canvas || !host || reduce || coarse){ if(canvas) canvas.style.display="none"; return; }
+
+  var ctx = canvas.getContext("2d", { willReadFrequently:true });
+  var W=0, H=0, dpr = Math.min(window.devicePixelRatio||1, 2);
+  var mouse = { x:-9999, y:-9999, active:false };
+  var t = 0;
+
+  // 4x4 Bayer ordered matrix (0..15) -> threshold map
+  var bayer = [
+     0, 8, 2,10,
+    12, 4,14, 6,
+     3,11, 1, 9,
+    15, 7,13, 5
+  ];
+
+  function resize(){
+    var r = host.getBoundingClientRect();
+    W = Math.max(1, Math.floor(r.width));
+    H = Math.max(1, Math.floor(r.height));
+    canvas.width  = Math.floor(W*dpr);
+    canvas.height = Math.floor(H*dpr);
+    canvas.style.width  = W+"px";
+    canvas.style.height = H+"px";
+  }
+  resize();
+  window.addEventListener("resize", resize);
+
+  host.addEventListener("mousemove", function(e){
+    var r = host.getBoundingClientRect();
+    mouse.x = (e.clientX - r.left); mouse.y = (e.clientY - r.top); mouse.active = true;
+  });
+  host.addEventListener("mouseleave", function(){ mouse.active = false; });
+
+  // luminanza "scena" sintetica: onde radiali + diagonali -> verrà ditherata
+  function luma(px, py, time){
+    var cx = W*0.5, cy = H*0.45;
+    var dx = px-cx, dy = py-cy;
+    var d = Math.sqrt(dx*dx + dy*dy);
+    var v = 0.5
+          + 0.32*Math.sin(d*0.045 - time*0.9)
+          + 0.18*Math.sin((px+py)*0.02 + time*0.6);
+    // bolla luminosa che segue il mouse: "la lente"
+    if(mouse.active){
+      var mdx = px-mouse.x, mdy = py-mouse.y;
+      var md = Math.sqrt(mdx*mdx+mdy*mdy);
+      var infl = Math.max(0, 1 - md/130);
+      v += infl*0.85*Math.sin(md*0.18 - time*4); // anelli stretti = lente che ri-dithera
+    }
+    if(v<0)v=0; if(v>1)v=1;
+    return v;
+  }
+
+  var STEP = 4; // dimensione cella punto
+  function frame(){
+    t += 0.016;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = "#000";
+    for(var y=0; y<H; y+=STEP){
+      for(var x=0; x<W; x+=STEP){
+        var L = luma(x+STEP*0.5, y+STEP*0.5, t);
+        var bx = (x/STEP) & 3;
+        var by = (y/STEP) & 3;
+        var th = (bayer[by*4+bx] + 0.5)/16;
+        if(L < th){
+          // punto nero (densità = tono). radius scala leggermente col tono
+          var rad = 0.9 + (1 - L)*0.9;
+          ctx.beginPath();
+          ctx.arc(x+STEP*0.5, y+STEP*0.5, rad, 0, 6.2832);
+          ctx.fill();
+        }
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+  // poster statico resta sotto; il canvas è solo enhancement sopra
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

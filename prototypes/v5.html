@@ -1,0 +1,831 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SOTTOSOPRA — Indice 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @font-face{
+    font-family:"SoSo26";
+    src:url("/fonts/SoSo26.woff") format("woff");
+    font-weight:normal;
+    font-style:normal;
+    font-display:swap;
+  }
+
+  :root{
+    --black:#000;
+    --ink:#111;
+    --ink-2:#262626;
+    --gray:#6b6b6b;
+    --gray-2:#9a9a9a;
+    --line:#e4e4e4;
+    --paper:#f4f4f4;
+    --white:#fff;
+
+    --bg:var(--white);
+    --fg:var(--black);
+    --muted:var(--gray);
+    --hair:var(--line);
+    --invert-bg:var(--black);
+    --invert-fg:var(--white);
+
+    --col-num:3.25rem;
+    --col-time:7.5rem;
+    --col-tag:9rem;
+    --gut:clamp(20px,4vw,72px);
+    --disp-feat:"ss07","ss08","liga","calt";
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  }
+
+  /* ---- INVERSIONE GLOBALE (tasto S / bottone) ---- */
+  html[data-flip="true"]{
+    --bg:var(--black);
+    --fg:var(--white);
+    --muted:var(--gray-2);
+    --hair:var(--ink-2);
+    --invert-bg:var(--white);
+    --invert-fg:var(--black);
+  }
+  html[data-flip="true"] .logo-black{display:none;}
+  html[data-flip="true"] .logo-white{display:inline-block;}
+  html .logo-white{display:none;}
+  html .logo-black{display:inline-block;}
+
+  *{box-sizing:border-box;margin:0;padding:0;}
+
+  html{
+    background:var(--bg);
+    overflow-x:clip;
+    transition:transform .55s cubic-bezier(.7,0,.2,1);
+  }
+  html[data-rotate="true"]{transform:rotate(180deg);}
+
+  body{
+    background:var(--bg);
+    color:var(--fg);
+    font-family:"Inter",system-ui,sans-serif;
+    font-size:17px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+    transition:background .25s ease,color .25s ease;
+  }
+
+  ::selection{background:var(--fg);color:var(--bg);}
+
+  /* grana stampa */
+  .grain{
+    position:fixed;inset:0;z-index:9999;pointer-events:none;
+    opacity:.05;mix-blend-mode:multiply;
+  }
+  html[data-flip="true"] .grain{mix-blend-mode:screen;opacity:.06;}
+
+  a{color:inherit;text-decoration:none;}
+
+  .wrap{max-width:1400px;margin:0 auto;padding:0 var(--gut);}
+
+  .disp{
+    font-family:"SoSo26","Inter",sans-serif;
+    font-feature-settings:var(--disp-feat);
+    line-height:.9;
+    text-transform:uppercase;
+  }
+  .mono{font-family:var(--mono);font-size:.78rem;letter-spacing:.01em;}
+  .eyebrow{
+    font-family:"Inter";font-size:.7rem;font-weight:600;
+    text-transform:uppercase;letter-spacing:.18em;color:var(--muted);
+  }
+
+  /* ================= HEADER ================= */
+  header.bar{
+    position:sticky;top:0;z-index:200;
+    background:var(--bg);
+    border-bottom:1px solid var(--fg);
+    transition:background .25s ease;
+  }
+  .bar-inner{
+    display:flex;align-items:center;justify-content:space-between;
+    gap:1.5rem;padding:0 var(--gut);height:58px;
+  }
+  .brand img{height:18px;width:auto;display:block;}
+  nav.top{display:flex;align-items:center;gap:0;}
+  nav.top a{
+    font-size:.78rem;font-weight:500;text-transform:uppercase;letter-spacing:.12em;
+    padding:0 1.05rem;height:58px;display:flex;align-items:center;
+    border-left:1px solid var(--hair);transition:background .15s ease,color .15s ease;
+  }
+  nav.top a:hover{background:var(--fg);color:var(--bg);}
+  .ticket{
+    font-family:var(--mono);font-size:.8rem;font-weight:600;letter-spacing:.06em;
+    background:var(--fg);color:var(--bg);
+    height:38px;padding:0 1.1rem;display:flex;align-items:center;gap:.55rem;
+    border:1px solid var(--fg);transition:.15s ease;text-transform:uppercase;
+  }
+  .ticket:hover{background:var(--bg);color:var(--fg);}
+  .ticket .arr{font-family:var(--mono);}
+
+  .flipbtn{
+    font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;
+    border:1px solid var(--fg);background:transparent;color:var(--fg);
+    height:30px;width:30px;display:grid;place-items:center;cursor:pointer;
+    transition:.15s ease;flex:none;
+  }
+  .flipbtn:hover{background:var(--fg);color:var(--bg);}
+
+  /* ================= MASTHEAD (riga unica indice) ================= */
+  .masthead{
+    border-bottom:5px solid var(--fg);
+    padding:clamp(28px,5vh,64px) 0 clamp(20px,3vh,36px);
+  }
+  .mh-line{
+    display:flex;flex-wrap:wrap;align-items:baseline;gap:.4em 1.1em;
+    font-family:var(--mono);font-size:clamp(.72rem,1.15vw,.9rem);
+    letter-spacing:.04em;color:var(--muted);text-transform:uppercase;
+    margin-bottom:clamp(18px,3vh,40px);
+  }
+  .mh-line b{color:var(--fg);font-weight:600;}
+  .mh-line .sep{color:var(--hair);}
+
+  .mh-title{
+    font-size:clamp(4rem,18.5vw,15rem);
+    letter-spacing:-.01em;
+    margin-left:-.02em;
+  }
+  .mh-sub{
+    display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;
+    gap:1rem 2rem;margin-top:clamp(14px,2.4vh,26px);
+  }
+  .mh-claim{
+    font-size:clamp(1.1rem,2.4vw,2rem);
+    max-width:22ch;line-height:1.04;
+  }
+  .mh-meta{
+    font-family:var(--mono);font-size:.8rem;color:var(--muted);
+    text-align:right;line-height:1.7;text-transform:uppercase;letter-spacing:.04em;
+  }
+  .mh-meta b{color:var(--fg);}
+
+  /* ================= LEDGER GENERICO ================= */
+  .section-head{
+    display:flex;align-items:center;justify-content:space-between;gap:1rem;
+    border-bottom:1px solid var(--fg);
+    padding:14px 0 11px;
+  }
+  .section-head h2{
+    font-family:"Inter";font-size:.72rem;font-weight:700;
+    text-transform:uppercase;letter-spacing:.22em;
+  }
+  .section-head .idx{
+    font-family:var(--mono);font-size:.72rem;color:var(--muted);letter-spacing:.05em;
+  }
+
+  /* riga base del registro */
+  .row{
+    display:grid;align-items:center;
+    border-bottom:1px solid var(--hair);
+    position:relative;
+    color:var(--fg);
+    transition:background .15s ease,color .15s ease,padding .15s ease;
+  }
+  .row .cell{padding:0 .9rem;min-width:0;}
+  .row .cell:first-child{padding-left:0;}
+
+  /* hover-invert dell'intera riga */
+  .row.invert:hover,
+  .row.invert:focus-within{
+    background:var(--invert-bg);
+    color:var(--invert-fg);
+  }
+  .row.invert:hover .muted,
+  .row.invert:focus-within .muted{color:var(--invert-fg);opacity:.65;}
+
+  .muted{color:var(--muted);}
+
+  /* ---- LINEUP / PROGRAMMA: grid colonne fisse ---- */
+  .ledger{counter-reset:line;}
+  .row.lineup{
+    grid-template-columns:var(--col-num) var(--col-time) 1fr var(--col-tag) auto;
+    min-height:74px;
+    cursor:pointer;
+  }
+  .row.lineup .num{
+    font-family:var(--mono);font-size:.8rem;color:var(--muted);letter-spacing:.02em;
+  }
+  .row.lineup:hover .num,.row.lineup:focus-within .num{color:var(--invert-fg);opacity:.7;}
+  .row.lineup .num::before{
+    counter-increment:line;content:counter(line,decimal-leading-zero);
+  }
+  .row.lineup .time{
+    font-family:var(--mono);font-size:.82rem;font-variant-numeric:tabular-nums;
+  }
+  .row.lineup .name{
+    font-family:"SoSo26","Inter",sans-serif;
+    font-feature-settings:var(--disp-feat);
+    text-transform:uppercase;line-height:.92;
+    font-size:clamp(1.55rem,3.2vw,2.85rem);
+    letter-spacing:-.005em;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .row.lineup .tag{
+    font-family:"Inter";font-size:.66rem;font-weight:600;text-transform:uppercase;
+    letter-spacing:.16em;color:var(--muted);
+    text-align:left;
+  }
+  .row.lineup:hover .tag,.row.lineup:focus-within .tag{color:var(--invert-fg);opacity:.7;}
+  .row.lineup .act{
+    font-family:var(--mono);font-size:.74rem;letter-spacing:.05em;text-transform:uppercase;
+    text-align:right;white-space:nowrap;color:var(--muted);
+  }
+  .row.lineup:hover .act,.row.lineup:focus-within .act{color:var(--invert-fg);opacity:1;}
+  .row.lineup .act::after{content:" ↗";}
+
+  /* silhouette reveal a destra sulle righe artista */
+  .silh{
+    position:absolute;top:50%;right:clamp(8px,8vw,120px);transform:translateY(-50%);
+    width:clamp(120px,18vw,230px);height:84%;
+    pointer-events:none;
+    opacity:0;
+    background-position:center;background-repeat:no-repeat;background-size:contain;
+    background-color:currentColor;
+    -webkit-mask-position:center;mask-position:center;
+    -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+    -webkit-mask-size:contain;mask-size:contain;
+    transition:opacity .15s ease,transform .25s cubic-bezier(.7,0,.2,1);
+    z-index:1;
+  }
+  .row.lineup:hover .silh,.row.lineup:focus-within .silh{
+    opacity:.92;transform:translateY(-50%) translateX(0);
+  }
+  /* silhouette = teste astratte mascherate da SVG inline */
+  .s-a{-webkit-mask-image:var(--silh-a);mask-image:var(--silh-a);}
+  .s-b{-webkit-mask-image:var(--silh-b);mask-image:var(--silh-b);}
+  .s-c{-webkit-mask-image:var(--silh-c);mask-image:var(--silh-c);}
+
+  /* day header riga (caps) */
+  .row.day{
+    grid-template-columns:var(--col-num) 1fr auto;
+    min-height:64px;
+    border-bottom:1px solid var(--fg);
+    border-top:1px solid var(--fg);
+    margin-top:-1px;
+  }
+  .row.day .dnum{
+    font-family:"SoSo26","Inter",sans-serif;font-feature-settings:var(--disp-feat);
+    font-size:clamp(2.2rem,5vw,3.4rem);line-height:.85;
+    font-variant-numeric:tabular-nums;
+  }
+  .row.day .dlabel{
+    font-family:"Inter";font-weight:600;text-transform:uppercase;letter-spacing:.14em;
+    font-size:.82rem;
+  }
+  .row.day .dlabel small{
+    display:block;font-weight:500;letter-spacing:.06em;color:var(--muted);
+    font-size:.7rem;margin-top:3px;
+  }
+  .row.day .dtix{
+    font-family:var(--mono);font-size:.74rem;text-transform:uppercase;letter-spacing:.05em;
+    text-align:right;color:var(--muted);
+  }
+  .row.day .dtix::after{content:" ↗";}
+
+  /* ================= NASTRO / MARQUEE ================= */
+  .marquee{
+    border-top:1px solid var(--fg);border-bottom:1px solid var(--fg);
+    overflow:hidden;white-space:nowrap;
+    padding:clamp(14px,2vh,22px) 0;
+    position:relative;
+  }
+  .marquee:hover .track{animation-play-state:paused;}
+  .track{
+    display:inline-block;will-change:transform;
+    animation:scroll 26s linear infinite;
+  }
+  .track span{
+    font-family:"SoSo26","Inter",sans-serif;font-feature-settings:var(--disp-feat);
+    text-transform:uppercase;font-size:clamp(2rem,5.5vw,4.6rem);
+    letter-spacing:.04em;padding:0 .45em;
+  }
+  .track .dot{font-size:.5em;vertical-align:.35em;color:var(--muted);}
+  @keyframes scroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+  /* ================= INFO / ESPERIENZE LEDGER ================= */
+  .row.info{
+    grid-template-columns:var(--col-num) 1fr var(--col-tag) auto;
+    min-height:60px;cursor:default;
+  }
+  .row.info .num{font-family:var(--mono);font-size:.78rem;color:var(--muted);}
+  .row.info .num::before{counter-increment:line;content:counter(line,decimal-leading-zero);}
+  .row.info .lbl{font-weight:500;}
+  .row.info .lbl b{font-weight:600;}
+  .row.info .tg{
+    font-family:"Inter";font-size:.66rem;font-weight:600;text-transform:uppercase;
+    letter-spacing:.16em;color:var(--muted);
+  }
+  .row.info:hover .tg,.row.info:focus-within .tg{color:var(--invert-fg);opacity:.7;}
+  .row.info .meta{font-family:var(--mono);font-size:.74rem;text-align:right;color:var(--muted);}
+  .row.info:hover .meta,.row.info:focus-within .meta{color:var(--invert-fg);}
+
+  /* ================= SPONSOR REGISTRO ================= */
+  .row.spon{
+    grid-template-columns:var(--col-num) 1fr var(--col-tag);
+    min-height:56px;cursor:default;
+  }
+  .row.spon .num{font-family:var(--mono);font-size:.78rem;color:var(--muted);}
+  .row.spon .num::before{counter-increment:line;content:counter(line,decimal-leading-zero);}
+  .row.spon .sname{
+    font-family:"SoSo26","Inter",sans-serif;font-feature-settings:var(--disp-feat);
+    text-transform:uppercase;font-size:clamp(1.2rem,2.4vw,1.9rem);line-height:.95;
+  }
+  .row.spon .stier{
+    font-family:"Inter";font-size:.66rem;font-weight:600;text-transform:uppercase;
+    letter-spacing:.16em;color:var(--muted);text-align:right;
+  }
+  .row.spon:hover .stier,.row.spon:focus-within .stier{color:var(--invert-fg);opacity:.7;}
+
+  /* ================= COLOPHON / CTA FINALE ================= */
+  .colophon{
+    border-top:5px solid var(--fg);
+    display:grid;grid-template-columns:1fr 1fr;
+    margin-top:clamp(40px,8vh,90px);
+  }
+  .colophon > div{padding:clamp(26px,5vh,56px) var(--gut);}
+  .colophon > div:first-child{border-right:1px solid var(--hair);}
+  .col-kick{
+    font-family:"SoSo26","Inter",sans-serif;font-feature-settings:var(--disp-feat);
+    text-transform:uppercase;font-size:clamp(2rem,5vw,4rem);line-height:.88;
+    margin-bottom:1.2rem;
+  }
+  .col-line{
+    display:flex;justify-content:space-between;align-items:center;gap:1rem;
+    border-top:1px solid var(--hair);padding:14px 0;
+    font-family:var(--mono);font-size:.82rem;text-transform:uppercase;letter-spacing:.04em;
+    transition:.15s ease;cursor:pointer;
+  }
+  .col-line:hover{background:var(--fg);color:var(--bg);padding-left:10px;padding-right:10px;}
+  .col-line span:last-child{color:var(--muted);}
+  .col-line:hover span:last-child{color:var(--bg);opacity:.7;}
+  .col-line:hover span:last-child::after{content:" →";}
+
+  .nl{margin-top:1.6rem;}
+  .nl form{display:flex;border:1px solid var(--fg);}
+  .nl input{
+    flex:1;border:0;background:transparent;color:var(--fg);
+    font-family:var(--mono);font-size:.82rem;padding:.8rem .9rem;outline:none;min-width:0;
+  }
+  .nl input::placeholder{color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+  .nl button{
+    border:0;border-left:1px solid var(--fg);background:var(--fg);color:var(--bg);
+    font-family:var(--mono);font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;
+    padding:0 1.1rem;cursor:pointer;transition:.15s ease;
+  }
+  .nl button:hover{background:var(--bg);color:var(--fg);}
+
+  /* ================= FOOTER ================= */
+  footer{
+    border-top:1px solid var(--fg);
+    padding:clamp(28px,5vh,56px) var(--gut) clamp(20px,3vh,32px);
+    display:flex;flex-wrap:wrap;justify-content:space-between;gap:2rem;align-items:flex-end;
+  }
+  footer .f-logo img{height:22px;width:auto;display:block;margin-bottom:1rem;}
+  footer .f-meta{font-family:var(--mono);font-size:.78rem;color:var(--muted);line-height:1.9;text-transform:uppercase;letter-spacing:.03em;}
+  footer .f-meta a:hover{color:var(--fg);text-decoration:underline;}
+  footer .f-legal{font-family:var(--mono);font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;text-align:right;}
+  footer .f-legal a:hover{color:var(--fg);}
+  .f-flipnote{margin-top:.6rem;}
+
+  /* scroll reveal */
+  @media (prefers-reduced-motion:no-preference){
+    .reveal{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s cubic-bezier(.7,0,.2,1);}
+    .reveal.in{opacity:1;transform:none;}
+  }
+
+  /* lente cursore (solo pointer fine) */
+  @media (hover:hover) and (pointer:fine){
+    .lens{
+      position:fixed;width:96px;height:96px;border-radius:50%;
+      border:1px solid #888;pointer-events:none;z-index:5000;
+      mix-blend-mode:difference;background:#fff;
+      transform:translate(-50%,-50%) scale(0);
+      transition:transform .18s ease;
+    }
+    body.lens-on .lens{transform:translate(-50%,-50%) scale(1);}
+  }
+
+  /* ================= RESPONSIVE ================= */
+  @media (max-width:760px){
+    :root{--col-num:2rem;--col-time:0;--col-tag:0;}
+    nav.top{display:none;}
+    .row.lineup{
+      grid-template-columns:var(--col-num) 1fr auto;
+      min-height:62px;
+    }
+    .row.lineup .time{display:none;}
+    .row.lineup .tag{display:none;}
+    .row.lineup .name{white-space:normal;font-size:1.5rem;}
+    .silh{display:none;}
+    .row.day{grid-template-columns:var(--col-num) 1fr auto;}
+    .row.info{grid-template-columns:var(--col-num) 1fr auto;}
+    .row.info .tg{display:none;}
+    .row.spon{grid-template-columns:var(--col-num) 1fr auto;}
+    .colophon{grid-template-columns:1fr;}
+    .colophon > div:first-child{border-right:0;border-bottom:1px solid var(--hair);}
+    .mh-sub{flex-direction:column;align-items:flex-start;}
+    .mh-meta{text-align:left;}
+    .lens{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<!-- grana stampa -->
+<svg class="grain" xmlns="http://www.w3.org/2000/svg">
+  <filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter>
+  <rect width="100%" height="100%" filter="url(#n)"/>
+</svg>
+
+<div class="lens" aria-hidden="true"></div>
+
+<!-- ============ HEADER ============ -->
+<header class="bar">
+  <div class="bar-inner">
+    <a class="brand" href="#" aria-label="Sottosopra — home">
+      <img class="logo-black" src="/brand/sottosopra-logo-black.png" alt="Sottosopra">
+      <img class="logo-white" src="/brand/sottosopra-logo-white.png" alt="Sottosopra">
+    </a>
+    <nav class="top" aria-label="Principale">
+      <a href="#programma">Programma</a>
+      <a href="#info">Info</a>
+      <a href="#about">About</a>
+      <a href="#news">News</a>
+    </nav>
+    <div style="display:flex;align-items:center;gap:.7rem;">
+      <button class="flipbtn" id="flip" title="Capovolgi (premi S)" aria-label="Capovolgi la pagina">S</button>
+      <a class="ticket" href="#" target="_blank" rel="noopener">Biglietti <span class="arr">↗</span></a>
+    </div>
+  </div>
+</header>
+
+<!-- ============ MASTHEAD (riga d'apertura indice) ============ -->
+<div class="masthead">
+  <div class="wrap">
+    <p class="mh-line">
+      <b>Sottosopra</b><span class="sep">—</span>
+      <span>8ª ed.</span><span class="sep">—</span>
+      <span>31.07 / 02.08.2026</span><span class="sep">—</span>
+      <span>Castelfranco V.</span><span class="sep">—</span>
+      <span>Giardini del Castello</span><span class="sep">—</span>
+      <b>Indice / Vol. 08</b>
+    </p>
+    <h1 class="disp mh-title">Sempre<br>Sottosopra</h1>
+    <div class="mh-sub">
+      <p class="mh-claim disp">Cambia il<br>punto di vista</p>
+      <p class="mh-meta">
+        Musica · cultura · corpo<br>
+        Tre serate / un catalogo da sfogliare<br>
+        <b>Premi S per capovolgere →</b>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PROGRAMMA / LINEUP — IL REGISTRO ============ -->
+<main class="wrap" id="programma">
+
+  <div class="section-head reveal">
+    <h2>Programma — Lineup 2026</h2>
+    <span class="idx">Voci 01–14 · sfoglia ↓</span>
+  </div>
+
+  <div class="ledger">
+
+    <!-- GIORNO 1 -->
+    <div class="row day reveal" id="day-31">
+      <span class="cell dnum disp">31</span>
+      <span class="cell dlabel">Venerdì 31 luglio<small>Apertura cancelli · ore 18:00</small></span>
+      <a class="cell dtix mono" href="#">Biglietti giornata</a>
+    </div>
+
+    <a class="row lineup invert reveal" href="#" tabindex="0">
+      <span class="cell num mono"></span>
+      <span class="cell time mono">22:30</span>
+      <span class="cell name disp">Generic Animal</span>
+      <span class="cell tag">Live · Headliner</span>
+      <span class="cell act mono">Biglietti</span>
+      <span class="silh s-a" aria-hidden="true"></span>
+    </a>
+    <a class="row lineup invert reveal" href="#" tabindex="0">
+      <span class="cell num mono"></span>
+      <span class="cell time mono">21:00</span>
+      <span class="cell name disp">Auroro Borealo</span>
+      <span class="cell tag">Live</span>
+      <span class="cell act mono">Biglietti</span>
+      <span class="silh s-b" aria-hidden="true"></span>
+    </a>
+    <a class="row lineup invert reveal" href="#" tabindex="0">
+      <span class="cell num mono"></span>
+      <span class="cell time mono">19:30</span>
+      <span class="cell name disp">Krano</span>
+      <span class="cell tag">DJ Set</span>
+      <span class="cell act mono">Biglietti</span>
+      <span class="silh s-c" aria-hidden="true"></span>
+    </a>
+
+    <!-- GIORNO 2 -->
+    <div class="row day reveal" id="day-01">
+      <span class="cell dnum disp">01</span>
+      <span class="cell dlabel">Sabato 1 agosto<small>Giornata centrale · ore 17:00</small></span>
+      <a class="cell dtix mono" href="#">Biglietti giornata</a>
+    </div>
+
+    <a class="row lineup invert reveal" href="#" tabindex="0">
+      <span class="cell num mono"></span>
+      <span class="cell time mono">23:00</span>
+      <span class="cell name disp">Ex-Otago</span>
+      <span class="cell tag">Live · Headliner</span>
+      <span class="cell act mono">Biglietti</span>
+      <span class="silh s-b" aria-hidden="true"></span>
+    </a>
+    <a class="row lineup invert reveal" href="#" tabindex="0">
+      <span class="cell num mono"></span>
+      <span class="cell time mono">21:30</span>
+      <span class="cell name disp">Vendredi sur Mer</span>
+      <span class="cell tag">Live</span>
+      <span class="cell act mono">Biglietti</span>
+      <span class="silh s-a" aria-hidden="true"></span>
+    </a>
+    <a class="row lineup invert reveal" href="#" tabindex="0">
+      <span class="cell num mono"></span>
+      <span class="cell time mono">20:00</span>
+      <span class="cell name disp">Jesse The Faccio</span>
+      <span class="cell tag">Live</span>
+      <span class="cell act mono">Biglietti</span>
+      <span class="silh s-c" aria-hidden="true"></span>
+    </a>
+
+    <!-- GIORNO 3 -->
+    <div class="row day reveal" id="day-02">
+      <span class="cell dnum disp">02</span>
+      <span class="cell dlabel">Domenica 2 agosto<small>Chiusura + brunch · ore 11:00</small></span>
+      <a class="cell dtix mono" href="#">Biglietti giornata</a>
+    </div>
+
+    <a class="row lineup invert reveal" href="#" tabindex="0">
+      <span class="cell num mono"></span>
+      <span class="cell time mono">22:00</span>
+      <span class="cell name disp">Alberto Ferrari</span>
+      <span class="cell tag">Live · Headliner</span>
+      <span class="cell act mono">Biglietti</span>
+      <span class="silh s-c" aria-hidden="true"></span>
+    </a>
+    <a class="row lineup invert reveal" href="#" tabindex="0">
+      <span class="cell num mono"></span>
+      <span class="cell time mono">20:30</span>
+      <span class="cell name disp">Popa</span>
+      <span class="cell tag">Live</span>
+      <span class="cell act mono">Biglietti</span>
+      <span class="silh s-a" aria-hidden="true"></span>
+    </a>
+
+  </div><!-- /ledger -->
+</main>
+
+<!-- ============ NASTRO ============ -->
+<div class="marquee reveal" aria-hidden="true" style="margin-top:clamp(36px,7vh,80px);">
+  <div class="track">
+    <span>Sempre Sottosopra</span><span class="dot">●</span>
+    <span>8ª Edizione</span><span class="dot">●</span>
+    <span>Castelfranco Veneto</span><span class="dot">●</span>
+    <span>31.07—02.08.2026</span><span class="dot">●</span>
+    <span>Sempre Sottosopra</span><span class="dot">●</span>
+    <span>8ª Edizione</span><span class="dot">●</span>
+    <span>Castelfranco Veneto</span><span class="dot">●</span>
+    <span>31.07—02.08.2026</span><span class="dot">●</span>
+  </div>
+</div>
+
+<!-- ============ ESPERIENZE + INFO ============ -->
+<main class="wrap" id="info" style="margin-top:clamp(40px,8vh,90px);">
+  <div class="section-head reveal">
+    <h2>Oltre la musica — Esperienze &amp; Info</h2>
+    <span class="idx">Voci 01–08</span>
+  </div>
+
+  <div class="ledger">
+    <a class="row info invert reveal" href="#" tabindex="0">
+      <span class="cell num mono"></span>
+      <span class="cell lbl"><b>Workshop</b> — ceramica, stampa, suono</span>
+      <span class="cell tg">Esperienza</span>
+      <span class="cell meta mono">Sab · Dom · gratuiti</span>
+    </a>
+    <a class="row info invert reveal" href="#" tabindex="0">
+      <span class="cell num mono"></span>
+      <span class="cell lbl"><b>Talk</b> — incontri e voci dal palco minore</span>
+      <span class="cell tg">Esperienza</span>
+      <span class="cell meta mono">Tutti i giorni · 18:00</span>
+    </a>
+    <a class="row info invert reveal" href="#" tabindex="0">
+      <span class="cell num mono"></span>
+      <span class="cell lbl"><b>Presentazioni libri</b> — autori &amp; editoria indipendente</span>
+      <span class="cell tg">Esperienza</span>
+      <span class="cell meta mono">Sab · Dom · 19:00</span>
+    </a>
+    <a class="row info invert reveal" href="#" tabindex="0">
+      <span class="cell num mono"></span>
+      <span class="cell lbl"><b>Brunch domenicale</b> — chiusura lenta nei Giardini</span>
+      <span class="cell tg">Esperienza</span>
+      <span class="cell meta mono">Dom · dalle 11:00</span>
+    </a>
+    <a class="row info invert reveal" href="#" tabindex="0">
+      <span class="cell num mono"></span>
+      <span class="cell lbl"><b>Come arrivare</b> — treno, auto, bici</span>
+      <span class="cell tg">Info</span>
+      <span class="cell meta mono">Castelfranco V. (TV)</span>
+    </a>
+    <a class="row info invert reveal" href="#" tabindex="0">
+      <span class="cell num mono"></span>
+      <span class="cell lbl"><b>Dove dormire / mangiare</b> — selezione locale</span>
+      <span class="cell tg">Info</span>
+      <span class="cell meta mono">Mappa ↗</span>
+    </a>
+    <a class="row info invert reveal" href="#" tabindex="0">
+      <span class="cell num mono"></span>
+      <span class="cell lbl"><b>Accessibilità</b> — area accessibile, info dedicate</span>
+      <span class="cell tg">Info</span>
+      <span class="cell meta mono">info@sottosopra.com</span>
+    </a>
+    <a class="row info invert reveal" href="#" tabindex="0">
+      <span class="cell num mono"></span>
+      <span class="cell lbl"><b>FAQ</b> — domande frequenti &amp; commissioni DICE</span>
+      <span class="cell tg">Info</span>
+      <span class="cell meta mono">Apri ↓</span>
+    </a>
+  </div>
+</main>
+
+<!-- ============ SPONSOR REGISTRO ============ -->
+<main class="wrap" id="about" style="margin-top:clamp(40px,8vh,90px);">
+  <div class="section-head reveal">
+    <h2>Sostenitori — Edizione 2026</h2>
+    <span class="idx">Voci 01–05</span>
+  </div>
+  <div class="ledger">
+    <a class="row spon invert reveal" href="#" tabindex="0">
+      <span class="cell num mono"></span>
+      <span class="cell sname disp">Azimut</span>
+      <span class="cell stier">Main partner</span>
+    </a>
+    <a class="row spon invert reveal" href="#" tabindex="0">
+      <span class="cell num mono"></span>
+      <span class="cell sname disp">Ceccato</span>
+      <span class="cell stier">Premium</span>
+    </a>
+    <a class="row spon invert reveal" href="#" tabindex="0">
+      <span class="cell num mono"></span>
+      <span class="cell sname disp">Prodeco</span>
+      <span class="cell stier">Premium</span>
+    </a>
+    <a class="row spon invert reveal" href="#" tabindex="0">
+      <span class="cell num mono"></span>
+      <span class="cell sname disp">CNA</span>
+      <span class="cell stier">Standard</span>
+    </a>
+    <a class="row spon invert reveal" href="#" tabindex="0">
+      <span class="cell num mono"></span>
+      <span class="cell sname disp">Banca Terre Venete</span>
+      <span class="cell stier">Tecnico</span>
+    </a>
+  </div>
+</main>
+
+<!-- ============ COLOPHON / CTA ============ -->
+<section class="colophon" id="news">
+  <div class="reveal">
+    <p class="eyebrow" style="margin-bottom:.9rem;">Entra nell'indice</p>
+    <h2 class="col-kick disp">Fai parte<br>del catalogo</h2>
+    <a class="col-line" href="#"><span>Diventa volontario*</span><span>~80 persone</span></a>
+    <a class="col-line" href="#"><span>Proposte &amp; collaborazioni</span><span>info@sottosopra.com</span></a>
+    <a class="col-line" href="#"><span>Diventa sostenitore</span><span>partner kit</span></a>
+    <div class="nl">
+      <p class="eyebrow" style="margin-bottom:.6rem;">Newsletter — registro aggiornamenti</p>
+      <form onsubmit="return false">
+        <input type="email" placeholder="la-tua@mail.com" aria-label="Email newsletter">
+        <button type="submit">Iscrivi ↗</button>
+      </form>
+    </div>
+  </div>
+  <div class="reveal">
+    <p class="eyebrow" style="margin-bottom:.9rem;">Ultime voci — News</p>
+    <a class="row info invert" href="#" style="grid-template-columns:1fr auto;border-top:1px solid var(--hair);" tabindex="0">
+      <span class="cell lbl"><b>Annunciata la prima ondata</b></span>
+      <span class="cell meta mono">12.05.2026</span>
+    </a>
+    <a class="row info invert" href="#" style="grid-template-columns:1fr auto;" tabindex="0">
+      <span class="cell lbl"><b>Aprono le candidature volontari</b></span>
+      <span class="cell meta mono">28.04.2026</span>
+    </a>
+    <a class="row info invert" href="#" style="grid-template-columns:1fr auto;" tabindex="0">
+      <span class="cell lbl"><b>Sottosopra 2026: le date</b></span>
+      <span class="cell meta mono">02.04.2026</span>
+    </a>
+    <a class="row info invert" href="#" style="grid-template-columns:1fr auto;border-bottom:1px solid var(--fg);" tabindex="0">
+      <span class="cell lbl"><b>Il festival raccontato dai sensi</b></span>
+      <span class="cell meta mono">29.08.2025</span>
+    </a>
+    <p class="mono" style="color:var(--muted);margin-top:1.4rem;">Tutte le news ↗</p>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="f-logo">
+    <img class="logo-black" src="/brand/sottosopra-logo-black.png" alt="Sottosopra">
+    <img class="logo-white" src="/brand/sottosopra-logo-white.png" alt="Sottosopra">
+    <p class="f-meta">Festival di musica e cultura<br>Castelfranco Veneto — dal 2017</p>
+  </div>
+  <div class="f-meta">
+    <a href="mailto:info@sottosopra.com">info@sottosopra.com</a><br>
+    <a href="#">Instagram @sottosoprafestival</a><br>
+    <a href="#">Facebook</a>
+  </div>
+  <div class="f-legal">
+    <a href="#">Privacy</a> · <a href="#">Cookie</a><br>
+    © 2026 APS Sottosopra<br>
+    <span class="f-flipnote">Indice / Vol. 08 — sempre sottosopra</span>
+  </div>
+</footer>
+
+<script>
+/* -------- silhouette masks (SVG inline come CSS var) -------- */
+(function(){
+  var root=document.documentElement.style;
+  var heads={
+    a:"<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 160'><path d='M40 160c0-34 18-58 50-58 8 0 14 2 20 5 6-6 9-15 9-26 0-9-4-16-4-25 0-22 16-38 38-38 20 0 34 14 34 33 0 14-7 23-7 35 0 14 8 20 8 36 0 22-16 38-38 38z'/></svg>",
+    b:"<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 160'><path d='M30 160c0-40 26-64 64-64 10 0 18 2 25 6 14-8 23-24 23-44 0-26-18-44-42-44-22 0-38 16-38 38 0 16 8 26 8 40 0 8-4 14-12 18-12 6-22 18-22 36z'/><circle cx='150' cy='40' r='16'/></svg>",
+    c:"<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 160'><path d='M44 160c0-32 16-56 46-58 0-2-1-4-1-7 0-10 4-18 4-28 0-24 17-41 40-41 21 0 35 15 35 35 0 15-8 24-8 38 0 16 9 22 9 40 0 12-7 21-19 21z'/></svg>"
+  };
+  for(var k in heads){
+    var url="url(\"data:image/svg+xml;utf8,"+encodeURIComponent(heads[k])+"\")";
+    root.setProperty('--silh-'+k,url);
+  }
+})();
+
+/* -------- inversione B/N (tasto S + bottone) -------- */
+(function(){
+  var html=document.documentElement;
+  function toggleFlip(){
+    var on=html.getAttribute('data-flip')==='true';
+    html.setAttribute('data-flip', on?'false':'true');
+  }
+  document.getElementById('flip').addEventListener('click',toggleFlip);
+  document.addEventListener('keydown',function(e){
+    if(e.key==='s'||e.key==='S'){
+      var t=e.target.tagName;
+      if(t==='INPUT'||t==='TEXTAREA') return;
+      toggleFlip();
+    }
+    /* doppio gesto: shift+S = rotazione 180° fisica (rispetta reduced-motion via CSS) */
+    if((e.key==='r'||e.key==='R')&&e.shiftKey){
+      var r=html.getAttribute('data-rotate')==='true';
+      html.setAttribute('data-rotate', r?'false':'true');
+    }
+  });
+})();
+
+/* -------- scroll reveal (IntersectionObserver) -------- */
+(function(){
+  var rm=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var els=document.querySelectorAll('.reveal');
+  if(rm||!('IntersectionObserver' in window)){
+    els.forEach(function(el){el.classList.add('in');});
+    return;
+  }
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}
+    });
+  },{threshold:.12,rootMargin:'0px 0px -8% 0px'});
+  els.forEach(function(el){io.observe(el);});
+})();
+
+/* -------- lente cursore (solo pointer fine) -------- */
+(function(){
+  if(!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var lens=document.querySelector('.lens');
+  var body=document.body;
+  document.addEventListener('mousemove',function(e){
+    lens.style.left=e.clientX+'px';
+    lens.style.top=e.clientY+'px';
+  });
+  /* la lente appare solo sul masthead (zona-titolo) */
+  var zone=document.querySelector('.masthead');
+  zone.addEventListener('mouseenter',function(){body.classList.add('lens-on');});
+  zone.addEventListener('mouseleave',function(){body.classList.remove('lens-on');});
+})();
+</script>
+</body>
+</html>

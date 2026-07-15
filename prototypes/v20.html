@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="it" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SOTTOSOPRA — Nastro Radio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ===================== FONT ===================== */
+@font-face{
+  font-family:"SoSo26";
+  src:url("/fonts/SoSo26.woff") format("woff");
+  font-weight:normal;font-style:normal;font-display:swap;
+}
+
+/* ===================== TOKENS ===================== */
+:root{
+  --bg:#FFFFFF;
+  --fg:#000000;
+  --muted:#6B6B6B;
+  --line:#000000;
+  --bg-inv:#000000;
+  --fg-inv:#FFFFFF;
+  --tape-h:64px;
+  --ticker-h:54px;
+  --ease:cubic-bezier(.2,.7,.2,1);
+}
+[data-theme="dark"]{
+  --bg:#000000;
+  --fg:#FFFFFF;
+  --muted:#9A9A9A;
+  --line:#FFFFFF;
+  --bg-inv:#FFFFFF;
+  --fg-inv:#000000;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--fg);
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:17px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  transition:background .45s var(--ease),color .45s var(--ease);
+  padding-bottom:var(--ticker-h);
+}
+.disp{
+  font-family:"SoSo26","Arial Narrow",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  text-transform:uppercase;
+  line-height:.86;
+  letter-spacing:-.01em;
+}
+.mono{font-family:"Space Mono",ui-monospace,monospace}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+
+/* ===================== HEADER ===================== */
+header{
+  position:sticky;top:0;z-index:60;
+  background:var(--bg);
+  border-bottom:2px solid var(--line);
+  transition:background .45s var(--ease),border-color .45s var(--ease);
+}
+.bar{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:16px;padding:12px 22px;
+}
+.brand{display:flex;align-items:center;gap:14px;min-width:0}
+.brand .logo{height:26px;width:auto}
+.on-air{
+  display:flex;align-items:center;gap:8px;
+  font-family:"Space Mono",monospace;font-size:11px;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;white-space:nowrap;
+  border:1.5px solid var(--line);padding:5px 9px;border-radius:2px;
+}
+.on-air .dot{
+  width:8px;height:8px;border-radius:50%;background:var(--fg);
+  animation:blink 1.4s steps(1) infinite;
+}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:.15}}
+nav.main{display:flex;align-items:center;gap:24px}
+nav.main a{
+  font-family:"Space Mono",monospace;font-size:12px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;position:relative;
+}
+nav.main a::after{content:"";position:absolute;left:0;bottom:-4px;width:0;height:2px;background:var(--fg);transition:width .25s var(--ease)}
+nav.main a:hover::after{width:100%}
+.tools{display:flex;align-items:center;gap:10px}
+.s-flip{
+  font-family:"Space Mono",monospace;font-size:12px;font-weight:700;
+  letter-spacing:.06em;border:1.5px solid var(--line);
+  background:transparent;color:var(--fg);cursor:pointer;
+  width:34px;height:34px;border-radius:2px;display:grid;place-items:center;
+  transition:transform .5s var(--ease),background .2s,color .2s;
+}
+.s-flip:hover{background:var(--fg);color:var(--bg)}
+.s-flip.spin{transform:rotate(180deg)}
+.btn-tix{
+  font-family:"Space Mono",monospace;font-size:13px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;
+  background:var(--fg);color:var(--bg);
+  padding:10px 18px;border-radius:2px;white-space:nowrap;border:2px solid var(--fg);
+  transition:background .2s,color .2s,transform .15s;
+}
+.btn-tix:hover{background:var(--bg);color:var(--fg);transform:translateY(-1px)}
+.burger{display:none}
+
+/* ===================== MARQUEE / TAPE ===================== */
+.tape{
+  height:var(--tape-h);
+  display:flex;align-items:center;overflow:hidden;white-space:nowrap;
+  border-top:2px solid var(--line);border-bottom:2px solid var(--line);
+  position:relative;
+}
+.tape.inv{background:var(--bg-inv);color:var(--fg-inv);border-color:var(--bg-inv)}
+.tape .track{display:inline-flex;align-items:center;will-change:transform;flex:none}
+.tape .track span{
+  font-family:"SoSo26","Arial Narrow",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  text-transform:uppercase;font-size:30px;letter-spacing:.14em;
+  padding:0 26px;display:inline-flex;align-items:center;gap:26px;
+}
+.tape .track .star{font-family:"Inter";font-size:18px;opacity:.55}
+.tape .track.a{animation:scroll-l 26s linear infinite}
+.tape .track.b{animation:scroll-l 26s linear infinite}
+.tape.rev .track.a,.tape.rev .track.b{animation:scroll-r 30s linear infinite}
+.tape.slow .track.a,.tape.slow .track.b{animation-duration:40s}
+@keyframes scroll-l{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes scroll-r{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+
+/* ===================== HERO ===================== */
+.hero{
+  padding:46px 22px 30px;position:relative;overflow:hidden;
+}
+.hero .freq{
+  font-family:"Space Mono",monospace;font-size:12px;font-weight:700;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--muted);
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  border-bottom:1.5px solid var(--line);padding-bottom:12px;margin-bottom:22px;
+}
+.hero h1{
+  font-family:"SoSo26","Arial Narrow",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  text-transform:uppercase;line-height:.82;letter-spacing:-.02em;
+  font-size:clamp(4rem,16vw,15rem);
+  word-break:break-word;
+}
+.hero h1 .line{display:block;overflow:hidden}
+.hero h1 .line > span{display:inline-block;transform:translateY(0);animation:rise .9s var(--ease) both}
+.hero h1 .line:nth-child(1) span{animation-delay:.05s}
+.hero h1 .line:nth-child(2) span{animation-delay:.16s}
+.hero h1 .line:nth-child(2){text-align:right}
+@keyframes rise{from{transform:translateY(104%)}to{transform:translateY(0)}}
+.hero .sub{
+  display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;
+  gap:18px;margin-top:26px;border-top:1.5px solid var(--line);padding-top:18px;
+}
+.hero .sub p{max-width:46ch;font-size:18px}
+.hero .sub .where{
+  font-family:"Space Mono",monospace;font-size:13px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;text-align:right;
+}
+.hero .cta-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:26px}
+.cta{
+  font-family:"Space Mono",monospace;font-size:14px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;padding:14px 26px;border-radius:2px;
+  border:2px solid var(--line);transition:transform .15s,background .2s,color .2s;
+}
+.cta.solid{background:var(--fg);color:var(--bg)}
+.cta.solid:hover{background:var(--bg);color:var(--fg);transform:translateY(-2px)}
+.cta.ghost:hover{background:var(--fg);color:var(--bg);transform:translateY(-2px)}
+
+/* ===================== SECTION FRAME ===================== */
+.sec{padding:54px 22px}
+.sec.inv{background:var(--bg-inv);color:var(--fg-inv);transition:background .45s var(--ease),color .45s var(--ease)}
+.sec-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:26px}
+.sec-head .no{font-family:"Space Mono",monospace;font-size:13px;font-weight:700;letter-spacing:.12em}
+.sec-head h2{
+  font-family:"SoSo26","Arial Narrow",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  text-transform:uppercase;line-height:.86;letter-spacing:-.01em;
+  font-size:clamp(2.4rem,7vw,5.5rem);
+}
+.sec-head .meta{margin-left:auto;font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+
+/* ===================== LINEUP ===================== */
+.lineup{border-top:2px solid currentColor}
+.lineup .row{
+  display:flex;align-items:center;gap:18px;
+  border-bottom:1.5px solid currentColor;padding:14px 4px;cursor:default;
+  position:relative;overflow:hidden;
+}
+.lineup .row .idx{font-family:"Space Mono",monospace;font-size:13px;font-weight:700;width:42px;flex:none;opacity:.6}
+.lineup .row .name{
+  font-family:"SoSo26","Arial Narrow",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  text-transform:uppercase;font-size:clamp(1.7rem,4.4vw,3.4rem);line-height:1;
+  letter-spacing:0;transition:letter-spacing .3s var(--ease),transform .3s var(--ease);
+}
+.lineup .row .tag{margin-left:auto;font-family:"Space Mono",monospace;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;opacity:.7;flex:none}
+.lineup .row:hover .name{letter-spacing:.04em;transform:translateX(10px)}
+.lineup .row:hover{background:currentColor}
+.lineup .row:hover .name,.lineup .row:hover .idx,.lineup .row:hover .tag{mix-blend-mode:difference;color:#fff}
+
+/* ===================== PROGRAM DAYS ===================== */
+.days{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:2px solid var(--line)}
+.day{padding:24px 20px;border-right:1.5px solid var(--line);position:relative}
+.day:last-child{border-right:none}
+.day .dno{font-family:"Space Mono",monospace;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.day h3{
+  font-family:"SoSo26","Arial Narrow",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  text-transform:uppercase;font-size:clamp(2rem,4.5vw,3.4rem);line-height:.9;margin:8px 0 14px;
+}
+.day ul{list-style:none}
+.day li{padding:8px 0;border-top:1px solid var(--line);font-size:15px;display:flex;justify-content:space-between;gap:10px}
+.day li .t{font-family:"Space Mono",monospace;font-size:12px;color:var(--muted);flex:none}
+
+/* ===================== EXPERIENCES (broadcast grid) ===================== */
+.exp{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.exp .card{border:2px solid currentColor;padding:20px 18px;min-height:180px;display:flex;flex-direction:column;justify-content:space-between;transition:background .2s,color .2s}
+.exp .card .k{font-family:"Space Mono",monospace;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;opacity:.65}
+.exp .card h4{
+  font-family:"SoSo26","Arial Narrow",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  text-transform:uppercase;font-size:clamp(1.4rem,2.5vw,2.1rem);line-height:.92;
+}
+.exp .card p{font-size:14px;opacity:.8;margin-top:8px}
+.sec.inv .exp .card:hover{background:#fff;color:#000}
+.sec:not(.inv) .exp .card:hover{background:#000;color:#fff}
+
+/* ===================== NEWSLETTER / CTA ===================== */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:0;border:2px solid var(--line)}
+.split > div{padding:34px 28px;border-right:1.5px solid var(--line)}
+.split > div:last-child{border-right:none}
+.split h3{
+  font-family:"SoSo26","Arial Narrow",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  text-transform:uppercase;font-size:clamp(1.8rem,4vw,3rem);line-height:.9;margin-bottom:14px;
+}
+.split p{font-size:15px;color:var(--muted);margin-bottom:18px;max-width:38ch}
+.field{display:flex;gap:0;border:2px solid var(--line);border-radius:2px;overflow:hidden;max-width:420px}
+.field input{flex:1;border:none;background:transparent;color:var(--fg);padding:13px 14px;font-family:"Space Mono",monospace;font-size:14px;outline:none;min-width:0}
+.field input::placeholder{color:var(--muted)}
+.field button{border:none;background:var(--fg);color:var(--bg);font-family:"Space Mono",monospace;font-weight:700;font-size:13px;letter-spacing:.08em;padding:0 18px;cursor:pointer;text-transform:uppercase}
+.vol-link{display:inline-flex;align-items:center;gap:10px;font-family:"Space Mono",monospace;font-weight:700;font-size:14px;letter-spacing:.06em;text-transform:uppercase;border-bottom:2px solid var(--fg);padding-bottom:4px}
+.vol-link span{transition:transform .25s var(--ease)}
+.vol-link:hover span{transform:translateX(6px)}
+
+/* ===================== FOOTER ===================== */
+footer{border-top:2px solid var(--line);padding:40px 22px 28px}
+.foot-top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:24px;align-items:flex-start}
+footer .logo{height:30px}
+.foot-cols{display:flex;gap:54px;flex-wrap:wrap}
+.foot-cols .col h5{font-family:"Space Mono",monospace;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.foot-cols .col a,.foot-cols .col p{display:block;font-size:14px;padding:3px 0}
+.foot-cols .col a:hover{text-decoration:underline}
+.foot-bot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:36px;padding-top:18px;border-top:1.5px solid var(--line);font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+/* ===================== NOW PLAYING TICKER (fixed) ===================== */
+.ticker{
+  position:fixed;left:0;right:0;bottom:0;z-index:80;height:var(--ticker-h);
+  background:var(--bg-inv);color:var(--fg-inv);
+  display:flex;align-items:center;border-top:2px solid var(--bg-inv);
+  transition:background .45s var(--ease),color .45s var(--ease);
+}
+.ticker .np{
+  display:flex;align-items:center;gap:12px;padding:0 16px;flex:none;
+  border-right:1.5px solid var(--fg-inv);height:100%;
+}
+.ticker .cover{
+  width:30px;height:30px;flex:none;position:relative;overflow:hidden;
+  border:1px solid var(--fg-inv);
+  background:
+    repeating-linear-gradient(45deg,var(--fg-inv) 0 3px,transparent 3px 6px);
+}
+.ticker .eq{display:flex;align-items:flex-end;gap:2px;height:16px}
+.ticker .eq i{width:3px;background:var(--fg-inv);height:40%;animation:eq .9s ease-in-out infinite}
+.ticker .eq i:nth-child(2){animation-delay:.2s}
+.ticker .eq i:nth-child(3){animation-delay:.45s}
+.ticker .eq i:nth-child(4){animation-delay:.1s}
+@keyframes eq{0%,100%{height:30%}50%{height:100%}}
+.ticker .label{font-family:"Space Mono",monospace;font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
+.ticker .feed{flex:1;overflow:hidden;white-space:nowrap;height:100%;display:flex;align-items:center}
+.ticker .feed .track{display:inline-flex;will-change:transform;animation:scroll-l 38s linear infinite}
+.ticker .feed .track span{
+  font-family:"Space Mono",monospace;font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  padding:0 20px;display:inline-flex;align-items:center;gap:20px;
+}
+.ticker .feed .track .dot{opacity:.5}
+.ticker .clock{flex:none;padding:0 16px;border-left:1.5px solid var(--fg-inv);height:100%;display:flex;align-items:center;font-family:"Space Mono",monospace;font-size:13px;font-weight:700;letter-spacing:.06em}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width:860px){
+  nav.main{display:none}
+  .burger{display:grid;place-items:center;width:34px;height:34px;border:1.5px solid var(--line);border-radius:2px;background:transparent;color:var(--fg);cursor:pointer;font-size:18px}
+  .days{grid-template-columns:1fr}
+  .day{border-right:none;border-bottom:1.5px solid var(--line)}
+  .day:last-child{border-bottom:none}
+  .exp{grid-template-columns:1fr 1fr}
+  .split{grid-template-columns:1fr}
+  .split > div{border-right:none;border-bottom:1.5px solid var(--line)}
+  .split > div:last-child{border-bottom:none}
+  .hero h1{font-size:clamp(3rem,18vw,6rem)}
+  .ticker .clock{display:none}
+}
+@media (max-width:480px){
+  .exp{grid-template-columns:1fr}
+  .tape .track span{font-size:24px}
+  .ticker .np .label{display:none}
+}
+
+/* mobile menu */
+.mmenu{display:none}
+.mmenu.open{display:flex;flex-direction:column;gap:0;border-top:2px solid var(--line)}
+.mmenu a{font-family:"Space Mono",monospace;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:14px 22px;border-bottom:1.5px solid var(--line);font-size:14px}
+
+/* reduced motion: freeze loops, keep everything visible */
+@media (prefers-reduced-motion:reduce){
+  *{animation:none !important;transition:none !important;scroll-behavior:auto !important}
+  .hero h1 .line > span{transform:none !important}
+}
+</style>
+</head>
+<body data-theme="light">
+
+<!-- ===================== HEADER ===================== -->
+<header>
+  <div class="bar">
+    <div class="brand">
+      <img class="logo" id="logo" src="/brand/sottosopra-logo-black.png" alt="SOTTOSOPRA">
+      <span class="on-air"><span class="dot"></span>ON AIR · 87.6 FM</span>
+    </div>
+    <nav class="main">
+      <a href="#programma">Programma</a>
+      <a href="#info">Info</a>
+      <a href="#about">About</a>
+      <a href="#news">News</a>
+    </nav>
+    <div class="tools">
+      <button class="s-flip" id="sflip" title="Premi S — capovolgi" aria-label="Inverti palette">S</button>
+      <a class="btn-tix" href="https://dice.fm" target="_blank" rel="noopener">Biglietti</a>
+      <button class="burger" id="burger" aria-label="Menu">≡</button>
+    </div>
+  </div>
+  <div class="mmenu" id="mmenu">
+    <a href="#programma">Programma</a>
+    <a href="#info">Info</a>
+    <a href="#about">About</a>
+    <a href="#news">News</a>
+  </div>
+</header>
+
+<!-- ===================== TAPE 1 (date) ===================== -->
+<div class="tape" data-tape>
+  <div class="track a disp">
+    <span>Ven 31 Lug <i class="star">✶</i> Sab 1 Ago <i class="star">✶</i> Dom 2 Ago <i class="star">✶</i> 2026 <i class="star">✶</i> Sempre Sottosopra <i class="star">✶</i></span>
+    <span>Ven 31 Lug <i class="star">✶</i> Sab 1 Ago <i class="star">✶</i> Dom 2 Ago <i class="star">✶</i> 2026 <i class="star">✶</i> Sempre Sottosopra <i class="star">✶</i></span>
+  </div>
+</div>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+  <div class="freq">
+    <span>Trasmissione N.08 — Castelfranco Veneto</span>
+    <span>Giardini del Castello</span>
+    <span>Frequenza · Sottosopra</span>
+  </div>
+  <h1 class="disp">
+    <span class="line"><span>Sempre</span></span>
+    <span class="line"><span>Sottosopra</span></span>
+  </h1>
+  <div class="sub">
+    <p>Otto edizioni di musica e cultura che ribaltano il punto di vista. Tre serate di concerti, workshop, talk e incontri nei Giardini del Castello.</p>
+    <div class="where">8ª Edizione<br>31 Lug — 2 Ago 2026<br>Castelfranco Veneto</div>
+  </div>
+  <div class="cta-row">
+    <a class="cta solid" href="https://dice.fm" target="_blank" rel="noopener">Biglietti su DICE →</a>
+    <a class="cta ghost" href="#programma">Sintonizza il programma</a>
+  </div>
+</section>
+
+<!-- ===================== TAPE 2 (inverted, manifesto) ===================== -->
+<div class="tape inv rev" data-tape>
+  <div class="track a disp">
+    <span>Cambia il punto di vista <i class="star">✶</i> Musica <i class="star">✶</i> Cultura <i class="star">✶</i> Comunità <i class="star">✶</i></span>
+    <span>Cambia il punto di vista <i class="star">✶</i> Musica <i class="star">✶</i> Cultura <i class="star">✶</i> Comunità <i class="star">✶</i></span>
+  </div>
+</div>
+
+<!-- ===================== LINEUP ===================== -->
+<section class="sec" id="programma">
+  <div class="sec-head">
+    <span class="no">01 / Playlist</span>
+    <h2 class="disp">Lineup</h2>
+    <span class="meta">In rotazione · 2026</span>
+  </div>
+  <div class="lineup">
+    <div class="row"><span class="idx">A1</span><span class="name disp">Generic Animal</span><span class="tag">Live</span></div>
+    <div class="row"><span class="idx">A2</span><span class="name disp">Ex-Otago</span><span class="tag">Live</span></div>
+    <div class="row"><span class="idx">A3</span><span class="name disp">Vendredi sur Mer</span><span class="tag">Live</span></div>
+    <div class="row"><span class="idx">A4</span><span class="name disp">Alberto Ferrari</span><span class="tag">Live</span></div>
+    <div class="row"><span class="idx">B1</span><span class="name disp">Auroro Borealo</span><span class="tag">Live</span></div>
+    <div class="row"><span class="idx">B2</span><span class="name disp">Popa</span><span class="tag">DJ Set</span></div>
+    <div class="row"><span class="idx">B3</span><span class="name disp">Krano</span><span class="tag">DJ Set</span></div>
+    <div class="row"><span class="idx">B4</span><span class="name disp">Jesse The Faccio</span><span class="tag">Live</span></div>
+  </div>
+</section>
+
+<!-- ===================== TAPE 3 (sponsor) ===================== -->
+<div class="tape slow" data-tape>
+  <div class="track a disp">
+    <span>Azimut <i class="star">/</i> Ceccato <i class="star">/</i> Prodeco <i class="star">/</i> CNA <i class="star">/</i> Banca Terre Venete <i class="star">/</i></span>
+    <span>Azimut <i class="star">/</i> Ceccato <i class="star">/</i> Prodeco <i class="star">/</i> CNA <i class="star">/</i> Banca Terre Venete <i class="star">/</i></span>
+  </div>
+</div>
+
+<!-- ===================== PROGRAM DAYS (inverted section) ===================== -->
+<section class="sec inv" id="info">
+  <div class="sec-head">
+    <span class="no">02 / Palinsesto</span>
+    <h2 class="disp">Tre Serate</h2>
+    <span class="meta">Giardini del Castello · 21:00 →</span>
+  </div>
+  <div class="days">
+    <div class="day">
+      <div class="dno">Giorno 01</div>
+      <h3 class="disp">Ven 31</h3>
+      <ul>
+        <li><span>Generic Animal</span><span class="t">21:30</span></li>
+        <li><span>Vendredi sur Mer</span><span class="t">22:45</span></li>
+        <li><span>Popa — DJ Set</span><span class="t">00:30</span></li>
+      </ul>
+    </div>
+    <div class="day">
+      <div class="dno">Giorno 02</div>
+      <h3 class="disp">Sab 01</h3>
+      <ul>
+        <li><span>Auroro Borealo</span><span class="t">21:30</span></li>
+        <li><span>Ex-Otago</span><span class="t">22:45</span></li>
+        <li><span>Krano — DJ Set</span><span class="t">00:30</span></li>
+      </ul>
+    </div>
+    <div class="day">
+      <div class="dno">Giorno 03</div>
+      <h3 class="disp">Dom 02</h3>
+      <ul>
+        <li><span>Brunch + Talk</span><span class="t">11:00</span></li>
+        <li><span>Alberto Ferrari</span><span class="t">21:30</span></li>
+        <li><span>Jesse The Faccio</span><span class="t">22:45</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TAPE 4 (inverted-from-inverted = light, alternation rhythm) ===================== -->
+<div class="tape rev" data-tape>
+  <div class="track a disp">
+    <span>Workshop <i class="star">✶</i> Talk <i class="star">✶</i> Libri <i class="star">✶</i> Brunch <i class="star">✶</i> Arte <i class="star">✶</i></span>
+    <span>Workshop <i class="star">✶</i> Talk <i class="star">✶</i> Libri <i class="star">✶</i> Brunch <i class="star">✶</i> Arte <i class="star">✶</i></span>
+  </div>
+</div>
+
+<!-- ===================== EXPERIENCES ===================== -->
+<section class="sec" id="about">
+  <div class="sec-head">
+    <span class="no">03 / Extra</span>
+    <h2 class="disp">Esperienze</h2>
+    <span class="meta">Oltre i concerti</span>
+  </div>
+  <div class="exp">
+    <div class="card">
+      <span class="k">Lab</span>
+      <h4 class="disp">Workshop</h4>
+      <p>Laboratori aperti a tuttǝ, dal suono alla stampa.</p>
+    </div>
+    <div class="card">
+      <span class="k">Voci</span>
+      <h4 class="disp">Talk</h4>
+      <p>Incontri e dialoghi per cambiare il punto di vista.</p>
+    </div>
+    <div class="card">
+      <span class="k">Pagine</span>
+      <h4 class="disp">Libri</h4>
+      <p>Presentazioni e letture con autrici e autori ospiti.</p>
+    </div>
+    <div class="card">
+      <span class="k">Domenica</span>
+      <h4 class="disp">Brunch</h4>
+      <p>Il brunch domenicale che chiude la trasmissione.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TAPE 5 (inverted, CTA tape) ===================== -->
+<div class="tape inv slow" data-tape>
+  <div class="track a disp">
+    <span>Diventa Volontariǝ <i class="star">✶</i> Entra nella Radio <i class="star">✶</i> Iscriviti <i class="star">✶</i></span>
+    <span>Diventa Volontariǝ <i class="star">✶</i> Entra nella Radio <i class="star">✶</i> Iscriviti <i class="star">✶</i></span>
+  </div>
+</div>
+
+<!-- ===================== NEWSLETTER + VOLONTARI ===================== -->
+<section class="sec" id="news">
+  <div class="sec-head">
+    <span class="no">04 / Frequenza</span>
+    <h2 class="disp">Resta Sintonizzatǝ</h2>
+  </div>
+  <div class="split">
+    <div>
+      <h3 class="disp">Newsletter</h3>
+      <p>Ricevi lineup, orari e annunci prima che vadano in onda.</p>
+      <form class="field" onsubmit="return false">
+        <input type="email" placeholder="la-tua@mail.it" aria-label="Email">
+        <button type="submit">Iscriviti</button>
+      </form>
+    </div>
+    <div>
+      <h3 class="disp">Volontari</h3>
+      <p>Ottanta persone fanno andare in onda Sottosopra. Vuoi esserci anche tu?</p>
+      <a class="vol-link" href="mailto:info@sottosopra.com?subject=Volontariato">Diventa volontariǝ <span>→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer>
+  <div class="foot-top">
+    <div>
+      <img class="logo" id="logo2" src="/brand/sottosopra-logo-black.png" alt="SOTTOSOPRA">
+      <p style="margin-top:14px;max-width:30ch;font-size:14px;color:var(--muted)">Festival di musica e cultura · Castelfranco Veneto · dal 2017.</p>
+    </div>
+    <div class="foot-cols">
+      <div class="col">
+        <h5>Naviga</h5>
+        <a href="#programma">Programma</a>
+        <a href="#info">Info</a>
+        <a href="#about">About</a>
+        <a href="#news">News</a>
+      </div>
+      <div class="col">
+        <h5>Contatti</h5>
+        <a href="mailto:info@sottosopra.com">info@sottosopra.com</a>
+        <a href="https://instagram.com/sottosoprafestival" target="_blank" rel="noopener">@sottosoprafestival</a>
+      </div>
+      <div class="col">
+        <h5>Biglietti</h5>
+        <a href="https://dice.fm" target="_blank" rel="noopener">Acquista su DICE →</a>
+      </div>
+    </div>
+  </div>
+  <div class="foot-bot">
+    <span>© 2026 Sottosopra APS</span>
+    <span>Cambia il punto di vista</span>
+    <span>Privacy · Cookie</span>
+  </div>
+</footer>
+
+<!-- ===================== NOW PLAYING TICKER (fixed bottom) ===================== -->
+<div class="ticker" role="status" aria-label="Now playing">
+  <div class="np">
+    <div class="cover"></div>
+    <div class="eq"><i></i><i></i><i></i><i></i></div>
+    <span class="label">Now Playing</span>
+  </div>
+  <div class="feed">
+    <div class="track">
+      <span>Generic Animal — Limonata <span class="dot">●</span> Ex-Otago — Cinghiali Incazzati <span class="dot">●</span> Vendredi sur Mer — Écoute Chérie <span class="dot">●</span> Auroro Borealo — Tutto Bene <span class="dot">●</span> Krano — Live Set <span class="dot">●</span> </span>
+      <span>Generic Animal — Limonata <span class="dot">●</span> Ex-Otago — Cinghiali Incazzati <span class="dot">●</span> Vendredi sur Mer — Écoute Chérie <span class="dot">●</span> Auroro Borealo — Tutto Bene <span class="dot">●</span> Krano — Live Set <span class="dot">●</span> </span>
+    </div>
+  </div>
+  <div class="clock" id="clock">--:--:--</div>
+</div>
+
+<script>
+(function(){
+  var root = document.documentElement;
+
+  /* ---- S-flip: inversione palette animata (tasto S + bottone) ---- */
+  var sflip = document.getElementById('sflip');
+  var logo = document.getElementById('logo');
+  var logo2 = document.getElementById('logo2');
+  function setLogos(theme){
+    var src = theme === 'dark' ? '/brand/sottosopra-logo-white.png' : '/brand/sottosopra-logo-black.png';
+    if(logo) logo.src = src;
+    if(logo2) logo2.src = src;
+  }
+  function flip(){
+    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    setLogos(next);
+    sflip.classList.add('spin');
+    setTimeout(function(){ sflip.classList.remove('spin'); }, 520);
+  }
+  sflip.addEventListener('click', flip);
+  document.addEventListener('keydown', function(e){
+    if((e.key === 's' || e.key === 'S') && !/input|textarea/i.test(e.target.tagName)){ flip(); }
+  });
+
+  /* ---- mobile menu ---- */
+  var burger = document.getElementById('burger');
+  var mmenu = document.getElementById('mmenu');
+  if(burger){
+    burger.addEventListener('click', function(){ mmenu.classList.toggle('open'); });
+    mmenu.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', function(){ mmenu.classList.remove('open'); }); });
+  }
+
+  /* ---- broadcast clock ---- */
+  var clock = document.getElementById('clock');
+  function tick(){
+    if(!clock) return;
+    var d = new Date();
+    var p = function(n){ return (n<10?'0':'')+n; };
+    clock.textContent = p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());
+  }
+  tick(); setInterval(tick, 1000);
+
+  /* ---- duplicate marquee tracks so loop is seamless (track is 50% width) ---- */
+  document.querySelectorAll('[data-tape] .track.a').forEach(function(track){
+    // already authored with two identical spans => -50% loop is seamless. nothing to do.
+  });
+
+  /* ---- kinetic type on scroll: hero scales/weights subtly. Enhancement only. ---- */
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!reduce){
+    var h1 = document.querySelector('.hero h1');
+    var ticking = false;
+    function onScroll(){
+      if(ticking) return;
+      ticking = true;
+      requestAnimationFrame(function(){
+        var y = window.scrollY || 0;
+        var t = Math.max(0, Math.min(1, y / 600));
+        if(h1){
+          // gentle horizontal letter-spacing pulse + slight lift, never hides content
+          h1.style.letterSpacing = (-0.02 + t*0.05) + 'em';
+          h1.style.transform = 'translateY(' + (t * -18) + 'px)';
+          h1.style.opacity = (1 - t*0.35).toFixed(3);
+        }
+        ticking = false;
+      });
+    }
+    window.addEventListener('scroll', onScroll, {passive:true});
+  }
+})();
+</script>
+</body>
+</html>

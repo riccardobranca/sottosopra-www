@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SOTTOSOPRA — Cinema Muto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+/* ============== FONT ============== */
+@font-face{
+  font-family:"SoSo26";
+  src:url("/fonts/SoSo26.woff") format("woff");
+  font-display:swap;
+}
+
+/* ============== TOKENS ============== */
+:root{
+  --bg:#0a0a0a;
+  --ink:#f4f1ea;          /* warm celluloid white */
+  --ink-dim:#a8a39a;
+  --line:#2a2824;
+  --frame:#1a1815;
+  --grain:0.06;
+  --8:8px; --16:16px; --24:24px; --32:32px; --48:48px; --64:64px; --96:96px; --128:128px;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"Inter",system-ui,sans-serif;
+  line-height:1.6;
+  overflow-x:hidden;
+  position:relative;
+}
+
+.display{
+  font-family:"SoSo26","Inter",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  line-height:0.9;
+  letter-spacing:-0.01em;
+}
+
+/* ============== FILM GRAIN + FLICKER (atmosphere) ============== */
+.grain{
+  position:fixed; inset:-50%;
+  width:200%; height:200%;
+  pointer-events:none;
+  z-index:9000;
+  opacity:var(--grain);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode:overlay;
+  animation:grainShift 0.6s steps(6) infinite;
+}
+@keyframes grainShift{
+  0%{transform:translate(0,0)} 20%{transform:translate(-4%,3%)}
+  40%{transform:translate(3%,-5%)} 60%{transform:translate(-2%,4%)}
+  80%{transform:translate(4%,-2%)} 100%{transform:translate(0,0)}
+}
+/* flicker on the whole page like a projector lamp */
+.flicker{
+  position:fixed; inset:0; pointer-events:none; z-index:8999;
+  background:#fff; mix-blend-mode:overlay; opacity:0;
+  animation:flick 5s infinite;
+}
+@keyframes flick{
+  0%,7%,9%,40%,42%,100%{opacity:0}
+  8%{opacity:.04} 41%{opacity:.05}
+}
+/* vignette: every scene is a frame */
+.vignette{
+  position:fixed; inset:0; pointer-events:none; z-index:8990;
+  background:radial-gradient(ellipse 90% 80% at 50% 45%, transparent 55%, rgba(0,0,0,.55) 100%);
+}
+
+/* scratch lines drifting down the print */
+.scratch{
+  position:fixed; top:0; bottom:0; width:1px; pointer-events:none; z-index:8995;
+  background:linear-gradient(180deg,transparent,rgba(244,241,234,.5),transparent);
+  opacity:.35;
+}
+.scratch.s1{left:18%; animation:drift1 7s linear infinite}
+.scratch.s2{left:71%; animation:drift2 11s linear infinite}
+@keyframes drift1{0%,100%{transform:translateX(0)}50%{transform:translateX(40px)}}
+@keyframes drift2{0%,100%{transform:translateX(0)}50%{transform:translateX(-60px)}}
+
+/* ============== SPROCKET FILM-STRIP BORDERS ============== */
+.sprockets{
+  position:fixed; top:0; bottom:0; width:34px; z-index:200;
+  background:#000;
+  display:flex; flex-direction:column; align-items:center; gap:14px;
+  padding:18px 0;
+}
+.sprockets.left{left:0; border-right:1px solid var(--line)}
+.sprockets.right{right:0; border-left:1px solid var(--line)}
+.hole{
+  flex:0 0 auto;
+  width:14px; height:20px; border-radius:3px;
+  background:var(--bg);
+  border:1px solid #161410;
+}
+.sprockets .reel{
+  width:100%; flex:1;
+  background:repeating-linear-gradient(180deg,#000 0 22px, #0d0d0d 22px 44px);
+  display:flex; flex-direction:column; align-items:center; gap:14px; padding:8px 0;
+}
+@media(max-width:760px){ .sprockets{display:none} }
+
+/* ============== SHELL ============== */
+.shell{ padding:0 34px; }
+@media(max-width:760px){ .shell{padding:0} }
+.wrap{ max-width:1180px; margin:0 auto; padding:0 32px; }
+@media(max-width:760px){ .wrap{padding:0 20px} }
+
+/* ============== HEADER ============== */
+header{
+  position:fixed; top:0; left:34px; right:34px; z-index:500;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 32px;
+  background:linear-gradient(180deg, rgba(10,10,10,.9), rgba(10,10,10,0));
+  backdrop-filter:blur(2px);
+}
+@media(max-width:760px){ header{left:0;right:0;padding:14px 20px} }
+header .logo img{ height:26px; display:block; filter:contrast(1.1) }
+header nav{ display:flex; align-items:center; gap:26px }
+header nav a{
+  color:var(--ink-dim); text-decoration:none; font-size:12px;
+  letter-spacing:.18em; text-transform:uppercase; font-weight:500;
+  transition:color .2s var(--ease);
+}
+header nav a:hover{ color:var(--ink) }
+.btn-tix{
+  font-family:"SoSo26","Inter",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  background:var(--ink); color:#000;
+  padding:9px 20px 7px; font-size:15px; letter-spacing:.04em;
+  text-decoration:none; border:1px solid var(--ink);
+  transition:transform .2s var(--ease), background .2s;
+}
+.btn-tix:hover{ background:transparent; color:var(--ink); transform:translateY(-1px) }
+@media(max-width:760px){ header nav .navlinks{display:none} }
+
+/* ============== INTERTITLE (silent-film card divider) ============== */
+.intertitle{
+  position:relative;
+  text-align:center;
+  padding:var(--96) var(--24);
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  background:
+    radial-gradient(ellipse 120% 100% at 50% 50%, #161512 0%, #0a0a0a 70%);
+}
+.intertitle::before, .intertitle::after{
+  content:"❋"; display:block; color:var(--ink-dim);
+  font-size:18px; margin:0 auto var(--16);
+}
+.intertitle::after{ margin:var(--16) auto 0 }
+.intertitle .card{
+  display:inline-block; padding:var(--32) var(--48);
+  border:2px solid var(--ink);
+  box-shadow:0 0 0 1px var(--ink) inset, 0 0 0 6px var(--bg), 0 0 0 7px var(--line);
+}
+.intertitle h2{
+  font-family:"SoSo26","Inter",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  font-size:clamp(1.8rem,5vw,3.4rem);
+  letter-spacing:.02em; line-height:1; text-transform:uppercase;
+}
+.intertitle .sub{
+  margin-top:var(--16); font-size:12px; letter-spacing:.34em;
+  text-transform:uppercase; color:var(--ink-dim);
+}
+
+/* ============== HERO ============== */
+.hero{
+  position:relative; min-height:100vh;
+  display:flex; flex-direction:column; justify-content:center;
+  padding:130px 0 var(--64);
+  overflow:hidden;
+}
+.hero .reel-tag{
+  position:absolute; top:96px; left:32px;
+  font-size:11px; letter-spacing:.3em; text-transform:uppercase; color:var(--ink-dim);
+  border:1px solid var(--line); padding:6px 12px;
+}
+.hero .reel-tag.r{ left:auto; right:32px }
+.hero .claim{
+  font-family:"SoSo26","Inter",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  font-size:clamp(3.6rem,15vw,12rem);
+  line-height:.84; text-transform:uppercase; letter-spacing:-.02em;
+}
+.hero .claim .l1{ display:block }
+.hero .claim .l2{ display:block; color:transparent; -webkit-text-stroke:1.5px var(--ink); }
+.hero .tagline{
+  margin-top:var(--24); max-width:540px;
+  font-size:clamp(1rem,2vw,1.2rem); color:var(--ink-dim); line-height:1.55;
+}
+.hero .tagline em{ color:var(--ink); font-style:normal; }
+.hero-meta{
+  margin-top:var(--48);
+  display:flex; flex-wrap:wrap; gap:var(--24) var(--48); align-items:flex-end;
+}
+.hero-meta .dates{
+  font-family:"SoSo26","Inter",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  font-size:clamp(1.4rem,3.2vw,2.6rem); line-height:1; text-transform:uppercase;
+}
+.hero-meta .dates small{ display:block; font-family:Inter; font-size:12px; letter-spacing:.28em; color:var(--ink-dim); margin-bottom:8px; font-weight:500 }
+.hero-cta{ display:flex; gap:var(--16); flex-wrap:wrap }
+.cta{
+  font-family:"SoSo26","Inter",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  font-size:18px; letter-spacing:.03em; text-decoration:none;
+  padding:14px 28px 11px; border:1px solid var(--ink);
+  transition:transform .2s var(--ease), background .2s, color .2s;
+}
+.cta.solid{ background:var(--ink); color:#000 }
+.cta.solid:hover{ background:transparent; color:var(--ink); transform:translateY(-2px) }
+.cta.ghost{ color:var(--ink); background:transparent }
+.cta.ghost:hover{ background:var(--ink); color:#000; transform:translateY(-2px) }
+.scroll-hint{
+  position:absolute; bottom:24px; left:50%; transform:translateX(-50%);
+  font-size:11px; letter-spacing:.3em; text-transform:uppercase; color:var(--ink-dim);
+  display:flex; flex-direction:column; align-items:center; gap:8px;
+}
+.scroll-hint .bar{ width:1px; height:36px; background:var(--ink-dim); animation:pulse 2s var(--ease) infinite }
+@keyframes pulse{0%,100%{opacity:.3;transform:scaleY(.6)}50%{opacity:1;transform:scaleY(1)}}
+
+/* ============== SECTION GENERIC ============== */
+section{ position:relative }
+.scene{ padding:var(--96) 0 }
+.eyebrow{
+  font-size:11px; letter-spacing:.32em; text-transform:uppercase; color:var(--ink-dim);
+  display:flex; align-items:center; gap:14px; margin-bottom:var(--24);
+}
+.eyebrow::before{ content:""; width:42px; height:1px; background:var(--ink-dim) }
+
+/* ============== LINEUP — horizontal frame strip ============== */
+.lineup-head{ display:flex; justify-content:space-between; align-items:flex-end; gap:var(--24); flex-wrap:wrap; margin-bottom:var(--48) }
+.lineup-head h2{
+  font-family:"SoSo26","Inter",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  font-size:clamp(2.4rem,7vw,5rem); line-height:.9; text-transform:uppercase;
+}
+.lineup-head p{ max-width:340px; color:var(--ink-dim); font-size:14px }
+.filmstrip{
+  display:flex; gap:0; overflow-x:auto; scroll-snap-type:x mandatory;
+  padding:0 2px var(--16);
+  border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+  scrollbar-width:thin; scrollbar-color:var(--line) transparent;
+}
+.filmstrip::-webkit-scrollbar{ height:6px }
+.filmstrip::-webkit-scrollbar-thumb{ background:var(--line) }
+.frame{
+  scroll-snap-align:start; flex:0 0 clamp(220px,26vw,300px);
+  position:relative; aspect-ratio:3/4;
+  border-right:1px solid var(--line);
+  background:linear-gradient(160deg,#1c1a16,#0c0b09);
+  display:flex; flex-direction:column; justify-content:flex-end;
+  padding:var(--24);
+  overflow:hidden;
+  filter:grayscale(1) contrast(1.05);
+}
+.frame:first-child{ border-left:1px solid var(--line) }
+/* sprocket strip at top of each frame */
+.frame::before{
+  content:""; position:absolute; top:0; left:0; right:0; height:14px;
+  background:repeating-linear-gradient(90deg, transparent 0 10px, #000 10px 16px);
+  border-bottom:1px solid var(--line);
+}
+/* duotone "portrait" placeholder built from radial light = silent-film key light */
+.frame .portrait{
+  position:absolute; inset:14px 0 0 0;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(244,241,234,.22), transparent 46%),
+    repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 2px, transparent 2px 4px);
+  mix-blend-mode:screen; opacity:.7;
+}
+.frame .no{
+  position:absolute; top:22px; left:14px; font-size:10px; letter-spacing:.2em;
+  color:var(--ink-dim); font-variant-numeric:tabular-nums;
+}
+.frame h3{
+  position:relative; z-index:2;
+  font-family:"SoSo26","Inter",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  font-size:clamp(1.5rem,2.6vw,2.1rem); line-height:.92; text-transform:uppercase;
+}
+.frame .role{ position:relative; z-index:2; margin-top:8px; font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--ink-dim) }
+.frame:hover{ filter:grayscale(1) contrast(1.18) brightness(1.08) }
+
+/* ============== PROGRAMMA — three scenes / days ============== */
+.days{ display:grid; grid-template-columns:repeat(3,1fr); gap:var(--24) }
+@media(max-width:880px){ .days{grid-template-columns:1fr} }
+.day{
+  border:1px solid var(--line); padding:var(--32);
+  background:linear-gradient(180deg,#121110,#0a0a0a);
+  position:relative;
+}
+.day .scene-no{ font-size:11px; letter-spacing:.3em; text-transform:uppercase; color:var(--ink-dim) }
+.day .num{
+  font-family:"SoSo26","Inter",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  font-size:clamp(3rem,6vw,4.6rem); line-height:.85; margin:var(--16) 0 4px;
+}
+.day .when{ font-size:13px; letter-spacing:.04em; color:var(--ink); margin-bottom:var(--24); border-bottom:1px solid var(--line); padding-bottom:var(--16) }
+.day ul{ list-style:none; display:flex; flex-direction:column; gap:10px }
+.day li{ font-size:14px; color:var(--ink-dim); display:flex; gap:10px }
+.day li b{ color:var(--ink); font-weight:600; min-width:54px; font-variant-numeric:tabular-nums }
+
+/* ============== ESPERIENZE ============== */
+.exp{ display:grid; grid-template-columns:repeat(4,1fr); gap:0; border:1px solid var(--line) }
+@media(max-width:880px){ .exp{grid-template-columns:repeat(2,1fr)} }
+@media(max-width:480px){ .exp{grid-template-columns:1fr} }
+.exp .cell{
+  padding:var(--32); border-right:1px solid var(--line); border-bottom:1px solid var(--line);
+  min-height:180px; display:flex; flex-direction:column; justify-content:space-between;
+}
+.exp .cell h4{
+  font-family:"SoSo26","Inter",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  font-size:1.7rem; text-transform:uppercase; line-height:.92;
+}
+.exp .cell p{ font-size:13px; color:var(--ink-dim) }
+.exp .cell .tag{ font-size:10px; letter-spacing:.28em; text-transform:uppercase; color:var(--ink-dim) }
+
+/* ============== MANIFESTO band (parallax-able) ============== */
+.manifesto{ text-align:center; padding:var(--128) var(--24); border-top:1px solid var(--line); border-bottom:1px solid var(--line) }
+.manifesto p{
+  font-family:"SoSo26","Inter",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  font-size:clamp(1.6rem,4.6vw,3.4rem); line-height:1.05; text-transform:uppercase;
+  max-width:980px; margin:0 auto; letter-spacing:.01em;
+}
+.manifesto p span{ color:transparent; -webkit-text-stroke:1px var(--ink-dim) }
+.manifesto .by{ margin-top:var(--32); font-size:12px; letter-spacing:.3em; text-transform:uppercase; color:var(--ink-dim) }
+
+/* ============== SPONSOR marquee ============== */
+.sponsor-bar{ overflow:hidden; border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:var(--24) 0; background:#000 }
+.sponsor-track{
+  display:flex; gap:var(--64); white-space:nowrap; align-items:center;
+  animation:marquee 26s linear infinite; will-change:transform;
+}
+.sponsor-track span{
+  font-family:"SoSo26","Inter",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  font-size:clamp(1.4rem,3vw,2.2rem); text-transform:uppercase; letter-spacing:.05em;
+  color:var(--ink-dim); opacity:.7;
+}
+@keyframes marquee{ from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+/* ============== CTA / NEWSLETTER ============== */
+.endcards{ display:grid; grid-template-columns:1fr 1fr; gap:0; border:1px solid var(--line) }
+@media(max-width:760px){ .endcards{grid-template-columns:1fr} }
+.endcard{ padding:var(--64) var(--48); border-right:1px solid var(--line) }
+.endcard:last-child{ border-right:0 }
+@media(max-width:760px){ .endcard{border-right:0;border-bottom:1px solid var(--line)} .endcard:last-child{border-bottom:0} }
+.endcard h3{
+  font-family:"SoSo26","Inter",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  font-size:clamp(1.8rem,3.4vw,2.6rem); text-transform:uppercase; line-height:.95; margin-bottom:var(--16);
+}
+.endcard p{ color:var(--ink-dim); font-size:14px; margin-bottom:var(--24); max-width:380px }
+.nform{ display:flex; gap:0; border:1px solid var(--ink); max-width:420px }
+.nform input{
+  flex:1; background:transparent; border:0; color:var(--ink);
+  padding:14px 16px; font-family:Inter; font-size:14px; outline:none;
+}
+.nform input::placeholder{ color:var(--ink-dim) }
+.nform button{
+  background:var(--ink); color:#000; border:0; cursor:pointer;
+  padding:0 22px; font-family:"SoSo26","Inter",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt"; font-size:15px; letter-spacing:.04em;
+  transition:opacity .2s;
+}
+.nform button:hover{ opacity:.85 }
+
+/* ============== FOOTER (THE END card) ============== */
+footer{ padding:var(--96) 0 var(--64); text-align:center; position:relative }
+footer .end{
+  display:inline-block; padding:var(--32) var(--64);
+  border:2px solid var(--ink); margin-bottom:var(--48);
+  box-shadow:0 0 0 6px var(--bg), 0 0 0 7px var(--line);
+}
+footer .end .display{ font-size:clamp(2.4rem,6vw,4rem); text-transform:uppercase; letter-spacing:.06em }
+footer .meta{ display:flex; gap:var(--32); justify-content:center; flex-wrap:wrap; color:var(--ink-dim); font-size:13px; margin-bottom:var(--16) }
+footer .meta a{ color:var(--ink-dim); text-decoration:none; transition:color .2s }
+footer .meta a:hover{ color:var(--ink) }
+footer .legal{ font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:#5a564f }
+footer img.flogo{ height:30px; margin-top:var(--32); opacity:.9 }
+
+/* ============== SCROLL-REVEAL (enhancement only — initial state VISIBLE) ============== */
+.reveal{ opacity:1; transform:none; }
+.js-anim .reveal{ opacity:0; transform:translateY(28px); transition:opacity .9s var(--ease), transform .9s var(--ease) }
+.js-anim .reveal.in{ opacity:1; transform:none }
+
+@media(prefers-reduced-motion:reduce){
+  *{ animation:none !important; transition:none !important }
+  .reveal{ opacity:1 !important; transform:none !important }
+  .grain,.flicker,.scratch{ display:none }
+}
+</style>
+</head>
+<body>
+
+<!-- film texture layers -->
+<div class="grain" aria-hidden="true"></div>
+<div class="flicker" aria-hidden="true"></div>
+<div class="scratch s1" aria-hidden="true"></div>
+<div class="scratch s2" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+
+<!-- sprocket film strips -->
+<div class="sprockets left" aria-hidden="true">
+  <span class="hole"></span><span class="hole"></span><span class="hole"></span>
+  <div class="reel"></div>
+  <span class="hole"></span><span class="hole"></span><span class="hole"></span>
+</div>
+<div class="sprockets right" aria-hidden="true">
+  <span class="hole"></span><span class="hole"></span><span class="hole"></span>
+  <div class="reel"></div>
+  <span class="hole"></span><span class="hole"></span><span class="hole"></span>
+</div>
+
+<!-- HEADER -->
+<header>
+  <a class="logo" href="#top" aria-label="Sottosopra — home">
+    <img src="/brand/sottosopra-logo-white.png" alt="SOTTOSOPRA" />
+  </a>
+  <nav>
+    <div class="navlinks" style="display:flex;gap:26px">
+      <a href="#programma">Programma</a>
+      <a href="#info">Info</a>
+      <a href="#about">About</a>
+      <a href="#news">News</a>
+    </div>
+    <a class="btn-tix" href="https://dice.fm" target="_blank" rel="noopener">Biglietti</a>
+  </nav>
+</header>
+
+<div class="shell" id="top">
+<div class="wrap">
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <span class="reel-tag">Reel 01 — Apertura</span>
+    <span class="reel-tag r">8ª edizione · 2026</span>
+    <h1 class="claim">
+      <span class="l1">Sempre</span>
+      <span class="l2">Sottosopra</span>
+    </h1>
+    <p class="tagline reveal">
+      Un festival di musica e cultura proiettato come un film muto in bianco e nero.
+      <em>Cambia il punto di vista.</em>
+    </p>
+
+    <div class="hero-meta">
+      <div class="dates display reveal">
+        <small>Le tre serate</small>
+        31 Lug — 01 — 02 Ago
+      </div>
+      <div class="hero-cta reveal">
+        <a class="cta solid" href="https://dice.fm" target="_blank" rel="noopener">Biglietti →</a>
+        <a class="cta ghost" href="#programma">Programma</a>
+      </div>
+    </div>
+
+    <div class="scroll-hint" aria-hidden="true">
+      <span>Scorri · prossima scena</span>
+      <span class="bar"></span>
+    </div>
+  </section>
+
+</div>
+</div>
+
+<!-- INTERTITLE 1 -->
+<div class="intertitle reveal">
+  <div class="card">
+    <h2 class="display">Atto I — La Lineup</h2>
+  </div>
+  <div class="sub">Castelfranco Veneto · Giardini del Castello</div>
+</div>
+
+<!-- LINEUP — horizontal filmstrip -->
+<div class="shell"><div class="wrap">
+  <section class="scene" id="lineup">
+    <div class="lineup-head reveal">
+      <h2 class="display">Otto<br>protagonisti</h2>
+      <p>Ogni artista entra in scena come il fotogramma di una pellicola ritrovata. Scorri la striscia →</p>
+    </div>
+  </section>
+</div></div>
+
+<div class="shell"><div class="wrap">
+  <div class="filmstrip reveal" id="filmstrip">
+    <article class="frame"><span class="no">FRAME 01</span><span class="portrait" aria-hidden="true"></span><h3 class="display">Generic<br>Animal</h3><span class="role">Live · Headliner</span></article>
+    <article class="frame"><span class="no">FRAME 02</span><span class="portrait" aria-hidden="true"></span><h3 class="display">Ex-Otago</h3><span class="role">Live</span></article>
+    <article class="frame"><span class="no">FRAME 03</span><span class="portrait" aria-hidden="true"></span><h3 class="display">Vendredi<br>sur Mer</h3><span class="role">Live · FR</span></article>
+    <article class="frame"><span class="no">FRAME 04</span><span class="portrait" aria-hidden="true"></span><h3 class="display">Alberto<br>Ferrari</h3><span class="role">DJ Set</span></article>
+    <article class="frame"><span class="no">FRAME 05</span><span class="portrait" aria-hidden="true"></span><h3 class="display">Auroro<br>Borealo</h3><span class="role">Live</span></article>
+    <article class="frame"><span class="no">FRAME 06</span><span class="portrait" aria-hidden="true"></span><h3 class="display">Popa</h3><span class="role">Live</span></article>
+    <article class="frame"><span class="no">FRAME 07</span><span class="portrait" aria-hidden="true"></span><h3 class="display">Krano</h3><span class="role">DJ Set</span></article>
+    <article class="frame"><span class="no">FRAME 08</span><span class="portrait" aria-hidden="true"></span><h3 class="display">Jesse<br>The Faccio</h3><span class="role">Live</span></article>
+  </div>
+</div></div>
+
+<!-- INTERTITLE 2 -->
+<div class="intertitle reveal">
+  <div class="card">
+    <h2 class="display">Atto II — Il Programma</h2>
+  </div>
+  <div class="sub">Tre scene · tre serate</div>
+</div>
+
+<!-- PROGRAMMA / DAYS -->
+<div class="shell"><div class="wrap">
+  <section class="scene" id="programma">
+    <div class="eyebrow reveal">Soggetto e sceneggiatura</div>
+    <div class="days">
+      <article class="day reveal">
+        <div class="scene-no">Scena 01</div>
+        <div class="num display">VEN</div>
+        <div class="when">Venerdì 31 luglio · apertura porte 18:00</div>
+        <ul>
+          <li><b>19:00</b> Talk d'apertura</li>
+          <li><b>21:00</b> Popa — live</li>
+          <li><b>22:30</b> Generic Animal</li>
+          <li><b>00:00</b> Krano — DJ set</li>
+        </ul>
+      </article>
+      <article class="day reveal">
+        <div class="scene-no">Scena 02</div>
+        <div class="num display">SAB</div>
+        <div class="when">Sabato 1 agosto · porte 17:00</div>
+        <ul>
+          <li><b>17:30</b> Presentazione libro</li>
+          <li><b>21:00</b> Auroro Borealo</li>
+          <li><b>22:30</b> Ex-Otago</li>
+          <li><b>00:00</b> Alberto Ferrari</li>
+        </ul>
+      </article>
+      <article class="day reveal">
+        <div class="scene-no">Scena 03</div>
+        <div class="num display">DOM</div>
+        <div class="when">Domenica 2 agosto · brunch 11:00</div>
+        <ul>
+          <li><b>11:00</b> Brunch domenicale</li>
+          <li><b>16:00</b> Workshop aperti</li>
+          <li><b>21:00</b> Vendredi sur Mer</li>
+          <li><b>22:30</b> Jesse The Faccio</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+</div></div>
+
+<!-- MANIFESTO -->
+<div class="manifesto reveal" id="about">
+  <p>Tre giorni in cui la città <span>si capovolge</span> e l'arte prende il posto della quotidianità.</p>
+  <div class="by">— Manifesto Sottosopra, dal 2017</div>
+</div>
+
+<!-- INTERTITLE 3 -->
+<div class="intertitle reveal">
+  <div class="card">
+    <h2 class="display">Atto III — Le Esperienze</h2>
+  </div>
+  <div class="sub">Oltre il palco</div>
+</div>
+
+<!-- ESPERIENZE -->
+<div class="shell"><div class="wrap">
+  <section class="scene" id="info">
+    <div class="exp reveal">
+      <div class="cell"><span class="tag">01 / Lab</span><h4 class="display">Workshop</h4><p>Mani in pasta: stampa, suono, scena.</p></div>
+      <div class="cell"><span class="tag">02 / Voce</span><h4 class="display">Talk</h4><p>Idee che cambiano il punto di vista.</p></div>
+      <div class="cell"><span class="tag">03 / Carta</span><h4 class="display">Libri</h4><p>Presentazioni con gli autori.</p></div>
+      <div class="cell"><span class="tag">04 / Tavola</span><h4 class="display">Brunch</h4><p>La domenica si chiude insieme.</p></div>
+    </div>
+  </section>
+</div></div>
+
+<!-- SPONSOR MARQUEE -->
+<div class="sponsor-bar reveal" aria-label="Sostenitori">
+  <div class="sponsor-track">
+    <span>Azimut</span><span>·</span><span>Ceccato</span><span>·</span><span>Prodeco</span><span>·</span><span>CNA</span><span>·</span><span>Banca Terre Venete</span><span>·</span>
+    <span>Azimut</span><span>·</span><span>Ceccato</span><span>·</span><span>Prodeco</span><span>·</span><span>CNA</span><span>·</span><span>Banca Terre Venete</span><span>·</span>
+  </div>
+</div>
+
+<!-- CTA / NEWSLETTER -->
+<div class="shell"><div class="wrap">
+  <section class="scene" id="news">
+    <div class="endcards reveal">
+      <div class="endcard">
+        <h3 class="display">Entra<br>in scena</h3>
+        <p>Diventa volontario di Sottosopra: 80 persone fanno girare la pellicola ogni anno.</p>
+        <a class="cta ghost" href="mailto:info@sottosopra.com">Diventa volontario →</a>
+      </div>
+      <div class="endcard">
+        <h3 class="display">Resta<br>in pellicola</h3>
+        <p>Iscriviti alla newsletter: date, lineup e fuori-programma, prima di tutti.</p>
+        <form class="nform" onsubmit="return false">
+          <input type="email" placeholder="la-tua@email.it" aria-label="Email" />
+          <button type="submit">Iscriviti</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</div></div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="end reveal"><div class="display">Fine — Sempre Sottosopra</div></div>
+    <div class="meta">
+      <a href="mailto:info@sottosopra.com">info@sottosopra.com</a>
+      <a href="https://instagram.com/sottosoprafestival" target="_blank" rel="noopener">@sottosoprafestival</a>
+      <a href="https://dice.fm" target="_blank" rel="noopener">Biglietti su DICE</a>
+    </div>
+    <div class="legal">Castelfranco Veneto · Giardini del Castello · 31 Lug — 02 Ago 2026 · Privacy · Cookie</div>
+    <img class="flogo" src="/brand/sottosopra-logo-white.png" alt="SOTTOSOPRA" />
+  </div>
+</footer>
+
+<script>
+/* ===== Enhancement only. Page is fully visible without this script. ===== */
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce) return;
+
+  // arm reveal animations only when JS confirms motion is OK
+  document.body.classList.add('js-anim');
+
+  var els = document.querySelectorAll('.reveal');
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, {threshold:0.12, rootMargin:'0px 0px -8% 0px'});
+    els.forEach(function(el){ io.observe(el); });
+  } else {
+    els.forEach(function(el){ el.classList.add('in'); });
+  }
+  // safety net: if anything is off-screen logic-wise, reveal after 2.5s
+  setTimeout(function(){ els.forEach(function(el){ el.classList.add('in'); }); }, 2500);
+
+  // light parallax on hero claim (cinematic layering), throttled via rAF
+  var claim = document.querySelector('.hero .claim');
+  var ticking = false;
+  function onScroll(){
+    if(ticking) return;
+    ticking = true;
+    requestAnimationFrame(function(){
+      var y = window.scrollY;
+      if(claim && y < 900){ claim.style.transform = 'translateY(' + (y*0.12) + 'px)'; }
+      ticking = false;
+    });
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+})();
+</script>
+</body>
+</html>

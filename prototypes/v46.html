@@ -1,0 +1,1215 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SOTTOSOPRA 2026 — SEMPRE SOTTOSOPRA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+@font-face{
+  font-family:"SoSo26";
+  src:url("/fonts/SoSo26.woff") format("woff");
+  font-weight:400 900;
+  font-display:swap;
+}
+
+:root{
+  --black:#000;
+  --c1:#262626;
+  --muted:#6B6B6B;
+  --line:#E4E4E4;
+  --elev:#F4F4F4;
+  --white:#fff;
+
+  --bg:var(--white);
+  --fg:var(--black);
+
+  --gut:clamp(20px,5vw,90px);
+  --hair:1px;
+  --rule:2px;
+
+  /* RESPIRO: section-gap is the load-bearing token. Between chapters it's huge,
+     inside a group it stays tight. spazio-interno <= spazio-esterno, sempre. */
+  --section:clamp(88px,15vh,180px);
+  --section-sm:clamp(56px,9vh,110px);
+  --group:clamp(22px,3vw,40px);
+  --tight:clamp(8px,1.2vw,16px);
+
+  --display:"SoSo26","Arial Narrow",system-ui,sans-serif;
+  --ss:"ss07","ss08","liga","calt";
+  --body:"Inter",system-ui,-apple-system,sans-serif;
+
+  --np-h:54px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--fg);
+  font-family:var(--body);
+  font-size:17px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  padding-bottom:var(--np-h); /* desktop: room under fixed now-playing */
+}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+
+/* shared editorial micro-label */
+.eyebrow{
+  font-family:var(--body);
+  font-size:.7rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.22em;
+  color:var(--muted);
+}
+.tag{
+  font-family:var(--body);
+  font-size:.68rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.18em;
+  color:var(--muted);
+}
+
+/* focus visible everywhere */
+a:focus-visible,button:focus-visible,input:focus-visible,[tabindex]:focus-visible{
+  outline:2px solid var(--fg);outline-offset:3px;
+}
+
+/* skip link */
+.skip{
+  position:absolute;left:-9999px;top:0;z-index:500;
+  background:var(--fg);color:var(--bg);
+  padding:12px 18px;font-size:.85rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;
+}
+.skip:focus{left:0}
+
+/* ===================== HEADER ===================== */
+.site-head{
+  position:sticky;top:0;z-index:200;
+  background:var(--bg);
+  border-bottom:var(--hair) solid var(--fg);
+}
+.head-row{display:flex;align-items:stretch;height:58px}
+.head-logo{
+  display:flex;align-items:center;
+  padding:0 var(--gut);
+  border-right:var(--hair) solid var(--line);
+  flex:0 0 auto;
+}
+.head-logo img{height:17px;width:auto}
+
+.head-nav{display:flex;align-items:center;flex:1 1 auto}
+.head-nav a{
+  padding:0 clamp(14px,1.7vw,26px);
+  height:100%;display:flex;align-items:center;
+  font-size:.78rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.08em;
+  border-right:var(--hair) solid var(--line);
+  transition:background .2s ease,color .2s ease;
+}
+.head-nav a:hover{background:var(--fg);color:var(--bg)}
+.head-spacer{flex:1 1 auto}
+
+.btn-tickets{
+  flex:0 0 auto;
+  display:flex;align-items:center;gap:10px;
+  padding:0 clamp(20px,2.6vw,36px);
+  background:var(--fg);color:var(--bg);
+  font-size:.82rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;
+  transition:opacity .2s ease;
+}
+.btn-tickets:hover{opacity:.8}
+.btn-tickets .arr{font-family:var(--display);font-feature-settings:var(--ss);font-weight:900;font-size:1rem}
+
+/* burger — mobile only */
+.head-burger{
+  display:none;
+  flex:0 0 auto;width:58px;
+  align-items:center;justify-content:center;
+  background:var(--bg);color:var(--fg);border:none;
+  border-left:var(--hair) solid var(--line);
+}
+.head-burger svg{width:22px;height:22px;display:block}
+.head-burger .ic-close{display:none}
+
+/* mobile full-screen drawer */
+.drawer{
+  position:fixed;inset:0;z-index:190;
+  background:var(--bg);
+  display:flex;flex-direction:column;
+  padding:84px var(--gut) calc(40px + env(safe-area-inset-bottom));
+  transform:translateY(-100%);
+  transition:transform .35s cubic-bezier(.4,0,.2,1);
+  visibility:hidden;
+  overflow-y:auto;
+}
+.drawer.open{transform:translateY(0);visibility:visible}
+.drawer a.dnav{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;font-size:clamp(2.6rem,13vw,4rem);
+  line-height:1.05;text-transform:uppercase;
+  padding:10px 0;border-bottom:var(--hair) solid var(--line);
+}
+.drawer .dnav:first-child{border-top:var(--hair) solid var(--line)}
+.drawer .dticket{
+  margin-top:24px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:var(--fg);color:var(--bg);
+  padding:18px 22px;min-height:56px;
+  font-weight:700;font-size:1rem;text-transform:uppercase;letter-spacing:.08em;
+}
+.drawer .dticket .arr{font-family:var(--display);font-feature-settings:var(--ss);font-weight:900}
+.drawer .dmeta{
+  margin-top:auto;padding-top:32px;
+  font-size:.82rem;color:var(--muted);line-height:1.9;
+  text-transform:uppercase;letter-spacing:.06em;
+}
+.drawer .dmeta a{color:var(--fg);font-weight:700}
+
+/* ===================== HERO — ARIOSO ===================== */
+/* Asymmetric: text lives left, photo column right; half the screen is white. */
+.hero{
+  display:grid;
+  grid-template-columns:minmax(0,1.32fr) minmax(0,1fr);
+  border-bottom:var(--hair) solid var(--fg);
+  min-height:calc(86vh - 58px);
+}
+.hero-main{
+  display:flex;flex-direction:column;justify-content:center;
+  padding:clamp(48px,8vh,120px) var(--gut) clamp(44px,7vh,96px);
+  border-right:var(--hair) solid var(--fg);
+  min-width:0;
+}
+.hero-loc{
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:clamp(28px,5vh,56px);
+}
+.hero-loc .ln{flex:0 0 auto;width:clamp(28px,4vw,56px);height:var(--rule);background:var(--fg)}
+.hero-loc span{
+  font-family:var(--body);font-weight:700;
+  font-size:.7rem;text-transform:uppercase;letter-spacing:.2em;color:var(--muted);
+}
+.hero-claim{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;
+  /* contrasto di scala estremo — the claim IS the image */
+  font-size:clamp(3rem,12.5vw,12rem);
+  line-height:.84;
+  letter-spacing:-.025em;
+  text-transform:uppercase;
+}
+.hero-claim .l1,.hero-claim .l2{
+  display:block;white-space:nowrap;
+  word-break:keep-all;-webkit-hyphens:none;hyphens:none;
+}
+.hero-claim .l2{letter-spacing:-.035em}
+.hero-facts{
+  margin-top:clamp(30px,5vh,58px);
+  display:flex;flex-direction:column;gap:var(--tight);
+  max-width:46ch;
+}
+.hero-facts .fline{
+  font-family:var(--body);font-weight:700;
+  font-size:clamp(.86rem,1.4vw,1.02rem);
+  text-transform:uppercase;letter-spacing:.06em;
+  display:flex;align-items:baseline;gap:.7em;flex-wrap:wrap;
+}
+.hero-facts .fline .sep{color:var(--muted);font-weight:600}
+.hero-facts .fline .dim{color:var(--muted)}
+.hero-actions{
+  margin-top:clamp(30px,5vh,52px);
+  display:flex;align-items:center;gap:clamp(16px,2.4vw,32px);flex-wrap:wrap;
+}
+.cta-solid{
+  display:inline-flex;align-items:center;justify-content:center;gap:12px;
+  background:var(--fg);color:var(--bg);
+  padding:18px 34px;min-height:56px;
+  font-family:var(--body);font-weight:700;
+  font-size:clamp(.86rem,1.2vw,1rem);text-transform:uppercase;letter-spacing:.09em;
+  transition:background .22s ease,color .22s ease;
+  will-change:transform;
+}
+.cta-solid:hover{background:var(--bg);color:var(--fg);box-shadow:inset 0 0 0 var(--rule) var(--fg)}
+.cta-solid .arr{font-family:var(--display);font-feature-settings:var(--ss);font-weight:900;font-size:1.05rem}
+.cta-ghost{
+  display:inline-flex;align-items:center;gap:9px;
+  font-family:var(--body);font-weight:700;
+  font-size:.84rem;text-transform:uppercase;letter-spacing:.1em;
+  border-bottom:var(--rule) solid var(--fg);padding-bottom:4px;min-height:44px;
+}
+.cta-ghost:hover{background:var(--fg);color:var(--bg)}
+.cta-ghost .arr{font-family:var(--display);font-feature-settings:var(--ss);font-weight:900}
+
+/* hero photo column — vertical crowd, scrim, monochrome */
+.hero-photo{
+  position:relative;overflow:hidden;background:#000;min-height:42vh;
+}
+.hero-photo img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  filter:grayscale(1) contrast(1.06);
+}
+.hero-photo .scrim{
+  position:absolute;inset:0;
+  background:linear-gradient(200deg,rgba(0,0,0,0) 30%,rgba(0,0,0,.55) 100%);
+}
+.hero-photo .ph-cap{
+  position:absolute;left:0;right:0;bottom:0;
+  padding:18px var(--gut);
+  color:var(--bg);
+  font-family:var(--body);font-weight:700;
+  font-size:.66rem;text-transform:uppercase;letter-spacing:.18em;
+  display:flex;justify-content:space-between;gap:14px;
+}
+.hero-photo .ph-cap .dim{opacity:.7;font-weight:600}
+
+/* ===================== SECTION SCAFFOLD (chapter rhythm) ===================== */
+.chapter{padding:var(--section) 0}
+.chapter.sm{padding:var(--section-sm) 0}
+.wrap{padding-left:var(--gut);padding-right:var(--gut)}
+.chap-label{
+  display:flex;align-items:baseline;gap:16px;
+  margin-bottom:clamp(34px,6vh,72px);
+}
+.chap-label .num{
+  font-family:var(--body);font-weight:700;
+  font-size:.72rem;letter-spacing:.16em;color:var(--muted);
+}
+.chap-label .ttl{
+  font-family:var(--body);font-weight:700;
+  font-size:.78rem;text-transform:uppercase;letter-spacing:.2em;
+}
+.chap-label .line{flex:1 1 auto;height:var(--hair);background:var(--line);align-self:center}
+
+/* ===================== CALENDARIO MONSTRE (the 4 dates) ===================== */
+/* Each date = a giant number columned left that BLEEDS past the margin,
+   with caption + ticket button to the right, half the row left empty. */
+.cal{border-top:var(--hair) solid var(--fg)}
+.cal-row{
+  display:grid;
+  grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);
+  gap:clamp(20px,4vw,80px);
+  align-items:end;
+  padding:clamp(40px,6vh,80px) 0;
+  border-bottom:var(--hair) solid var(--fg);
+}
+.cal-row:last-child{border-bottom:none}
+.cal-numwrap{display:flex;flex-direction:column;min-width:0}
+.cal-idx{
+  font-family:var(--body);font-weight:700;
+  font-size:.72rem;letter-spacing:.16em;color:var(--muted);
+  margin-bottom:clamp(8px,1.4vh,16px);
+  display:flex;align-items:center;gap:10px;
+}
+.cal-idx .dow{color:var(--fg)}
+.cal-num{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;line-height:.78;letter-spacing:-.04em;
+  text-transform:uppercase;
+  /* MONSTRE: bleeds left past the gutter */
+  font-size:clamp(5.5rem,21vw,17rem);
+  margin-left:clamp(-6px,-1.4vw,-22px);
+}
+.cal-num .mon{
+  display:block;
+  font-size:clamp(.9rem,1.7vw,1.7rem);line-height:1;
+  letter-spacing:.06em;margin-top:clamp(6px,1vh,14px);
+  margin-left:clamp(4px,.6vw,10px);
+}
+.cal-side{
+  display:flex;flex-direction:column;
+  padding-bottom:clamp(6px,1.2vh,18px);
+  min-width:0;
+}
+.cal-kind{
+  font-family:var(--body);font-weight:700;
+  font-size:.7rem;text-transform:uppercase;letter-spacing:.18em;color:var(--muted);
+  margin-bottom:clamp(12px,2vh,22px);
+}
+.cal-acts{
+  display:flex;flex-direction:column;gap:6px;
+  margin-bottom:clamp(22px,3.4vh,40px);
+}
+.cal-acts .a{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;text-transform:uppercase;
+  font-size:clamp(1.15rem,2.1vw,2rem);line-height:1.04;letter-spacing:-.01em;
+}
+.cal-cta{
+  align-self:flex-start;
+  display:inline-flex;align-items:center;justify-content:space-between;gap:16px;
+  min-width:min(280px,100%);
+  background:var(--fg);color:var(--bg);
+  padding:16px 24px;min-height:54px;
+  font-family:var(--body);font-weight:700;
+  font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;
+  transition:background .2s ease,color .2s ease;
+}
+.cal-cta:hover,.cal-cta:focus-visible{background:var(--bg);color:var(--fg);box-shadow:inset 0 0 0 var(--rule) var(--fg)}
+.cal-cta .arr{font-family:var(--display);font-feature-settings:var(--ss);font-weight:900;font-size:1rem}
+.cal-cta.free{
+  background:var(--bg);color:var(--fg);box-shadow:inset 0 0 0 var(--rule) var(--fg);
+}
+.cal-cta.free:hover,.cal-cta.free:focus-visible{background:var(--fg);color:var(--bg);box-shadow:none}
+
+/* full pass row, spaced */
+.cal-foot{
+  display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;
+  margin-top:clamp(34px,6vh,72px);
+  padding-top:clamp(28px,4vh,48px);
+  border-top:var(--rule) solid var(--fg);
+}
+.cal-foot .note{
+  font-family:var(--body);font-weight:600;
+  font-size:.74rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);
+  max-width:40ch;
+}
+.cal-foot .note b{color:var(--fg);font-weight:700}
+
+/* ===================== MARQUEE (curved signature, from v44) ===================== */
+.wave-wrap{
+  background:var(--fg);color:var(--bg);
+  overflow:hidden;line-height:0;
+}
+.wave-wrap svg{display:block;width:100%;height:clamp(72px,11vw,128px)}
+.wave-text{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;font-size:30px;letter-spacing:6px;
+  text-transform:uppercase;fill:var(--bg);
+}
+
+/* ===================== LINEUP teaser ===================== */
+.lineup-day{
+  padding:clamp(26px,4vh,56px) 0;
+  border-bottom:var(--hair) solid var(--line);
+}
+.lineup-day:last-of-type{border-bottom:none}
+.ld-head{
+  display:flex;align-items:baseline;gap:16px;
+  margin-bottom:clamp(14px,2vh,22px);
+}
+.ld-head .d{
+  font-family:var(--body);font-weight:700;
+  font-size:.74rem;text-transform:uppercase;letter-spacing:.18em;
+}
+.ld-head .k{
+  font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);
+}
+.ld-acts{display:flex;flex-direction:column;gap:clamp(2px,.6vh,8px)}
+.ld-acts a{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;text-transform:uppercase;
+  font-size:clamp(1.7rem,5.2vw,3.4rem);line-height:1.02;letter-spacing:-.015em;
+  width:fit-content;max-width:100%;
+  transition:background .15s ease,color .15s ease;
+}
+.ld-acts a:hover{background:var(--fg);color:var(--bg)}
+.lineup-more{
+  display:flex;justify-content:flex-end;
+  margin-top:clamp(30px,5vh,60px);
+}
+.lineup-more a{
+  display:inline-flex;align-items:center;gap:10px;min-height:48px;
+  font-family:var(--body);font-weight:700;
+  font-size:.82rem;text-transform:uppercase;letter-spacing:.1em;
+  border-bottom:var(--rule) solid var(--fg);padding-bottom:4px;
+}
+.lineup-more a:hover{background:var(--fg);color:var(--bg)}
+
+/* ===================== MANIFESTO ===================== */
+.manifesto{
+  display:flex;flex-direction:column;
+}
+.manifesto .mf-line{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;text-transform:uppercase;
+  font-size:clamp(2.4rem,9vw,7.5rem);line-height:.9;letter-spacing:-.02em;
+  max-width:16ch;
+}
+.manifesto .mf-sub{
+  margin-top:clamp(26px,4vh,48px);
+  max-width:42ch;
+  font-family:var(--body);font-weight:600;
+  font-size:clamp(.92rem,1.5vw,1.12rem);line-height:1.6;color:var(--muted);
+  text-transform:none;letter-spacing:0;
+}
+.manifesto .mf-more{
+  margin-top:clamp(28px,4.5vh,52px);
+  display:inline-flex;align-items:center;gap:10px;min-height:48px;width:fit-content;
+  font-family:var(--body);font-weight:700;
+  font-size:.82rem;text-transform:uppercase;letter-spacing:.1em;
+  border-bottom:var(--rule) solid var(--fg);padding-bottom:4px;
+}
+.manifesto .mf-more:hover{background:var(--fg);color:var(--bg)}
+.manifesto .mf-more .arr{font-family:var(--display);font-feature-settings:var(--ss);font-weight:900}
+
+/* ===================== ESPERIENZE — one breathing line ===================== */
+.exp{
+  border-top:var(--hair) solid var(--fg);
+  border-bottom:var(--hair) solid var(--fg);
+}
+.exp .exp-in{
+  padding:clamp(48px,9vh,130px) var(--gut);
+}
+.exp .exp-eye{display:block;margin-bottom:clamp(18px,3vh,34px)}
+.exp .exp-line{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;text-transform:uppercase;
+  font-size:clamp(1.6rem,4.4vw,3.6rem);line-height:1.08;letter-spacing:-.01em;
+  max-width:22ch;
+}
+.exp .exp-line .dim{color:var(--muted)}
+
+/* ===================== PARTECIPA ===================== */
+.part-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  border:var(--hair) solid var(--fg);
+}
+.part-cell{padding:clamp(32px,5vw,64px) clamp(26px,4vw,56px)}
+.part-cell:first-child{border-right:var(--hair) solid var(--fg)}
+.part-cell .eyebrow{display:block;margin-bottom:clamp(16px,2.6vh,26px)}
+.part-cell h3{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;font-size:clamp(2rem,4vw,3.4rem);line-height:.92;
+  text-transform:uppercase;margin-bottom:clamp(14px,2.4vh,22px);
+}
+.part-cell p{
+  font-family:var(--body);font-weight:600;
+  font-size:.88rem;color:var(--muted);margin-bottom:clamp(22px,3.6vh,34px);
+  max-width:34ch;text-transform:uppercase;letter-spacing:.04em;line-height:1.5;
+}
+.part-link{
+  display:inline-flex;align-items:center;gap:10px;
+  border:var(--rule) solid var(--fg);
+  padding:15px 24px;font-size:.8rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;min-height:52px;
+  transition:background .2s ease,color .2s ease;
+}
+.part-link:hover{background:var(--fg);color:var(--bg)}
+.part-link .arr{font-family:var(--display);font-feature-settings:var(--ss);font-weight:900}
+
+.nl-form{display:flex;border:var(--rule) solid var(--fg);max-width:480px}
+.nl-form input{
+  flex:1 1 auto;border:none;background:transparent;color:var(--fg);
+  padding:16px 18px;font-family:var(--body);font-size:16px;outline:none;min-width:0;
+  text-transform:uppercase;letter-spacing:.04em;
+}
+.nl-form input::placeholder{color:var(--muted)}
+.nl-form button{
+  flex:0 0 auto;border:none;border-left:var(--rule) solid var(--fg);
+  background:var(--fg);color:var(--bg);
+  padding:0 24px;font-size:.76rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.1em;min-height:52px;
+  transition:opacity .2s ease;
+}
+.nl-form button:hover{opacity:.82}
+.nl-consent{
+  display:flex;align-items:flex-start;gap:10px;margin-top:18px;
+  font-size:.78rem;color:var(--muted);line-height:1.5;max-width:42ch;
+}
+.nl-consent input{margin-top:2px;width:18px;height:18px;flex:0 0 auto;accent-color:var(--fg)}
+.nl-consent a{color:var(--fg);text-decoration:underline;text-underline-offset:2px}
+
+/* ===================== PARTNER — 3 marquees (from v45) ===================== */
+.partners{border:var(--hair) solid var(--fg)}
+.partners .p-head{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:clamp(20px,3vw,32px) clamp(26px,4vw,56px);
+  border-bottom:var(--hair) solid var(--fg);
+}
+.partners .p-head .st-l{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;font-size:clamp(1.8rem,4vw,3rem);line-height:.9;text-transform:uppercase;
+}
+.p-tier{
+  position:relative;
+  border-bottom:var(--hair) solid var(--fg);
+  overflow:hidden;display:flex;align-items:center;
+}
+.p-tier:last-of-type{border-bottom:none}
+.p-tier .p-label{
+  flex:0 0 auto;z-index:2;align-self:stretch;display:flex;align-items:center;
+  padding:0 14px;background:var(--bg);
+  border-right:var(--hair) solid var(--fg);
+  font-family:var(--body);font-weight:700;
+  font-size:.58rem;text-transform:uppercase;letter-spacing:.16em;
+  color:var(--muted);white-space:nowrap;
+  writing-mode:vertical-rl;transform:rotate(180deg);text-align:center;
+}
+.p-flow{flex:1 1 auto;overflow:hidden}
+.p-track{display:flex;width:max-content;align-items:center;will-change:transform}
+.p-track.t1{animation:scroll 40s linear infinite;padding:clamp(18px,2.6vw,30px) 0}
+.p-track.t2{animation:scroll 34s linear infinite;padding:clamp(14px,1.9vw,21px) 0}
+.p-track.t3{animation:scroll 28s linear infinite;padding:clamp(10px,1.4vw,16px) 0}
+.p-tier:hover .p-track,.p-tier:focus-within .p-track{animation-play-state:paused}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+.chip{
+  flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;
+  border:var(--hair) solid var(--fg);color:var(--fg);
+  font-family:var(--body);font-weight:700;
+  text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;
+  transition:background .2s ease,color .2s ease;
+}
+.chip:hover,.chip:focus-visible{background:var(--fg);color:var(--bg)}
+.t1 .chip{margin:0 clamp(14px,1.5vw,24px);padding:18px 30px;font-size:1.04rem;letter-spacing:.06em}
+.t2 .chip{margin:0 clamp(12px,1.2vw,20px);padding:13px 22px;font-size:.84rem}
+.t3 .chip{margin:0 clamp(9px,1vw,15px);padding:9px 15px;font-size:.7rem;color:var(--muted);border-color:var(--line)}
+.t3 .chip:hover,.t3 .chip:focus-visible{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+
+.partners-foot{
+  padding:clamp(20px,3vw,32px) clamp(26px,4vw,56px);
+  font-size:.84rem;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.05em;font-weight:600;
+  border-top:var(--hair) solid var(--fg);
+}
+.partners-foot a{color:var(--fg);font-weight:700;border-bottom:var(--rule) solid var(--fg);padding-bottom:2px}
+.partners-foot a:hover{background:var(--fg);color:var(--bg)}
+
+/* ===================== FOOTER ===================== */
+.site-foot{background:var(--fg);color:var(--bg);margin-top:var(--section-sm)}
+.foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr}
+.foot-cell{
+  padding:clamp(32px,5vw,64px) var(--gut);
+  border-left:var(--hair) solid rgba(255,255,255,.22);
+}
+.foot-cell:first-child{border-left:none}
+.foot-cell .big{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;font-size:clamp(2.2rem,5.5vw,4.2rem);line-height:.86;
+  letter-spacing:-.01em;text-transform:uppercase;
+}
+.foot-cell .eyebrow{opacity:.6;display:block;margin-bottom:18px;color:var(--bg)}
+.foot-cell a{display:block;padding:6px 0;font-size:.86rem;opacity:.85;text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+.foot-cell a:hover{opacity:1;text-decoration:underline;text-underline-offset:3px}
+.foot-cell .tk{
+  display:inline-flex;align-items:center;gap:8px;margin-top:12px;
+  opacity:1;font-weight:700;border-bottom:1px solid rgba(255,255,255,.5);padding-bottom:3px;
+}
+.foot-foot{
+  display:flex;justify-content:space-between;align-items:center;gap:16px;
+  padding:18px var(--gut);
+  border-top:var(--hair) solid rgba(255,255,255,.22);
+  font-size:.7rem;letter-spacing:.06em;opacity:.8;flex-wrap:wrap;
+  text-transform:uppercase;font-weight:600;
+}
+.foot-foot img{height:14px;width:auto;opacity:.9}
+.foot-foot .ll a{display:inline;margin-left:16px;opacity:.8}
+.foot-foot .ll a:hover{opacity:1}
+
+/* ===================== NOW PLAYING (from v44/v20) ===================== */
+.np-bar{
+  position:fixed;left:0;right:0;bottom:0;z-index:80;height:var(--np-h);
+  background:var(--fg);color:var(--bg);
+  display:flex;align-items:stretch;
+  border-top:var(--hair) solid var(--fg);
+}
+.np-now{
+  display:flex;align-items:center;gap:12px;padding:0 16px;flex:0 0 auto;
+  border-right:var(--hair) solid rgba(255,255,255,.32);
+}
+.np-cover{
+  width:30px;height:30px;flex:none;position:relative;overflow:hidden;
+  border:1px solid var(--bg);
+  background:repeating-linear-gradient(45deg,var(--bg) 0 3px,transparent 3px 6px);
+}
+.np-eq{display:flex;align-items:flex-end;gap:2px;height:16px}
+.np-eq i{width:3px;background:var(--bg);height:40%;animation:eq .9s ease-in-out infinite}
+.np-eq i:nth-child(2){animation-delay:.2s}
+.np-eq i:nth-child(3){animation-delay:.45s}
+.np-eq i:nth-child(4){animation-delay:.1s}
+@keyframes eq{0%,100%{height:30%}50%{height:100%}}
+.np-label{
+  font-family:var(--body);font-size:.62rem;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;white-space:nowrap;
+}
+.np-feed{flex:1 1 auto;overflow:hidden;white-space:nowrap;display:flex;align-items:center}
+.np-feed .np-track{display:inline-flex;will-change:transform;animation:scroll-l 40s linear infinite}
+.np-feed:hover .np-track{animation-play-state:paused}
+.np-feed .np-track span{
+  font-family:var(--body);font-size:.78rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  padding:0 20px;display:inline-flex;align-items:center;gap:20px;white-space:nowrap;
+}
+.np-feed .np-track .dot{opacity:.5}
+@keyframes scroll-l{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.np-spotify{
+  flex:0 0 auto;padding:0 18px;
+  border-left:var(--hair) solid rgba(255,255,255,.32);
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--body);font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;
+  transition:background .2s ease,color .2s ease;
+}
+.np-spotify:hover,.np-spotify:focus-visible{background:var(--bg);color:var(--fg)}
+.np-spotify .arr{font-family:var(--display);font-feature-settings:var(--ss);font-weight:900;font-size:.85rem}
+
+/* ===================== STICKY BOTTOM CTA (mobile only) ===================== */
+.sticky-cta{
+  display:none;
+  position:fixed;left:0;right:0;bottom:0;z-index:180;
+  background:var(--bg);
+  border-top:var(--rule) solid var(--fg);
+  padding:10px var(--gut) calc(10px + env(safe-area-inset-bottom));
+  gap:10px;
+}
+.sticky-cta a{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  min-height:52px;font-weight:700;font-size:.85rem;
+  text-transform:uppercase;letter-spacing:.08em;
+}
+.sticky-cta .sc-tickets{flex:1 1 auto;background:var(--fg);color:var(--bg)}
+.sticky-cta .sc-prog{
+  flex:0 0 auto;padding:0 22px;border:var(--rule) solid var(--fg);color:var(--fg);
+}
+.sticky-cta .arr{font-family:var(--display);font-feature-settings:var(--ss);font-weight:900}
+body.drawer-open .sticky-cta{display:none !important}
+
+/* ===================== RESPONSIVE ===================== */
+@media(max-width:1080px){
+  .hero{grid-template-columns:minmax(0,1.18fr) minmax(0,1fr);min-height:auto}
+}
+@media(max-width:920px){
+  .head-nav{display:none}
+  .head-spacer{display:none}
+  .head-burger{display:flex}
+
+  /* hero stacks: claim+facts first, photo below — claim+CTA stay above the fold */
+  .hero{grid-template-columns:1fr}
+  .hero-main{border-right:none;padding:clamp(40px,7vh,72px) var(--gut) clamp(36px,5vh,56px)}
+  .hero-photo{min-height:46vh;border-top:var(--hair) solid var(--fg)}
+
+  /* calendar: number on top, side below, still spacious */
+  .cal-row{grid-template-columns:1fr;gap:clamp(18px,4vh,32px);align-items:start}
+  .cal-num{margin-left:-4px}
+
+  .part-grid{grid-template-columns:1fr}
+  .part-cell:first-child{border-right:none;border-bottom:var(--hair) solid var(--fg)}
+
+  .foot-grid{grid-template-columns:1fr}
+  .foot-cell{border-left:none;border-top:var(--hair) solid rgba(255,255,255,.22)}
+  .foot-cell:first-child{border-top:none}
+}
+
+@media(max-width:760px){
+  body{font-size:16px;padding-bottom:78px}
+  .sticky-cta{display:flex}
+
+  .hero-actions{flex-direction:column;align-items:stretch}
+  .hero-actions .cta-solid{width:100%}
+  .hero-actions .cta-ghost{align-self:flex-start}
+
+  .cal-num{font-size:clamp(5rem,30vw,9rem)}
+  .cal-cta{width:100%;min-width:0}
+
+  /* now-playing becomes a STATIC strip above the footer (no clash with sticky CTA) */
+  .np-bar{position:static;height:auto;flex-wrap:wrap;border-top:var(--rule) solid var(--fg);border-bottom:0}
+  .np-now{flex:1 1 100%;justify-content:flex-start;border-right:none;border-bottom:var(--hair) solid rgba(255,255,255,.3);padding:10px 16px}
+  .np-feed{flex:1 1 auto;min-width:0;padding:9px 0}
+  .np-spotify{flex:0 0 auto;border-left:var(--hair) solid rgba(255,255,255,.3)}
+}
+
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .p-track,.np-feed .np-track{animation:none !important}
+  .np-eq i{animation:none;height:60%}
+  #waveAnim{display:none}
+  .drawer{transition:none}
+  .cta-solid{transition:none !important;transform:none !important}
+}
+</style>
+</head>
+<body data-theme="light">
+
+<a class="skip" href="#main">Salta al contenuto</a>
+
+<!-- ===================== HEADER ===================== -->
+<header class="site-head">
+  <div class="head-row">
+    <a class="head-logo" href="/" aria-label="Sottosopra — home">
+      <img src="/brand/sottosopra-logo-black.png" alt="Sottosopra">
+    </a>
+    <nav class="head-nav" aria-label="Principale">
+      <a href="/programma">Programma</a>
+      <a href="/info">Info</a>
+      <a href="/about">About</a>
+      <a href="/news">News</a>
+    </nav>
+    <span class="head-spacer"></span>
+    <a class="btn-tickets" href="https://dice.fm/sottosopra?utm_source=sito&utm_medium=header" target="_blank" rel="noopener">Biglietti <span class="arr">↗</span></a>
+    <button class="head-burger" id="burger" aria-label="Apri menu" aria-expanded="false" aria-controls="drawer">
+      <svg class="ic-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="21" y2="17"/></svg>
+      <svg class="ic-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- mobile full-screen drawer -->
+<nav class="drawer" id="drawer" aria-label="Menu mobile">
+  <a class="dnav" href="/programma">Programma</a>
+  <a class="dnav" href="/info">Info</a>
+  <a class="dnav" href="/about">About</a>
+  <a class="dnav" href="/news">News</a>
+  <a class="dticket" href="https://dice.fm/sottosopra?utm_source=sito&utm_medium=header" target="_blank" rel="noopener">Biglietti <span class="arr">↗</span></a>
+  <div class="dmeta">
+    30 LUG — 2 AGO 2026<br>
+    <a href="/">GIARDINI DEL CASTELLO · CASTELFRANCO VENETO</a><br>
+    <a href="mailto:info@sottosopra.com">INFO@SOTTOSOPRA.COM</a>
+  </div>
+</nav>
+
+<main id="main">
+
+<!-- ===================== 02 — HERO ARIOSO ===================== -->
+<section class="hero" aria-label="Sottosopra 2026 — Sempre Sottosopra">
+  <div class="hero-main">
+    <div class="hero-loc">
+      <span class="ln" aria-hidden="true"></span>
+      <span>GIARDINI DEL CASTELLO · CASTELFRANCO V.TO</span>
+    </div>
+    <h1 class="hero-claim">
+      <span class="l1 flipS">SEMPRE</span><span class="l2 flipS">SOTTOSOPRA</span>
+    </h1>
+    <div class="hero-facts">
+      <div class="fline">
+        <span>30 LUG — 2 AGO 2026</span><span class="sep">·</span><span class="dim">8ª EDIZIONE</span>
+      </div>
+      <div class="fline">
+        <span class="dim">4 GIORNATE · GIOVEDÌ INGRESSO GRATUITO</span>
+      </div>
+    </div>
+    <div class="hero-actions">
+      <a class="cta-solid" id="magnet" href="https://dice.fm/sottosopra?utm_source=sito&utm_medium=home" target="_blank" rel="noopener">BIGLIETTI <span class="arr">↗</span></a>
+      <a class="cta-ghost" href="#programma">PROGRAMMA <span class="arr">↓</span></a>
+    </div>
+  </div>
+  <div class="hero-photo">
+    <picture>
+      <img src="/media/crowd-night-portrait.jpg" alt="La folla di Sottosopra di notte, ai Giardini del Castello" loading="eager" fetchpriority="high">
+    </picture>
+    <div class="scrim" aria-hidden="true"></div>
+    <div class="ph-cap" aria-hidden="true">
+      <span>SOTTOSOPRA ’25</span>
+      <span class="dim">CASTELFRANCO VENETO</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 03 — CALENDARIO MONSTRE ===================== -->
+<section class="chapter" id="date" aria-label="Le quattro giornate">
+  <div class="wrap">
+    <div class="chap-label">
+      <span class="num">01</span>
+      <span class="ttl">Le quattro date</span>
+      <span class="line" aria-hidden="true"></span>
+    </div>
+
+    <div class="cal">
+
+      <!-- GIO 30 — FREE -->
+      <div class="cal-row">
+        <div class="cal-numwrap">
+          <div class="cal-idx"><span>01</span> · <span class="dow">GIOVEDÌ</span></div>
+          <div class="cal-num flipS">30<span class="mon">LUGLIO</span></div>
+        </div>
+        <div class="cal-side">
+          <div class="cal-kind">TALK · INGRESSO GRATUITO</div>
+          <div class="cal-acts">
+            <span class="a flipS">ADRIAN FARTADE</span>
+          </div>
+          <a class="cal-cta free" href="https://dice.fm/sottosopra-giovedi-free?utm_source=sito&utm_medium=home&utm_campaign=giovedi-free" target="_blank" rel="noopener">
+            <span>FREE — ISCRIVITI</span><span class="arr">↗</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- VEN 31 -->
+      <div class="cal-row">
+        <div class="cal-numwrap">
+          <div class="cal-idx"><span>02</span> · <span class="dow">VENERDÌ</span></div>
+          <div class="cal-num flipS">31<span class="mon">LUGLIO</span></div>
+        </div>
+        <div class="cal-side">
+          <div class="cal-kind">LIVE</div>
+          <div class="cal-acts">
+            <span class="a flipS">GENERIC ANIMAL</span>
+            <span class="a flipS">DEGHEIO</span>
+            <span class="a flipS">KRANO</span>
+            <span class="a flipS">CAVALLI MONGOLI</span>
+          </div>
+          <a class="cal-cta" href="https://dice.fm/sottosopra?utm_source=sito&utm_medium=home&utm_campaign=venerdi" target="_blank" rel="noopener">
+            <span>BIGLIETTI</span><span class="arr">↗</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- SAB 01 -->
+      <div class="cal-row">
+        <div class="cal-numwrap">
+          <div class="cal-idx"><span>03</span> · <span class="dow">SABATO</span></div>
+          <div class="cal-num flipS">01<span class="mon">AGOSTO</span></div>
+        </div>
+        <div class="cal-side">
+          <div class="cal-kind">LIVE</div>
+          <div class="cal-acts">
+            <span class="a flipS">POPA</span>
+            <span class="a flipS">VENDREDI SUR MER</span>
+            <span class="a flipS">FACCIANUVOLA</span>
+          </div>
+          <a class="cal-cta" href="https://dice.fm/sottosopra?utm_source=sito&utm_medium=home&utm_campaign=sabato" target="_blank" rel="noopener">
+            <span>BIGLIETTI</span><span class="arr">↗</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- DOM 02 -->
+      <div class="cal-row">
+        <div class="cal-numwrap">
+          <div class="cal-idx"><span>04</span> · <span class="dow">DOMENICA</span></div>
+          <div class="cal-num flipS">02<span class="mon">AGOSTO</span></div>
+        </div>
+        <div class="cal-side">
+          <div class="cal-kind">LIVE</div>
+          <div class="cal-acts">
+            <span class="a flipS">JESSE THE FACCIO</span>
+            <span class="a flipS">AURORO BOREALO</span>
+            <span class="a flipS">EX-OTAGO</span>
+          </div>
+          <a class="cal-cta" href="https://dice.fm/sottosopra?utm_source=sito&utm_medium=home&utm_campaign=domenica" target="_blank" rel="noopener">
+            <span>BIGLIETTI</span><span class="arr">↗</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="cal-foot">
+      <p class="note"><b>UN BIGLIETTO PER SERATA · GIOVEDÌ GRATIS.</b> OPPURE L’ABBONAMENTO 3 GIORNI.</p>
+      <a class="cta-solid" href="https://dice.fm/sottosopra?utm_source=sito&utm_medium=home&utm_campaign=full-pass" target="_blank" rel="noopener">FULL PASS <span class="arr">↗</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MARQUEE (curved signature) ===================== -->
+<div class="wave-wrap" aria-hidden="true">
+  <svg viewBox="0 0 1200 128" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <path id="wave" fill="none" d="M -200,72 C 50,36 250,36 500,72 C 750,108 950,108 1200,72 C 1450,36 1650,36 1900,72"/>
+    </defs>
+    <text class="wave-text">
+      <textPath href="#wave" xlink:href="#wave" startOffset="0">
+        SEMPRE SOTTOSOPRA · CAMBIA IL PUNTO DI VISTA · GIARDINI DEL CASTELLO · CASTELFRANCO VENETO · SEMPRE SOTTOSOPRA · CAMBIA IL PUNTO DI VISTA · GIARDINI DEL CASTELLO · CASTELFRANCO VENETO ·
+        <animate id="waveAnim" attributeName="startOffset" from="0" to="-900" dur="28s" repeatCount="indefinite"/>
+      </textPath>
+    </text>
+  </svg>
+</div>
+
+<!-- ===================== 04 — LINEUP TEASER ===================== -->
+<section class="chapter" id="programma" aria-label="Lineup">
+  <div class="wrap">
+    <div class="chap-label">
+      <span class="num">02</span>
+      <span class="ttl">Lineup</span>
+      <span class="line" aria-hidden="true"></span>
+    </div>
+
+    <div class="lineup-day">
+      <div class="ld-head"><span class="d">GIO 30 · FREE</span><span class="k">TALK</span></div>
+      <div class="ld-acts">
+        <a href="/programma" class="flipS">ADRIAN FARTADE</a>
+      </div>
+    </div>
+
+    <div class="lineup-day">
+      <div class="ld-head"><span class="d">VEN 31 LUGLIO</span><span class="k">LIVE</span></div>
+      <div class="ld-acts">
+        <a href="/programma" class="flipS">GENERIC ANIMAL</a>
+        <a href="/programma" class="flipS">DEGHEIO</a>
+        <a href="/programma" class="flipS">KRANO</a>
+        <a href="/programma" class="flipS">CAVALLI MONGOLI</a>
+      </div>
+    </div>
+
+    <div class="lineup-day">
+      <div class="ld-head"><span class="d">SAB 1 AGOSTO</span><span class="k">LIVE</span></div>
+      <div class="ld-acts">
+        <a href="/programma" class="flipS">POPA</a>
+        <a href="/programma" class="flipS">VENDREDI SUR MER</a>
+        <a href="/programma" class="flipS">FACCIANUVOLA</a>
+      </div>
+    </div>
+
+    <div class="lineup-day">
+      <div class="ld-head"><span class="d">DOM 2 AGOSTO</span><span class="k">LIVE</span></div>
+      <div class="ld-acts">
+        <a href="/programma" class="flipS">JESSE THE FACCIO</a>
+        <a href="/programma" class="flipS">AURORO BOREALO</a>
+        <a href="/programma" class="flipS">EX-OTAGO</a>
+      </div>
+    </div>
+
+    <div class="lineup-more">
+      <a href="/programma">TUTTO IL PROGRAMMA <span class="arr">↗</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 05 — MANIFESTO ===================== -->
+<section class="chapter" aria-label="Manifesto">
+  <div class="wrap">
+    <div class="chap-label">
+      <span class="num">03</span>
+      <span class="ttl">Manifesto</span>
+      <span class="line" aria-hidden="true"></span>
+    </div>
+    <div class="manifesto">
+      <p class="mf-line flipS">CAMBIA IL PUNTO DI VISTA</p>
+      <p class="mf-sub">Otto edizioni di musica, arte e relazioni nei Giardini del Castello. Un festival che si fa in ottanta, ogni estate, per ribaltare lo sguardo sulla città.</p>
+      <a class="mf-more flipS" href="/about">CHI SIAMO <span class="arr">↗</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 06 — ESPERIENZE ===================== -->
+<section class="exp" aria-label="Esperienze">
+  <div class="exp-in">
+    <span class="exp-eye eyebrow">04 — Non solo concerti</span>
+    <p class="exp-line flipS">TALK, WORKSHOP, LIBRI, SPORT, <span class="dim">SOFT CLUBBING.</span></p>
+  </div>
+</section>
+
+<!-- ===================== 07 — PARTECIPA ===================== -->
+<section class="chapter sm" aria-label="Partecipa">
+  <div class="wrap">
+    <div class="chap-label">
+      <span class="num">05</span>
+      <span class="ttl">Partecipa</span>
+      <span class="line" aria-hidden="true"></span>
+    </div>
+    <div class="part-grid">
+      <div class="part-cell">
+        <span class="eyebrow">FAI PARTE DEL FESTIVAL</span>
+        <h3 class="flipS">VOLONTARI*</h3>
+        <p>IL FESTIVAL LO FACCIAMO IN OTTANTA — MANCHI SOLO TU*.</p>
+        <a class="part-link" href="/about#volontari">DIVENTA VOLONTARI* <span class="arr">↗</span></a>
+      </div>
+      <div class="part-cell">
+        <span class="eyebrow">RESTA AGGIORNAT*</span>
+        <h3 class="flipS">NEWSLETTER</h3>
+        <p>DATE, LINE-UP E BIGLIETTI PRIMA DI TUTTI. NIENTE SPAM.</p>
+        <form class="nl-form" onsubmit="return false">
+          <input type="email" placeholder="LA-TUA@EMAIL.IT" aria-label="La tua email" required>
+          <button type="submit">ISCRIVITI</button>
+        </form>
+        <label class="nl-consent">
+          <input type="checkbox" required>
+          <span>Acconsento al trattamento dei dati per ricevere la newsletter. <a href="/privacy">Privacy</a>.</span>
+        </label>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 08 — PARTNER ===================== -->
+<section class="chapter sm" aria-label="Partner">
+  <div class="wrap">
+    <div class="chap-label">
+      <span class="num">06</span>
+      <span class="ttl">Partner</span>
+      <span class="line" aria-hidden="true"></span>
+    </div>
+    <div class="partners">
+      <div class="p-head">
+        <span class="st-l flipS">LO RENDONO POSSIBILE</span>
+        <span class="tag">EDIZIONE 2026</span>
+      </div>
+
+      <!-- TIER 1 — MAIN PARTNER -->
+      <div class="p-tier">
+        <span class="p-label">MAIN PARTNER</span>
+        <div class="p-flow">
+          <div class="p-track t1">
+            <a class="chip" href="#" rel="noopener">AZIMUT</a>
+            <a class="chip" href="#" rel="noopener">BANCA TERRE VENETE</a>
+            <a class="chip" href="#" rel="noopener">CECCATO</a>
+            <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">AZIMUT</a>
+            <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">BANCA TERRE VENETE</a>
+            <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">CECCATO</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- TIER 2 — PARTNER -->
+      <div class="p-tier">
+        <span class="p-label">PARTNER</span>
+        <div class="p-flow">
+          <div class="p-track t2">
+            <a class="chip" href="#" rel="noopener">PRODECO</a>
+            <a class="chip" href="#" rel="noopener">CNA</a>
+            <a class="chip" href="#" rel="noopener">ADRIATICA STRADE</a>
+            <a class="chip" href="#" rel="noopener">MERIEUX</a>
+            <a class="chip" href="#" rel="noopener">LIBRERIA ZABARELLA</a>
+            <a class="chip" href="#" rel="noopener">COOP L’INCONTRO</a>
+            <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">PRODECO</a>
+            <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">CNA</a>
+            <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">ADRIATICA STRADE</a>
+            <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">MERIEUX</a>
+            <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">LIBRERIA ZABARELLA</a>
+            <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">COOP L’INCONTRO</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- TIER 3 — SUPPORTER -->
+      <div class="p-tier">
+        <span class="p-label">SUPPORTER</span>
+        <div class="p-flow">
+          <div class="p-track t3">
+            <a class="chip" href="#" rel="noopener">ATLANTIS</a>
+            <a class="chip" href="#" rel="noopener">EUREKA</a>
+            <a class="chip" href="#" rel="noopener">COMUNE DI CASTELFRANCO</a>
+            <a class="chip" href="#" rel="noopener">PRO LOCO</a>
+            <a class="chip" href="#" rel="noopener">AVIS CASTELFRANCO</a>
+            <a class="chip" href="#" rel="noopener">BIRRA ANTONIANA</a>
+            <a class="chip" href="#" rel="noopener">CAFFÈ DIEMME</a>
+            <a class="chip" href="#" rel="noopener">RADIO COMPANY</a>
+            <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">ATLANTIS</a>
+            <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">EUREKA</a>
+            <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">COMUNE DI CASTELFRANCO</a>
+            <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">PRO LOCO</a>
+            <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">AVIS CASTELFRANCO</a>
+            <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">BIRRA ANTONIANA</a>
+            <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">CAFFÈ DIEMME</a>
+            <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">RADIO COMPANY</a>
+          </div>
+        </div>
+      </div>
+
+      <p class="partners-foot">VUOI SOSTENERE L’EDIZIONE 2026? <a href="mailto:info@sottosopra.com">INFO@SOTTOSOPRA.COM</a></p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ===================== NOW PLAYING (fixed desktop / static strip on mobile) ===================== -->
+<div class="np-bar" role="status" aria-label="Ora in cassa">
+  <div class="np-now">
+    <span class="np-cover" aria-hidden="true"></span>
+    <span class="np-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <span class="np-label">NOW PLAYING</span>
+  </div>
+  <div class="np-feed">
+    <div class="np-track">
+      <span>GENERIC ANIMAL — LIMONATA <span class="dot">●</span> VENDREDI SUR MER — ÉCOUTE CHÉRIE <span class="dot">●</span> EX-OTAGO — CINGHIALI <span class="dot">●</span> AURORO BOREALO — TUTTO BENE <span class="dot">●</span> KRANO — LIVE <span class="dot">●</span> POPA — SOUL <span class="dot">●</span> </span>
+      <span aria-hidden="true">GENERIC ANIMAL — LIMONATA <span class="dot">●</span> VENDREDI SUR MER — ÉCOUTE CHÉRIE <span class="dot">●</span> EX-OTAGO — CINGHIALI <span class="dot">●</span> AURORO BOREALO — TUTTO BENE <span class="dot">●</span> KRANO — LIVE <span class="dot">●</span> POPA — SOUL <span class="dot">●</span> </span>
+    </div>
+  </div>
+  <a class="np-spotify" href="https://open.spotify.com/playlist/sottosopra" target="_blank" rel="noopener">ASCOLTA SU SPOTIFY <span class="arr">↗</span></a>
+</div>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="site-foot">
+  <div class="foot-grid">
+    <div class="foot-cell">
+      <div class="big flipS">30·07<br>— 2·08<br>’26</div>
+    </div>
+    <div class="foot-cell">
+      <span class="eyebrow">NAVIGA</span>
+      <a href="/programma">Programma</a>
+      <a href="/info">Info</a>
+      <a href="/about">About</a>
+      <a href="/news">News</a>
+    </div>
+    <div class="foot-cell">
+      <span class="eyebrow">CONTATTI</span>
+      <a href="mailto:info@sottosopra.com">info@sottosopra.com</a>
+      <a href="https://instagram.com/sottosoprafestival" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://facebook.com/sottosoprafestival" target="_blank" rel="noopener">Facebook</a>
+      <a class="tk" href="https://dice.fm/sottosopra?utm_source=sito&utm_medium=footer" target="_blank" rel="noopener">BIGLIETTI ↗</a>
+    </div>
+  </div>
+  <div class="foot-foot">
+    <span class="flipS">SOTTOSOPRA APS · CAMBIA IL PUNTO DI VISTA</span>
+    <span class="ll">
+      <img src="/brand/sottosopra-logo-white.png" alt="Sottosopra">
+      <a href="/privacy">Privacy</a><a href="/cookie">Cookie</a>
+    </span>
+  </div>
+</footer>
+
+<!-- ===================== STICKY BOTTOM CTA (mobile) ===================== -->
+<div class="sticky-cta" aria-label="Azioni rapide">
+  <a class="sc-tickets" href="https://dice.fm/sottosopra?utm_source=sito&utm_medium=sticky" target="_blank" rel="noopener">Biglietti <span class="arr">↗</span></a>
+  <a class="sc-prog" href="/programma">Programma</a>
+</div>
+
+<script>
+(function(){
+  var body=document.body;
+
+  /* ---- mobile drawer + focus-trap ---- */
+  var burger=document.getElementById("burger");
+  var drawer=document.getElementById("drawer");
+  function setDrawer(open){
+    drawer.classList.toggle("open",open);
+    body.classList.toggle("drawer-open",open);
+    burger.setAttribute("aria-expanded",open?"true":"false");
+    burger.setAttribute("aria-label",open?"Chiudi menu":"Apri menu");
+    if(open){var f=drawer.querySelector("a[href]");if(f)f.focus();}
+  }
+  if(burger&&drawer){
+    burger.addEventListener("click",function(){setDrawer(!drawer.classList.contains("open"))});
+    drawer.querySelectorAll("a").forEach(function(a){
+      a.addEventListener("click",function(){setDrawer(false)});
+    });
+    document.addEventListener("keydown",function(e){
+      if(e.key==="Escape"&&drawer.classList.contains("open")){setDrawer(false);burger.focus();}
+    });
+    drawer.addEventListener("keydown",function(e){
+      if(e.key!=="Tab"||!drawer.classList.contains("open"))return;
+      var f=drawer.querySelectorAll("a[href]");
+      if(!f.length)return;
+      var first=f[0],last=f[f.length-1];
+      if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
+      else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
+    });
+  }
+
+  /* ---- magnetic primary CTA (desktop, fine pointer only) ---- */
+  var mag=document.getElementById("magnet");
+  if(mag && matchMedia('(pointer:fine)').matches && !matchMedia('(prefers-reduced-motion:reduce)').matches){
+    mag.style.transition="transform .18s cubic-bezier(.2,.7,.2,1),background .22s ease,color .22s ease";
+    mag.addEventListener("mousemove",function(e){
+      var r=mag.getBoundingClientRect();
+      var x=(e.clientX-(r.left+r.width/2))/r.width;
+      var y=(e.clientY-(r.top+r.height/2))/r.height;
+      mag.style.transform="translate("+(x*8).toFixed(1)+"px,"+(y*7).toFixed(1)+"px)";
+    });
+    mag.addEventListener("mouseleave",function(){mag.style.transform="translate(0,0)"});
+  }
+})();
+</script>
+
+<!-- SCROLL-S-FLIP (verificato): default S dritta, scrollando -> scaleY(-1) rovesciata -->
+<style>
+.sflip{display:inline-block;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.sflip.is-flipped{transform:scaleY(-1)}
+@media(prefers-reduced-motion:reduce){.sflip{transition:none;transform:none!important}}
+</style>
+<script>
+(function(){
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  document.querySelectorAll('.flipS').forEach(function(h){h.innerHTML=h.innerHTML.replace(/S/g,'<span class="sflip">S</span>');});
+  var L=[].slice.call(document.querySelectorAll('.sflip')),tick=false;
+  function upd(){tick=false;var line=innerHeight*0.5;L.forEach(function(el){el.classList.toggle('is-flipped',el.getBoundingClientRect().top<line);});}
+  addEventListener('scroll',function(){if(!tick){tick=true;requestAnimationFrame(upd)}},{passive:true});
+  addEventListener('resize',upd);setTimeout(upd,500);
+})();
+</script>
+</body>
+</html>

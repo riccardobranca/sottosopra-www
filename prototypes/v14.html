@@ -1,0 +1,964 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+<title>SOTTOSOPRA — Canvas Festa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+/* ============ FONT ============ */
+@font-face{
+  font-family:"SoSo26";
+  src:url("/fonts/SoSo26.woff") format("woff");
+  font-display:swap;
+}
+
+/* ============ TOKENS ============ */
+:root{
+  --bg:#ffffff;
+  --fg:#000000;
+  --muted:#6b6b6b;
+  --line:#000000;
+  --hairline:#d9d9d9;
+  --elev:#f2f2f2;
+  --dot:#c9c9c9;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg);
+  color:var(--fg);
+  font-family:Inter,system-ui,sans-serif;
+  font-size:16px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+.display{
+  font-family:"SoSo26","Arial Black",sans-serif;
+  font-feature-settings:"ss07","ss08","liga","calt";
+  font-weight:400;
+  line-height:.86;
+  letter-spacing:-.01em;
+  text-transform:uppercase;
+}
+.mono{font-family:"Space Mono",ui-monospace,monospace}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+
+.tag{
+  font-family:"Space Mono",monospace;
+  font-size:11px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--fg);
+}
+
+/* ============ HEADER ============ */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:60;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 22px;
+  background:rgba(255,255,255,.82);
+  backdrop-filter:saturate(140%) blur(8px);
+  border-bottom:2px solid var(--line);
+}
+.brand{display:flex;align-items:center;gap:12px}
+.brand img{height:22px;width:auto}
+.nav{display:flex;align-items:center;gap:4px}
+.nav a{
+  font-family:"Space Mono",monospace;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+  padding:8px 12px;border:1.5px solid transparent;border-radius:2px;
+  transition:border-color .2s var(--ease),background .2s var(--ease);
+}
+.nav a:hover{border-color:var(--line)}
+.btn-tix{
+  font-family:"Space Mono",monospace;font-weight:700;
+  font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+  background:var(--fg);color:var(--bg);
+  padding:10px 18px;border:2px solid var(--fg);border-radius:2px;
+  transition:transform .15s var(--ease);
+}
+.btn-tix:hover{transform:translateY(-1px) rotate(-1deg)}
+@media(max-width:760px){
+  .nav a:not(.btn-tix){display:none}
+}
+
+/* ============ CANVAS STAGE (HERO) ============ */
+.stage{
+  position:relative;
+  width:100%;
+  height:100vh;min-height:680px;
+  overflow:hidden;
+  border-bottom:3px solid var(--line);
+  /* dot-grid spatial plane */
+  background-color:var(--bg);
+  background-image:radial-gradient(var(--dot) 1.4px, transparent 1.5px);
+  background-size:26px 26px;
+  cursor:grab;
+  touch-action:none;
+}
+.stage.dragging{cursor:grabbing}
+/* the pannable world — moved via transform */
+.world{
+  position:absolute;
+  inset:0;
+  /* world is bigger than viewport so there's room to explore */
+  will-change:transform;
+}
+/* faint cardinal grid lines on the world to sell "infinite plane" */
+.world::before{
+  content:"";position:absolute;
+  left:-2000px;top:-2000px;width:6000px;height:6000px;
+  background-image:
+    linear-gradient(var(--hairline) 1px,transparent 1px),
+    linear-gradient(90deg,var(--hairline) 1px,transparent 1px);
+  background-size:260px 260px;
+  opacity:.5;pointer-events:none;
+}
+
+/* a tile = draggable artist body */
+.tile{
+  position:absolute;
+  user-select:none;
+  -webkit-user-select:none;
+  background:var(--bg);
+  border:2.5px solid var(--line);
+  border-radius:3px;
+  padding:14px 18px;
+  box-shadow:5px 6px 0 var(--fg);
+  cursor:grab;
+  transition:box-shadow .18s var(--ease), transform .12s var(--ease);
+  will-change:transform;
+}
+.tile:hover{box-shadow:8px 9px 0 var(--fg)}
+.tile.grabbed{cursor:grabbing;box-shadow:2px 3px 0 var(--fg);z-index:30!important}
+.tile .tname{
+  display:block;
+  white-space:nowrap;
+}
+.tile .tmeta{
+  font-family:"Space Mono",monospace;
+  font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);margin-top:4px;
+}
+/* inverted (domino) tiles */
+.tile.inv{background:var(--fg);color:var(--bg);box-shadow:5px 6px 0 #bdbdbd}
+.tile.inv:hover{box-shadow:8px 9px 0 #bdbdbd}
+.tile.inv .tmeta{color:#bdbdbd}
+/* headliner tile = bigger */
+.tile.big .tname{line-height:.84}
+
+/* photo-silhouette tiles */
+.tile.photo{
+  padding:0;width:148px;height:148px;overflow:hidden;
+  display:flex;align-items:flex-end;
+}
+.tile.photo .ph-fill{
+  position:absolute;inset:0;
+  background:var(--fg);
+}
+.tile.photo .ph-cut{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(40% 34% at 50% 30%, #fff 0 99%, transparent 100%),
+    radial-gradient(56% 50% at 50% 88%, #fff 0 99%, transparent 100%);
+  mix-blend-mode:screen;
+  opacity:.0; /* silhouette stays solid black; the cut is decorative */
+}
+.tile.photo .ph-label{
+  position:relative;z-index:2;
+  width:100%;
+  font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;color:#fff;
+  background:var(--fg);padding:6px 10px;border-top:2px solid #fff;
+}
+
+/* HERO overlay text — pinned, NOT part of world (always readable) */
+.hero-overlay{
+  position:absolute;z-index:20;left:0;right:0;top:0;bottom:0;
+  pointer-events:none;
+  display:flex;flex-direction:column;justify-content:space-between;
+  padding:96px 26px 26px;
+}
+.hero-top{max-width:680px}
+.claim-box{
+  display:inline-block;
+  background:var(--bg);
+  border:3px solid var(--line);
+  border-radius:3px;
+  box-shadow:8px 9px 0 var(--fg);
+  padding:14px 22px 18px;
+  pointer-events:auto;
+}
+.hero-claim{
+  font-size:clamp(2.8rem,8.4vw,7rem);
+}
+.hero-claim .l2{display:inline-block;transform:rotate(180deg)}
+.hero-sub{
+  display:inline-flex;flex-wrap:wrap;gap:8px;margin-top:14px;
+  pointer-events:auto;
+}
+.chip{
+  font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;
+  text-transform:uppercase;background:var(--bg);border:2px solid var(--line);
+  border-radius:2px;padding:6px 11px;
+}
+.chip.solid{background:var(--fg);color:var(--bg)}
+
+.hero-bottom{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  gap:18px;
+}
+.hint{
+  pointer-events:none;
+  font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.05em;
+  background:var(--bg);border:2px solid var(--line);border-radius:2px;
+  padding:9px 13px;display:flex;align-items:center;gap:9px;
+  box-shadow:3px 4px 0 var(--fg);
+}
+.hint .pulse{
+  width:9px;height:9px;border-radius:50%;background:var(--fg);
+  animation:pulse 1.4s var(--ease) infinite;
+}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(.4);opacity:.4}}
+.stage-tools{
+  pointer-events:auto;display:flex;gap:8px;
+}
+.tool{
+  font-family:"Space Mono",monospace;font-size:12px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;
+  background:var(--bg);border:2px solid var(--line);border-radius:2px;
+  width:42px;height:42px;display:grid;place-items:center;
+  box-shadow:3px 4px 0 var(--fg);
+  transition:transform .12s var(--ease);
+}
+.tool:hover{transform:translate(1px,1px);box-shadow:1px 2px 0 var(--fg)}
+.tool.wide{width:auto;padding:0 14px;gap:6px}
+
+/* info-card popover */
+.infocard{
+  position:fixed;z-index:80;
+  width:280px;max-width:calc(100vw - 32px);
+  background:var(--bg);border:2.5px solid var(--line);border-radius:3px;
+  box-shadow:8px 10px 0 var(--fg);
+  padding:0;display:none;
+}
+.infocard.show{display:block}
+.infocard .ic-head{
+  background:var(--fg);color:var(--bg);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 12px;
+}
+.infocard .ic-head .ic-k{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.16em}
+.infocard .ic-close{color:var(--bg);font-family:"Space Mono",monospace;font-size:16px;line-height:1;padding:2px 4px}
+.infocard .ic-body{padding:14px 16px 16px}
+.infocard .ic-name{font-size:clamp(1.6rem,5vw,2.3rem)}
+.infocard .ic-day{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.infocard .ic-desc{font-size:13.5px;line-height:1.45;margin-top:10px;color:#222}
+.infocard .ic-links{display:flex;gap:8px;margin-top:14px}
+.infocard .ic-links a{
+  font-family:"Space Mono",monospace;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  border:2px solid var(--line);border-radius:2px;padding:7px 11px;flex:1;text-align:center;
+  transition:background .15s var(--ease),color .15s var(--ease);
+}
+.infocard .ic-links a:hover{background:var(--fg);color:var(--bg)}
+
+/* MOBILE / no-JS linear fallback (the "lista lineare ordinata") */
+.linear{display:none}
+@media(max-width:760px){
+  /* stage becomes normal-flow: no absolute overlap, draggable world hidden */
+  .stage{
+    height:auto;min-height:0;cursor:auto;
+    display:flex;flex-direction:column;
+  }
+  .world{display:none}
+  .hero-overlay{
+    position:static;pointer-events:auto;
+    padding:84px 20px 24px;
+  }
+  .stage-tools{display:none}        /* no zoom/center on touch */
+  .hint{display:none}
+  .hero-bottom{display:none}
+  .claim-box{box-shadow:6px 7px 0 var(--fg)}
+  .linear{display:block;border-top:3px solid var(--line)}
+}
+@media(max-width:760px){
+  .nav{gap:0}
+}
+
+/* ============ SECTIONS (scrollable below the canvas) ============ */
+.section{padding:84px 26px;border-bottom:3px solid var(--line)}
+.sec-head{
+  display:flex;align-items:baseline;justify-content:space-between;
+  gap:16px;flex-wrap:wrap;margin-bottom:36px;
+}
+.sec-title{font-size:clamp(2.4rem,7vw,5rem)}
+.sec-kicker{
+  font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--muted);
+}
+
+/* LINEUP linear board (mobile + readable index) */
+.board{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+  border:2.5px solid var(--line);border-radius:3px;overflow:hidden;
+}
+.board .cell{
+  border-right:2px solid var(--line);border-bottom:2px solid var(--line);
+  padding:22px 18px;min-height:150px;
+  display:flex;flex-direction:column;justify-content:space-between;
+  background:var(--bg);
+  transition:background .18s var(--ease),color .18s var(--ease);
+}
+.board .cell:hover{background:var(--fg);color:var(--bg)}
+.board .cell:hover .cell-meta{color:#bdbdbd}
+.board .cell .cell-idx{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em}
+.board .cell .cell-name{font-size:clamp(1.5rem,3.4vw,2.4rem);margin-top:auto}
+.board .cell .cell-meta{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:8px}
+.board .cell:nth-child(4n){border-right:none}
+@media(max-width:1000px){.board{grid-template-columns:repeat(2,1fr)}.board .cell:nth-child(4n){border-right:2px solid var(--line)}.board .cell:nth-child(2n){border-right:none}}
+@media(max-width:560px){.board{grid-template-columns:1fr}.board .cell{border-right:none!important}}
+
+/* PROGRAMMA / dates as domino tiles */
+.days{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.day{
+  border:2.5px solid var(--line);border-radius:3px;
+  box-shadow:6px 7px 0 var(--fg);
+  padding:22px;background:var(--bg);
+  display:flex;flex-direction:column;gap:14px;
+}
+.day .d-num{font-size:clamp(3rem,8vw,5.4rem);line-height:.8}
+.day .d-row{display:flex;justify-content:space-between;align-items:baseline;border-top:2px solid var(--hairline);padding-top:8px}
+.day .d-when{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.day .d-acts{font-size:14px;color:#222;line-height:1.4}
+.day .d-tix{
+  font-family:"Space Mono",monospace;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+  margin-top:auto;background:var(--fg);color:var(--bg);text-align:center;
+  padding:10px;border:2px solid var(--fg);border-radius:2px;
+  transition:transform .12s var(--ease);
+}
+.day .d-tix:hover{transform:translate(1px,1px)}
+@media(max-width:840px){.days{grid-template-columns:1fr}}
+
+/* EXPERIENCES — scattered chips, draggable mini-canvas vibe but static grid */
+.exp-wrap{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start}
+.exp{
+  border:2.5px solid var(--line);border-radius:3px;
+  padding:16px 20px;background:var(--bg);
+  box-shadow:4px 5px 0 var(--fg);
+  transition:transform .14s var(--ease);
+}
+.exp:nth-child(odd){transform:rotate(-1.4deg)}
+.exp:nth-child(even){transform:rotate(1.2deg)}
+.exp:hover{transform:rotate(0deg) translateY(-2px)}
+.exp.inv{background:var(--fg);color:var(--bg);box-shadow:4px 5px 0 #bdbdbd}
+.exp .e-k{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px}
+.exp.inv .e-k{color:#bdbdbd}
+.exp .e-t{font-size:clamp(1.3rem,3vw,2rem)}
+
+/* SPONSOR domino strip */
+.sponsors{display:flex;flex-wrap:wrap;gap:0;border:2.5px solid var(--line);border-radius:3px;overflow:hidden}
+.sponsors .sp{
+  flex:1 1 180px;text-align:center;
+  font-family:"Space Mono",monospace;font-weight:700;font-size:14px;letter-spacing:.1em;text-transform:uppercase;
+  padding:26px 14px;border-right:2px solid var(--line);
+  display:grid;place-items:center;
+  transition:background .18s var(--ease),color .18s var(--ease);
+}
+.sponsors .sp:last-child{border-right:none}
+.sponsors .sp:hover{background:var(--fg);color:var(--bg)}
+
+/* CTA / NEWSLETTER */
+.cta-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.cta-card{
+  border:2.5px solid var(--line);border-radius:3px;padding:30px;
+  display:flex;flex-direction:column;gap:14px;
+}
+.cta-card.dark{background:var(--fg);color:var(--bg)}
+.cta-card .cc-t{font-size:clamp(1.8rem,4vw,2.8rem)}
+.cta-card p{font-size:14.5px;line-height:1.5;color:inherit;opacity:.92}
+.nl-form{display:flex;gap:0;border:2px solid currentColor;border-radius:2px;overflow:hidden;margin-top:auto}
+.nl-form input{
+  flex:1;border:none;background:transparent;color:inherit;
+  font-family:"Space Mono",monospace;font-size:13px;padding:12px 14px;outline:none;
+}
+.cta-card.dark .nl-form input::placeholder{color:#bdbdbd}
+.nl-form button{
+  background:currentColor;border:none;padding:0 18px;
+  font-family:"Space Mono",monospace;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+}
+.cta-card.dark .nl-form button{color:#fff;}
+.nl-form button span{mix-blend-mode:difference;color:#fff}
+.btn-vol{
+  font-family:"Space Mono",monospace;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;
+  border:2px solid currentColor;border-radius:2px;padding:13px;text-align:center;margin-top:auto;
+  transition:transform .12s var(--ease);
+}
+.btn-vol:hover{transform:translate(1px,1px)}
+@media(max-width:840px){.cta-grid{grid-template-columns:1fr}}
+
+/* FOOTER */
+.foot{padding:54px 26px;display:flex;flex-direction:column;gap:26px}
+.foot-top{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.foot img{height:26px}
+.foot-mark{font-size:clamp(3rem,12vw,9rem);line-height:.8;color:var(--fg)}
+.foot-mark .flip{display:inline-block;transform:rotate(180deg)}
+.foot-row{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.06em;text-transform:uppercase;border-top:2px solid var(--line);padding-top:18px}
+.foot-row a{border-bottom:1px solid transparent}
+.foot-row a:hover{border-bottom-color:var(--line)}
+
+/* reduced motion */
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="topbar">
+  <div class="brand">
+    <img src="/brand/sottosopra-logo-black.png" alt="SOTTOSOPRA" />
+  </div>
+  <nav class="nav">
+    <a href="#programma">Programma</a>
+    <a href="#info">Info</a>
+    <a href="#about">About</a>
+    <a href="#news">News</a>
+    <a class="btn-tix" href="https://dice.fm" target="_blank" rel="noopener">Biglietti</a>
+  </nav>
+</header>
+
+<!-- ===== HERO = INFINITE CANVAS ===== -->
+<section class="stage" id="stage" aria-label="Lineup esplorabile — trascina per scoprire gli artisti">
+  <!-- The pannable world. Tiles are positioned absolutely; JS adds drag+inertia.
+       Everything here is VISIBLE statically: no opacity:0, no reveal-on-scroll. -->
+  <div class="world" id="world">
+    <!-- headliner / big name tiles -->
+    <div class="tile big inv" data-artist="Generic Animal" data-day="VEN 31 LUG" data-tags="Indie · IT" style="left:600px;top:430px" tabindex="0">
+      <span class="tname display" style="font-size:clamp(2rem,5vw,3.4rem)">Generic Animal</span>
+      <span class="tmeta">★ HEADLINER · VEN 31</span>
+    </div>
+
+    <div class="tile big" data-artist="Ex-Otago" data-day="SAB 1 AGO" data-tags="Indie pop · IT" style="left:560px;top:90px" tabindex="0">
+      <span class="tname display" style="font-size:clamp(2rem,5vw,3.4rem)">Ex-Otago</span>
+      <span class="tmeta">★ HEADLINER · SAB 1</span>
+    </div>
+
+    <div class="tile big inv" data-artist="Vendredi sur Mer" data-day="DOM 2 AGO" data-tags="Pop · FR" style="left:340px;top:640px" tabindex="0">
+      <span class="tname display" style="font-size:clamp(1.8rem,4.4vw,3rem)">Vendredi<br>sur Mer</span>
+      <span class="tmeta">★ HEADLINER · DOM 2</span>
+    </div>
+
+    <!-- photo-silhouette tile -->
+    <div class="tile photo" data-artist="Auroro Borealo" data-day="SAB 1 AGO" data-tags="Cantautore · IT" style="left:840px;top:300px" tabindex="0">
+      <span class="ph-fill"></span>
+      <span class="ph-label">AURORO BOREALO →</span>
+    </div>
+
+    <!-- mid tiles -->
+    <div class="tile" data-artist="Alberto Ferrari" data-day="VEN 31 LUG" data-tags="Rock · IT" style="left:660px;top:380px" tabindex="0">
+      <span class="tname display" style="font-size:clamp(1.5rem,3.6vw,2.3rem)">Alberto Ferrari</span>
+      <span class="tmeta">VEN 31 · LIVE</span>
+    </div>
+
+    <div class="tile inv" data-artist="Popa" data-day="DOM 2 AGO" data-tags="Elettronica · IT" style="left:140px;top:480px" tabindex="0">
+      <span class="tname display" style="font-size:clamp(1.6rem,4vw,2.6rem)">Popa</span>
+      <span class="tmeta">DOM 2 · DJ SET</span>
+    </div>
+
+    <div class="tile" data-artist="Krano" data-day="VEN 31 LUG" data-tags="Hip-hop · IT" style="left:760px;top:690px" tabindex="0">
+      <span class="tname display" style="font-size:clamp(1.6rem,4vw,2.6rem)">Krano</span>
+      <span class="tmeta">VEN 31 · LIVE</span>
+    </div>
+
+    <div class="tile" data-artist="Jesse The Faccio" data-day="SAB 1 AGO" data-tags="Songwriter · IT" style="left:980px;top:120px" tabindex="0">
+      <span class="tname display" style="font-size:clamp(1.5rem,3.6vw,2.2rem)">Jesse<br>The Faccio</span>
+      <span class="tmeta">SAB 1 · LIVE</span>
+    </div>
+
+    <!-- floating info satellites -->
+    <div class="tile" data-static="1" style="left:1180px;top:420px;box-shadow:4px 5px 0 var(--fg)">
+      <span class="tag">★ 8ª EDIZIONE</span><br>
+      <span class="display" style="font-size:1.6rem;display:block;margin-top:4px">2017→2026</span>
+    </div>
+
+    <div class="tile" data-static="1" style="left:60px;top:660px;box-shadow:4px 5px 0 var(--fg)">
+      <span class="tag">GIARDINI DEL CASTELLO</span><br>
+      <span class="display" style="font-size:1.4rem;display:block;margin-top:4px">Castelfranco V.</span>
+    </div>
+  </div>
+
+  <!-- PINNED overlay: always readable, NOT in the world -->
+  <div class="hero-overlay">
+    <div class="hero-top">
+      <div class="claim-box">
+        <h1 class="hero-claim display">Sempre<br><span class="l2">Sottosopra</span></h1>
+      </div>
+      <div class="hero-sub">
+        <span class="chip solid">31 LUG → 2 AGO 2026</span>
+        <span class="chip">CASTELFRANCO VENETO</span>
+        <span class="chip">MUSICA + CULTURA</span>
+      </div>
+    </div>
+
+    <div class="hero-bottom">
+      <div class="hint" id="hint">
+        <span class="pulse"></span>
+        <span class="mono">TRASCINA il canvas · CLICCA un nome</span>
+      </div>
+      <div class="stage-tools">
+        <button class="tool" id="zoomOut" title="Allontana" aria-label="Allontana">−</button>
+        <button class="tool" id="zoomIn" title="Avvicina" aria-label="Avvicina">+</button>
+        <button class="tool wide" id="recenter" title="Ricentra" aria-label="Ricentra">⟳ <span class="mono" style="font-size:11px">CENTRA</span></button>
+        <button class="tool wide" id="flipBtn" title="Capovolgi (tasto S)" aria-label="Capovolgi">S <span class="mono" style="font-size:11px">↑↓</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LINEAR fallback list (shown on mobile / no-JS) -->
+  <div class="linear" style="padding:26px">
+    <p class="sec-kicker" style="margin-bottom:14px">LINEUP 2026 · LISTA</p>
+    <ul style="list-style:none;display:flex;flex-direction:column;gap:10px">
+      <li class="display" style="font-size:1.8rem;border-bottom:2px solid var(--line);padding-bottom:8px">Generic Animal</li>
+      <li class="display" style="font-size:1.8rem;border-bottom:2px solid var(--line);padding-bottom:8px">Ex-Otago</li>
+      <li class="display" style="font-size:1.8rem;border-bottom:2px solid var(--line);padding-bottom:8px">Vendredi sur Mer</li>
+      <li class="display" style="font-size:1.8rem;border-bottom:2px solid var(--line);padding-bottom:8px">Alberto Ferrari</li>
+      <li class="display" style="font-size:1.8rem;border-bottom:2px solid var(--line);padding-bottom:8px">Auroro Borealo</li>
+      <li class="display" style="font-size:1.8rem;border-bottom:2px solid var(--line);padding-bottom:8px">Popa</li>
+      <li class="display" style="font-size:1.8rem;border-bottom:2px solid var(--line);padding-bottom:8px">Krano</li>
+      <li class="display" style="font-size:1.8rem;padding-bottom:8px">Jesse The Faccio</li>
+    </ul>
+  </div>
+</section>
+
+<!-- info-card popover (filled by JS) -->
+<div class="infocard" id="infocard" role="dialog" aria-label="Dettaglio artista">
+  <div class="ic-head">
+    <span class="ic-k">// ARTISTA</span>
+    <button class="ic-close" id="icClose" aria-label="Chiudi">×</button>
+  </div>
+  <div class="ic-body">
+    <h3 class="ic-name display" id="icName">—</h3>
+    <p class="ic-day" id="icDay">—</p>
+    <p class="ic-desc" id="icDesc"></p>
+    <div class="ic-links">
+      <a href="https://dice.fm" target="_blank" rel="noopener">Biglietti ↗</a>
+      <a href="#programma">Programma</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== LINEUP (readable board / index) ===== -->
+<section class="section" id="lineup">
+  <div class="sec-head">
+    <h2 class="sec-title display">La Festa<br>al completo</h2>
+    <span class="sec-kicker">// 08 ARTISTI · 03 GIORNI · TRASCINA SOPRA O LEGGI QUI</span>
+  </div>
+  <div class="board">
+    <div class="cell"><span class="cell-idx">01</span><span class="cell-name display">Generic Animal</span><span class="cell-meta">VEN 31 · HEADLINER</span></div>
+    <div class="cell"><span class="cell-idx">02</span><span class="cell-name display">Ex-Otago</span><span class="cell-meta">SAB 1 · HEADLINER</span></div>
+    <div class="cell"><span class="cell-idx">03</span><span class="cell-name display">Vendredi sur Mer</span><span class="cell-meta">DOM 2 · HEADLINER</span></div>
+    <div class="cell"><span class="cell-idx">04</span><span class="cell-name display">Alberto Ferrari</span><span class="cell-meta">VEN 31 · LIVE</span></div>
+    <div class="cell"><span class="cell-idx">05</span><span class="cell-name display">Auroro Borealo</span><span class="cell-meta">SAB 1 · LIVE</span></div>
+    <div class="cell"><span class="cell-idx">06</span><span class="cell-name display">Popa</span><span class="cell-meta">DOM 2 · DJ SET</span></div>
+    <div class="cell"><span class="cell-idx">07</span><span class="cell-name display">Krano</span><span class="cell-meta">VEN 31 · LIVE</span></div>
+    <div class="cell"><span class="cell-idx">08</span><span class="cell-name display">Jesse The Faccio</span><span class="cell-meta">SAB 1 · LIVE</span></div>
+  </div>
+</section>
+
+<!-- ===== PROGRAMMA / DATE ===== -->
+<section class="section" id="programma">
+  <div class="sec-head">
+    <h2 class="sec-title display">Tre Serate</h2>
+    <span class="sec-kicker">// GIARDINI DEL CASTELLO · CASTELFRANCO V.</span>
+  </div>
+  <div class="days">
+    <div class="day">
+      <span class="tag">VENERDÌ · LUGLIO</span>
+      <span class="d-num display">31</span>
+      <div class="d-row"><span class="d-when">APERTURA 18:00</span><span class="tag">DAY 01</span></div>
+      <p class="d-acts">Generic Animal · Alberto Ferrari · Krano · workshop &amp; talk</p>
+      <a class="d-tix" href="https://dice.fm" target="_blank" rel="noopener">Biglietti VEN ↗</a>
+    </div>
+    <div class="day">
+      <span class="tag">SABATO · AGOSTO</span>
+      <span class="d-num display">01</span>
+      <div class="d-row"><span class="d-when">APERTURA 17:00</span><span class="tag">DAY 02</span></div>
+      <p class="d-acts">Ex-Otago · Auroro Borealo · Jesse The Faccio · presentazioni libri</p>
+      <a class="d-tix" href="https://dice.fm" target="_blank" rel="noopener">Biglietti SAB ↗</a>
+    </div>
+    <div class="day">
+      <span class="tag">DOMENICA · AGOSTO</span>
+      <span class="d-num display">02</span>
+      <div class="d-row"><span class="d-when">BRUNCH 11:00</span><span class="tag">DAY 03</span></div>
+      <p class="d-acts">Vendredi sur Mer · Popa · brunch domenicale · workshop</p>
+      <a class="d-tix" href="https://dice.fm" target="_blank" rel="noopener">Biglietti DOM ↗</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ESPERIENZE ===== -->
+<section class="section" id="about">
+  <div class="sec-head">
+    <h2 class="sec-title display">Non solo<br>concerti</h2>
+    <span class="sec-kicker">// CAMBIA IL PUNTO DI VISTA · DAL 2017</span>
+  </div>
+  <div class="exp-wrap">
+    <div class="exp"><span class="e-k">// LAB</span><span class="e-t display">Workshop</span></div>
+    <div class="exp inv"><span class="e-k">// PAROLE</span><span class="e-t display">Talk &amp; incontri</span></div>
+    <div class="exp"><span class="e-k">// PAGINE</span><span class="e-t display">Presentazioni libri</span></div>
+    <div class="exp inv"><span class="e-k">// DOMENICA</span><span class="e-t display">Brunch al castello</span></div>
+    <div class="exp"><span class="e-k">// FAMIGLIE</span><span class="e-t display">Spazio bimbɜ</span></div>
+    <div class="exp inv"><span class="e-k">// CUCINA</span><span class="e-t display">Food &amp; drink locale</span></div>
+  </div>
+</section>
+
+<!-- ===== SPONSOR ===== -->
+<section class="section" id="info">
+  <div class="sec-head">
+    <h2 class="sec-title display">Con il<br>sostegno di</h2>
+    <span class="sec-kicker">// PARTNER 2026 · DIVENTA PARTNER → info@sottosopra.com</span>
+  </div>
+  <div class="sponsors">
+    <div class="sp">Azimut</div>
+    <div class="sp">Ceccato</div>
+    <div class="sp">Prodeco</div>
+    <div class="sp">CNA</div>
+    <div class="sp">Banca Terre Venete</div>
+  </div>
+</section>
+
+<!-- ===== CTA / NEWSLETTER ===== -->
+<section class="section" id="news" style="border-bottom:3px solid var(--line)">
+  <div class="cta-grid">
+    <div class="cta-card dark">
+      <span class="tag" style="color:#bdbdbd">// COMMUNITY</span>
+      <h3 class="cc-t display">Diventa<br>volontariɜ</h3>
+      <p>~80 persone fanno succedere Sottosopra ogni anno. Entra nella squadra: monta il palco, accogli, racconta la festa.</p>
+      <a class="btn-vol" href="mailto:info@sottosopra.com">Scrivici → info@sottosopra.com</a>
+    </div>
+    <div class="cta-card">
+      <span class="tag">// NEWSLETTER</span>
+      <h3 class="cc-t display">Resta nel<br>giro</h3>
+      <p>Lineup, orari, sorprese dell'8ª edizione. Niente spam, solo Sottosopra.</p>
+      <form class="nl-form" onsubmit="return false;">
+        <input type="email" placeholder="la-tua@email.com" aria-label="Email" />
+        <button type="submit"><span>Iscriviti</span></button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="foot">
+  <div class="foot-top">
+    <img src="/brand/sottosopra-logo-black.png" alt="SOTTOSOPRA" />
+    <span class="tag">CAMBIA IL PUNTO DI VISTA · 2017—2026</span>
+  </div>
+  <div class="foot-mark display">SOTTOSOP<span class="flip">RA</span></div>
+  <div class="foot-row">
+    <a href="mailto:info@sottosopra.com">info@sottosopra.com</a>
+    <a href="https://instagram.com/sottosoprafestival" target="_blank" rel="noopener">IG @sottosoprafestival</a>
+    <a href="#">Privacy</a>
+    <a href="#">Cookie</a>
+    <span>© SOTTOSOPRA APS · CASTELFRANCO VENETO</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var stage = document.getElementById("stage");
+  var world = document.getElementById("world");
+  if(!stage || !world) return;
+
+  // If mobile linear layout is active (world hidden), skip the physics engine.
+  var isMobile = function(){ return window.matchMedia("(max-width:760px)").matches; };
+
+  /* ---------- CAMERA (pan + zoom of the whole world) ---------- */
+  var cam = {x:0, y:0, scale:1};
+  // center the world so the headliners sit nicely in view
+  function defaultCam(){
+    cam.x = -60; cam.y = -40; cam.scale = 1;
+  }
+  defaultCam();
+
+  function applyCam(){
+    world.style.transform = "translate("+cam.x+"px,"+cam.y+"px) scale("+cam.scale+")";
+    world.style.transformOrigin = "0 0";
+  }
+  applyCam();
+
+  /* ---------- POINTER STATE ---------- */
+  var dragTile = null;          // currently grabbed tile
+  var panning = false;          // dragging the empty canvas
+  var last = {x:0, y:0};
+  var moved = false;
+  var tileStart = {x:0, y:0};   // tile position at grab
+  var tileVel = {x:0, y:0};     // for inertia
+  var lastT = 0;
+
+  function pointFromEvent(e){
+    if(e.touches && e.touches[0]) return {x:e.touches[0].clientX, y:e.touches[0].clientY};
+    return {x:e.clientX, y:e.clientY};
+  }
+
+  /* ---------- TILE position helpers (store in dataset for physics) ---------- */
+  var tiles = Array.prototype.slice.call(world.querySelectorAll(".tile"));
+  tiles.forEach(function(t){
+    t.dataset.x = parseFloat(t.style.left)||0;
+    t.dataset.y = parseFloat(t.style.top)||0;
+    t.style.left = "0px"; t.style.top = "0px";
+    t.dataset.vx = 0; t.dataset.vy = 0;
+    placeTile(t);
+  });
+  function placeTile(t){
+    t.style.transform = "translate("+t.dataset.x+"px,"+t.dataset.y+"px)";
+  }
+
+  /* ---------- INFO CARD ---------- */
+  var infocard = document.getElementById("infocard");
+  var icName = document.getElementById("icName");
+  var icDay = document.getElementById("icDay");
+  var icDesc = document.getElementById("icDesc");
+  var icClose = document.getElementById("icClose");
+  var descMap = {
+    "Generic Animal":"Il progetto solista di Luca Galizia: cantautorato indie dalla scrittura intima e i synth caldi. Headliner della serata d'apertura.",
+    "Ex-Otago":"Indie-pop genovese, ritornelli che restano addosso. Una delle band più amate della scena italiana, headliner del sabato.",
+    "Vendredi sur Mer":"Pop francese vellutato e notturno, voce parlata-cantata e groove eleganti. Chiude la festa la domenica.",
+    "Alberto Ferrari":"La voce dei Verdena in versione solista: rock viscerale e poesia ruvida.",
+    "Auroro Borealo":"Cantautorato surreale e ironico, uno show imprevedibile e teatrale.",
+    "Popa":"Elettronica da club e dj set per ballare fino a tardi sotto il castello.",
+    "Krano":"Hip-hop e parole affilate, energia live ad alto voltaggio.",
+    "Jesse The Faccio":"Songwriting fresco e diretto, una delle proposte emergenti dell'edizione."
+  };
+  var cardTimer = null;
+  function openCard(tile){
+    var name = tile.dataset.artist;
+    if(!name) return;
+    icName.textContent = name;
+    icDay.textContent = (tile.dataset.day||"") + (tile.dataset.tags ? "  ·  "+tile.dataset.tags : "");
+    icDesc.textContent = descMap[name] || "Live a Sottosopra 2026.";
+    infocard.classList.add("show");
+    // position near the tile, clamped to viewport
+    var r = tile.getBoundingClientRect();
+    var cw = 280, ch = infocard.offsetHeight || 230;
+    var x = r.left + r.width/2 - cw/2;
+    var y = r.bottom + 12;
+    if(y + ch > window.innerHeight - 12) y = r.top - ch - 12;
+    x = Math.max(12, Math.min(x, window.innerWidth - cw - 12));
+    y = Math.max(70, y);
+    infocard.style.left = x + "px";
+    infocard.style.top = y + "px";
+  }
+  function closeCard(){ infocard.classList.remove("show"); }
+  icClose.addEventListener("click", closeCard);
+  document.addEventListener("keydown", function(e){ if(e.key==="Escape") closeCard(); });
+
+  /* ---------- DRAG START ---------- */
+  function onDown(e){
+    if(isMobile()) return;
+    closeCard();
+    var target = e.target.closest ? e.target.closest(".tile") : null;
+    last = pointFromEvent(e);
+    moved = false;
+    lastT = performance.now();
+    if(target && world.contains(target)){
+      dragTile = target;
+      tileStart = {x:parseFloat(target.dataset.x), y:parseFloat(target.dataset.y)};
+      tileVel = {x:0,y:0};
+      target.classList.add("grabbed");
+      // bring to front
+      target.style.zIndex = 40;
+    } else {
+      panning = true;
+      stage.classList.add("dragging");
+    }
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    window.addEventListener("touchmove", onMove, {passive:false});
+    window.addEventListener("touchend", onUp);
+  }
+
+  function onMove(e){
+    var p = pointFromEvent(e);
+    var dx = p.x - last.x;
+    var dy = p.y - last.y;
+    if(Math.abs(dx)+Math.abs(dy) > 3) moved = true;
+    var now = performance.now();
+    var dt = Math.max(1, now - lastT);
+
+    if(dragTile){
+      if(e.cancelable) e.preventDefault();
+      var nx = parseFloat(dragTile.dataset.x) + dx/cam.scale;
+      var ny = parseFloat(dragTile.dataset.y) + dy/cam.scale;
+      dragTile.dataset.x = nx; dragTile.dataset.y = ny;
+      tileVel.x = (dx/cam.scale)/dt*16;
+      tileVel.y = (dy/cam.scale)/dt*16;
+      placeTile(dragTile);
+    } else if(panning){
+      if(e.cancelable) e.preventDefault();
+      cam.x += dx; cam.y += dy;
+      // record pan velocity for inertia
+      panVel.x = dx/dt*16; panVel.y = dy/dt*16;
+      applyCam();
+    }
+    last = p;
+    lastT = now;
+  }
+
+  var panVel = {x:0,y:0};
+  function onUp(){
+    if(dragTile){
+      dragTile.classList.remove("grabbed");
+      // hand off velocity to physics
+      dragTile.dataset.vx = clamp(tileVel.x, -40, 40);
+      dragTile.dataset.vy = clamp(tileVel.y, -40, 40);
+      var t = dragTile;
+      if(!moved){ openCard(t); }       // a click (no drag) → info card
+      dragTile = null;
+      // reset z after a beat
+      setTimeout(function(){ if(t) t.style.zIndex=""; }, 600);
+    } else if(panning){
+      panning = false;
+      stage.classList.remove("dragging");
+    }
+    window.removeEventListener("mousemove", onMove);
+    window.removeEventListener("mouseup", onUp);
+    window.removeEventListener("touchmove", onMove);
+    window.removeEventListener("touchend", onUp);
+  }
+
+  stage.addEventListener("mousedown", onDown);
+  stage.addEventListener("touchstart", onDown, {passive:true});
+
+  function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+
+  /* ---------- KEYBOARD a11y: enter on focused tile opens card ---------- */
+  tiles.forEach(function(t){
+    t.addEventListener("keydown", function(e){
+      if((e.key==="Enter"||e.key===" ") && t.dataset.artist){ e.preventDefault(); openCard(t); }
+    });
+  });
+
+  /* ---------- ZOOM / TOOLS ---------- */
+  function setScale(s){
+    var prev = cam.scale;
+    cam.scale = clamp(s, 0.5, 1.8);
+    // keep view roughly centered
+    var cx = window.innerWidth/2, cy = window.innerHeight/2;
+    cam.x = cx - (cx - cam.x) * (cam.scale/prev);
+    cam.y = cy - (cy - cam.y) * (cam.scale/prev);
+    applyCam();
+  }
+  document.getElementById("zoomIn").addEventListener("click", function(){ setScale(cam.scale*1.2); });
+  document.getElementById("zoomOut").addEventListener("click", function(){ setScale(cam.scale/1.2); });
+  document.getElementById("recenter").addEventListener("click", function(){
+    defaultCam(); applyCam();
+  });
+
+  // wheel to zoom on the stage (desktop nicety)
+  stage.addEventListener("wheel", function(e){
+    if(isMobile()) return;
+    if(e.ctrlKey || Math.abs(e.deltaY) > 0){
+      // only zoom when pointer is over the stage and not scrolling page past it
+      var r = stage.getBoundingClientRect();
+      if(e.clientY < r.bottom && e.clientY > r.top){
+        e.preventDefault();
+        setScale(cam.scale * (e.deltaY < 0 ? 1.08 : 0.92));
+      }
+    }
+  }, {passive:false});
+
+  /* ---------- SOTTOSOPRA FLIP (tasto S) ---------- */
+  var flipped = false;
+  function toggleFlip(){
+    flipped = !flipped;
+    document.body.style.transition = reduce ? "none" : "transform .6s cubic-bezier(.7,0,.3,1)";
+    document.body.style.transformOrigin = "center center";
+    document.body.style.transform = flipped ? "rotate(180deg)" : "";
+  }
+  document.getElementById("flipBtn").addEventListener("click", toggleFlip);
+  document.addEventListener("keydown", function(e){
+    if((e.key==="s"||e.key==="S") && !/input|textarea/i.test((e.target.tagName||""))){
+      toggleFlip();
+    }
+  });
+
+  /* ---------- PHYSICS LOOP (inertia + soft bounds + collisions) ---------- */
+  // Static "info satellite" tiles do not move under physics.
+  var bodies = tiles.filter(function(t){ return t.dataset.static !== "1"; });
+  // world bounds (soft): tiles drift back if thrown too far
+  var BOUND = {minx:-300, miny:-200, maxx:1500, maxy:1000};
+
+  function step(){
+    if(reduce){ return; } // reduced motion → no physics, tiles stay where placed
+    if(!isMobile() && !dragTile){
+      // pan inertia
+      if(!panning){
+        if(Math.abs(panVel.x)>0.05 || Math.abs(panVel.y)>0.05){
+          cam.x += panVel.x; cam.y += panVel.y;
+          panVel.x *= 0.92; panVel.y *= 0.92;
+          applyCam();
+        }
+      }
+      // tile inertia
+      bodies.forEach(function(t){
+        if(t === dragTile) return;
+        var vx = parseFloat(t.dataset.vx)||0;
+        var vy = parseFloat(t.dataset.vy)||0;
+        if(Math.abs(vx)<0.05 && Math.abs(vy)<0.05) return;
+        var x = parseFloat(t.dataset.x) + vx;
+        var y = parseFloat(t.dataset.y) + vy;
+        // soft bounds bounce
+        if(x < BOUND.minx){ x = BOUND.minx; vx = -vx*0.5; }
+        if(x > BOUND.maxx){ x = BOUND.maxx; vx = -vx*0.5; }
+        if(y < BOUND.miny){ y = BOUND.miny; vy = -vy*0.5; }
+        if(y > BOUND.maxy){ y = BOUND.maxy; vy = -vy*0.5; }
+        vx *= 0.93; vy *= 0.93; // friction
+        t.dataset.x = x; t.dataset.y = y;
+        t.dataset.vx = vx; t.dataset.vy = vy;
+        placeTile(t);
+      });
+      // simple separation between nearby bodies (light "domino" collision)
+      for(var i=0;i<bodies.length;i++){
+        for(var j=i+1;j<bodies.length;j++){
+          var a=bodies[i], b=bodies[j];
+          if(a===dragTile||b===dragTile) continue;
+          var ax=parseFloat(a.dataset.x), ay=parseFloat(a.dataset.y);
+          var bx=parseFloat(b.dataset.x), by=parseFloat(b.dataset.y);
+          var ddx=bx-ax, ddy=by-ay;
+          var dist=Math.sqrt(ddx*ddx+ddy*ddy);
+          var minD=170;
+          if(dist>0 && dist<minD){
+            var push=(minD-dist)/dist*0.18;
+            a.dataset.x = ax - ddx*push; a.dataset.y = ay - ddy*push;
+            b.dataset.x = bx + ddx*push; b.dataset.y = by + ddy*push;
+            placeTile(a); placeTile(b);
+          }
+        }
+      }
+    }
+    raf = requestAnimationFrame(step);
+  }
+  var raf = requestAnimationFrame(step);
+
+  // hide the hint after first interaction
+  var hint = document.getElementById("hint");
+  stage.addEventListener("mousedown", function once(){
+    if(hint){ hint.style.opacity = "0"; hint.style.transition="opacity .4s ease"; }
+    stage.removeEventListener("mousedown", once);
+  });
+})();
+</script>
+</body>
+</html>

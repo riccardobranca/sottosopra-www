@@ -1,0 +1,1049 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SOTTOSOPRA 2026 — SEMPRE SOTTOSOPRA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+@font-face{
+  font-family:"SoSo26";
+  src:url("/fonts/SoSo26.woff") format("woff");
+  font-weight:400 900;
+  font-display:swap;
+}
+
+:root{
+  --black:#000;
+  --c1:#262626;
+  --muted:#6B6B6B;
+  --line:#E4E4E4;
+  --elev:#F4F4F4;
+  --white:#fff;
+
+  --bg:var(--white);
+  --fg:var(--black);
+
+  --gut:clamp(16px,4vw,56px);
+  --hair:1px;
+
+  --display:"SoSo26","Arial Narrow",system-ui,sans-serif;
+  --ss:"ss07","ss08","liga","calt";
+  --body:"Inter",system-ui,-apple-system,sans-serif;
+
+  --np-h:60px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg);
+  color:var(--fg);
+  font-family:var(--body);
+  font-size:17px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+
+.disp{
+  font-family:var(--display);
+  font-feature-settings:var(--ss);
+  font-weight:900;
+  line-height:.9;
+  letter-spacing:-.01em;
+  text-transform:uppercase;
+}
+.eyebrow{
+  font-family:var(--body);
+  font-size:.72rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.18em;
+}
+.tag{
+  font-family:var(--body);
+  font-size:.7rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.14em;
+  color:var(--muted);
+}
+
+/* focus visible everywhere */
+a:focus-visible,button:focus-visible,input:focus-visible,.dayrow:focus-visible{
+  outline:2px solid var(--fg);outline-offset:3px;
+}
+
+/* skip link */
+.skip{
+  position:absolute;left:-9999px;top:0;z-index:500;
+  background:var(--fg);color:var(--bg);
+  padding:12px 18px;font-size:.85rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;
+}
+.skip:focus{left:0}
+
+/* ===================== HEADER ===================== */
+.site-head{
+  position:sticky;top:0;z-index:200;
+  background:var(--bg);
+  border-bottom:var(--hair) solid var(--fg);
+}
+.head-row{display:flex;align-items:stretch;height:56px}
+.head-logo{
+  display:flex;align-items:center;
+  padding:0 var(--gut);
+  border-right:var(--hair) solid var(--line);
+  flex:0 0 auto;
+}
+.head-logo img{height:17px;width:auto}
+
+.head-nav{display:flex;align-items:center;flex:1 1 auto}
+.head-nav a{
+  padding:0 clamp(14px,1.6vw,24px);
+  height:100%;display:flex;align-items:center;
+  font-size:.8rem;font-weight:500;
+  text-transform:uppercase;letter-spacing:.06em;
+  border-right:var(--hair) solid var(--line);
+  transition:background .2s ease,color .2s ease;
+}
+.head-nav a:hover{background:var(--fg);color:var(--bg)}
+.head-spacer{flex:1 1 auto}
+
+.btn-tickets{
+  flex:0 0 auto;
+  display:flex;align-items:center;gap:10px;
+  padding:0 clamp(18px,2.4vw,32px);
+  background:var(--fg);color:var(--bg);
+  font-size:.82rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;
+  transition:opacity .2s ease;
+}
+.btn-tickets:hover{opacity:.78}
+.btn-tickets .arr{font-family:var(--display);font-feature-settings:var(--ss);font-weight:900;font-size:1rem}
+
+/* burger — mobile only */
+.head-burger{
+  display:none;
+  flex:0 0 auto;width:56px;
+  align-items:center;justify-content:center;
+  background:var(--bg);color:var(--fg);border:none;
+  border-left:var(--hair) solid var(--line);
+}
+.head-burger svg{width:22px;height:22px;display:block}
+.head-burger .ic-close{display:none}
+
+/* mobile full-screen drawer */
+.drawer{
+  position:fixed;inset:0;z-index:190;
+  background:var(--bg);
+  display:flex;flex-direction:column;
+  padding:80px var(--gut) calc(40px + env(safe-area-inset-bottom));
+  transform:translateY(-100%);
+  transition:transform .35s cubic-bezier(.4,0,.2,1);
+  visibility:hidden;
+  overflow-y:auto;
+}
+.drawer.open{transform:translateY(0);visibility:visible}
+.drawer a.dnav{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;font-size:clamp(2.6rem,13vw,4rem);
+  line-height:1.05;text-transform:uppercase;
+  padding:8px 0;border-bottom:var(--hair) solid var(--line);
+}
+.drawer .dflip{
+  margin-top:18px;align-self:flex-start;
+  border:var(--hair) solid var(--fg);background:transparent;color:var(--fg);
+  padding:12px 18px;min-height:48px;
+  font-family:var(--body);font-weight:700;font-size:.78rem;
+  text-transform:uppercase;letter-spacing:.1em;
+}
+.drawer .dmeta{
+  margin-top:auto;padding-top:32px;
+  font-size:.85rem;color:var(--muted);line-height:1.8;
+  text-transform:uppercase;letter-spacing:.04em;
+}
+.drawer .dmeta a{color:var(--fg);font-weight:600}
+
+/* ===================== HERO — CLAIM SPINE + DATE COLUMN ===================== */
+.hero{
+  display:grid;
+  grid-template-columns:minmax(220px,0.92fr) 1.4fr;
+  border-bottom:var(--hair) solid var(--fg);
+}
+
+/* LEFT — vertical claim spine */
+.spine{
+  position:relative;
+  border-right:var(--hair) solid var(--fg);
+  display:flex;flex-direction:column;
+  padding:clamp(18px,2vw,28px) clamp(14px,2vw,30px);
+  overflow:hidden;
+}
+.spine .sp-edition{
+  font-family:var(--body);font-weight:700;
+  font-size:.68rem;text-transform:uppercase;letter-spacing:.2em;
+  color:var(--muted);
+}
+.spine-claim{
+  flex:1 1 auto;
+  display:flex;align-items:center;justify-content:center;
+}
+.spine-claim .ttl{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;line-height:.86;letter-spacing:-.03em;
+  text-transform:uppercase;text-align:center;
+  white-space:nowrap;
+}
+.spine-claim .l1{
+  display:block;
+  font-size:clamp(2.6rem,10vw,7rem);
+  color:var(--muted);
+}
+.spine-claim .l2{
+  display:block;
+  font-size:clamp(3rem,11.5vw,8.4rem);
+}
+.spine .sp-foot{
+  font-family:var(--body);font-weight:700;
+  font-size:.66rem;text-transform:uppercase;letter-spacing:.14em;
+  color:var(--muted);line-height:1.7;
+}
+.spine .sp-foot b{color:var(--fg)}
+
+/* the photographic seam accent */
+.spine::after{
+  content:"";position:absolute;top:0;bottom:0;right:0;width:8px;
+  background:url("/media/garden-day.jpg") center/cover no-repeat;
+  filter:grayscale(1) contrast(1.05);opacity:.85;
+}
+
+/* RIGHT — the 4 dates: MONSTER, dominant */
+.datecol{
+  display:flex;flex-direction:column;
+  background:var(--bg);
+}
+.datecol .dc-head{
+  padding:13px var(--gut);
+  border-bottom:var(--hair) solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.datecol .dc-head .eyebrow{color:var(--muted)}
+
+.dayrow{
+  flex:1 1 0;min-height:0;
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:clamp(14px,2vw,28px);
+  padding:clamp(12px,1.6vw,20px) var(--gut);
+  border-bottom:var(--hair) solid var(--line);
+  transition:background .2s ease,color .2s ease;
+}
+.dayrow:last-of-type{border-bottom:none}
+.dayrow:hover,.dayrow:focus-visible{background:var(--fg);color:var(--bg)}
+.dayrow:hover .dr-acts,.dayrow:focus-visible .dr-acts{color:rgba(255,255,255,.82)}
+.dayrow:hover .dr-dow,.dayrow:focus-visible .dr-dow{color:rgba(255,255,255,.7)}
+.dayrow:hover .dr-mon,.dayrow:focus-visible .dr-mon{color:rgba(255,255,255,.7)}
+
+.dr-num{display:flex;flex-direction:column;align-items:flex-start;line-height:.8}
+.dr-dow{
+  font-family:var(--body);font-weight:700;
+  font-size:.62rem;text-transform:uppercase;letter-spacing:.16em;
+  color:var(--muted);margin-bottom:3px;
+}
+.dr-day{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;font-size:clamp(3rem,7vw,6rem);line-height:.78;
+  letter-spacing:-.04em;
+}
+.dr-mon{
+  font-family:var(--body);font-weight:700;
+  font-size:.6rem;text-transform:uppercase;letter-spacing:.18em;
+  color:var(--muted);margin-top:4px;
+}
+.dr-acts{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;text-transform:uppercase;
+  font-size:clamp(.95rem,1.55vw,1.5rem);line-height:1.04;
+  letter-spacing:-.005em;
+  min-width:0;
+}
+.dr-acts .sep{color:var(--muted);padding:0 .12em}
+.dayrow:hover .dr-acts .sep,.dayrow:focus-visible .dr-acts .sep{color:rgba(255,255,255,.55)}
+.dr-cta{
+  font-family:var(--body);font-weight:700;
+  font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;
+  white-space:nowrap;display:inline-flex;align-items:center;gap:6px;
+  border:var(--hair) solid currentColor;padding:10px 14px;min-height:44px;
+  justify-self:end;
+}
+.dr-cta.free{background:var(--fg);color:var(--bg)}
+.dayrow:hover .dr-cta.free,.dayrow:focus-visible .dr-cta.free{background:var(--bg);color:var(--fg)}
+.dr-cta .arr{font-family:var(--display);font-feature-settings:var(--ss);font-weight:900;font-size:.85rem}
+
+/* ===================== MARQUEE ===================== */
+.marquee{
+  border-bottom:var(--hair) solid var(--fg);
+  overflow:hidden;background:var(--fg);color:var(--bg);
+  padding:13px 0;
+}
+.marquee-track{
+  display:flex;width:max-content;
+  animation:scroll 30s linear infinite;
+  will-change:transform;
+}
+.marquee:hover .marquee-track{animation-play-state:paused}
+.marquee span{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;font-size:clamp(1.4rem,3vw,2.4rem);
+  letter-spacing:.06em;white-space:nowrap;padding:0 .35em;
+  text-transform:uppercase;
+}
+.marquee .dot{font-size:.9rem;align-self:center;opacity:.5}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ===================== SECTION TAG ===================== */
+.section-tag{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:clamp(16px,2vw,24px) var(--gut);
+  border-bottom:var(--hair) solid var(--fg);gap:16px;
+}
+.section-tag .st-l{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;font-size:clamp(1.6rem,4vw,3rem);line-height:.9;
+  text-transform:uppercase;
+}
+
+/* ===================== LINEUP TEASER ===================== */
+.lineup{border-bottom:var(--hair) solid var(--fg)}
+.day-block{border-bottom:var(--hair) solid var(--line)}
+.day-block:last-child{border-bottom:none}
+.day-head{
+  display:flex;align-items:baseline;gap:14px;
+  padding:clamp(16px,2vw,22px) var(--gut) 6px;
+}
+.day-head .dh-day{
+  font-family:var(--body);font-weight:700;
+  font-size:.74rem;text-transform:uppercase;letter-spacing:.16em;
+}
+.day-head .dh-tag{
+  font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;
+}
+.acts{padding:0 var(--gut) clamp(14px,1.8vw,20px)}
+.acts a{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;font-size:clamp(1.6rem,4.4vw,3rem);line-height:1.05;
+  letter-spacing:-.01em;text-transform:uppercase;
+  display:inline;transition:background .15s ease,color .15s ease;
+}
+.acts a:hover{background:var(--fg);color:var(--bg)}
+.acts .sep{color:var(--muted);font-weight:900;padding:0 .14em;
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-size:clamp(1.6rem,4.4vw,3rem);}
+.acts .role{
+  font-family:var(--body);font-weight:500;font-size:.74rem;
+  color:var(--muted);letter-spacing:.04em;text-transform:uppercase;
+  vertical-align:middle;
+}
+.lineup-more{display:flex;justify-content:flex-end;padding:clamp(16px,2vw,24px) var(--gut)}
+.lineup-more a{
+  display:inline-flex;align-items:center;gap:8px;min-height:44px;
+  font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+  border-bottom:var(--hair) solid var(--fg);
+}
+.lineup-more a:hover{background:var(--fg);color:var(--bg)}
+
+/* ===================== EXPERIENCES ===================== */
+.exp-row{
+  padding:clamp(24px,3.6vw,52px) var(--gut);
+  border-bottom:var(--hair) solid var(--fg);
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;font-size:clamp(1.5rem,3.6vw,2.8rem);line-height:1.1;
+  text-transform:uppercase;max-width:26ch;
+}
+.exp-row .dim{color:var(--muted)}
+
+/* ===================== PARTNER — 3 overlapping marquees ===================== */
+.partners{border-bottom:var(--hair) solid var(--fg)}
+.partners .p-head{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:clamp(16px,2vw,24px) var(--gut);
+  border-bottom:var(--hair) solid var(--line);
+}
+.partners .p-head .st-l{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;font-size:clamp(1.6rem,4vw,3rem);line-height:.9;text-transform:uppercase;
+}
+.p-tier{
+  position:relative;
+  border-bottom:var(--hair) solid var(--line);
+  overflow:hidden;
+  display:flex;align-items:center;
+}
+.p-tier .p-label{
+  flex:0 0 auto;z-index:2;
+  align-self:stretch;display:flex;align-items:center;
+  padding:0 16px;
+  background:var(--bg);
+  border-right:var(--hair) solid var(--fg);
+  font-family:var(--body);font-weight:700;
+  font-size:.62rem;text-transform:uppercase;letter-spacing:.14em;
+  color:var(--muted);white-space:nowrap;
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  text-align:center;
+}
+.p-flow{flex:1 1 auto;overflow:hidden}
+.p-track{display:flex;width:max-content;align-items:center;will-change:transform}
+.p-track.t1{animation:scroll 38s linear infinite;padding:clamp(18px,2.4vw,28px) 0}
+.p-track.t2{animation:scroll 32s linear infinite;padding:clamp(14px,1.8vw,20px) 0}
+.p-track.t3{animation:scroll 26s linear infinite;padding:clamp(10px,1.4vw,16px) 0}
+.p-tier:hover .p-track,.p-tier:focus-within .p-track{animation-play-state:paused}
+
+/* logo placeholder chips, monochrome, bordered */
+.chip{
+  flex:0 0 auto;
+  display:inline-flex;align-items:center;justify-content:center;
+  border:var(--hair) solid var(--fg);
+  color:var(--fg);
+  font-family:var(--body);font-weight:700;
+  text-transform:uppercase;letter-spacing:.04em;
+  white-space:nowrap;
+  transition:background .2s ease,color .2s ease;
+}
+.chip:hover,.chip:focus-visible{background:var(--fg);color:var(--bg)}
+.t1 .chip{margin:0 clamp(14px,1.4vw,22px);padding:18px 30px;font-size:1.05rem;letter-spacing:.06em}
+.t2 .chip{margin:0 clamp(12px,1.1vw,18px);padding:13px 22px;font-size:.85rem}
+.t3 .chip{margin:0 clamp(9px,.9vw,14px);padding:9px 16px;font-size:.72rem;color:var(--muted);border-color:var(--line)}
+.t3 .chip:hover,.t3 .chip:focus-visible{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+
+.partners-foot{
+  padding:clamp(18px,2.4vw,28px) var(--gut);
+  font-size:.92rem;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.04em;font-weight:500;
+}
+.partners-foot a{color:var(--fg);font-weight:700;border-bottom:var(--hair) solid var(--fg);padding-bottom:2px}
+.partners-foot a:hover{background:var(--fg);color:var(--bg)}
+
+/* ===================== PARTECIPA ===================== */
+.cta-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  border-bottom:var(--hair) solid var(--fg);
+}
+.cta-cell{padding:clamp(28px,4vw,56px) var(--gut)}
+.cta-cell:first-child{border-right:var(--hair) solid var(--fg)}
+.cta-cell .eyebrow{color:var(--muted);display:block;margin-bottom:16px}
+.cta-cell h3{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;font-size:clamp(1.9rem,3.6vw,3rem);line-height:.92;
+  text-transform:uppercase;margin-bottom:14px;
+}
+.cta-cell p{font-size:.95rem;color:var(--muted);margin-bottom:22px;max-width:36ch;
+  text-transform:uppercase;letter-spacing:.02em;}
+.cta-link{
+  display:inline-flex;align-items:center;gap:10px;
+  border:var(--hair) solid var(--fg);
+  padding:14px 22px;font-size:.82rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;min-height:48px;
+  transition:background .2s ease,color .2s ease;
+}
+.cta-link:hover{background:var(--fg);color:var(--bg)}
+.cta-link .arr{font-family:var(--display);font-feature-settings:var(--ss);font-weight:900}
+
+.nl-form{display:flex;border:var(--hair) solid var(--fg);max-width:460px}
+.nl-form input{
+  flex:1 1 auto;border:none;background:transparent;color:var(--fg);
+  padding:15px 16px;font-family:var(--body);font-size:16px;outline:none;min-width:0;
+}
+.nl-form input::placeholder{color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.nl-form button{
+  flex:0 0 auto;border:none;border-left:var(--hair) solid var(--fg);
+  background:var(--fg);color:var(--bg);
+  padding:0 22px;font-size:.78rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.1em;min-height:48px;
+  transition:opacity .2s ease;
+}
+.nl-form button:hover{opacity:.8}
+.nl-consent{
+  display:flex;align-items:flex-start;gap:10px;margin-top:16px;
+  font-size:.78rem;color:var(--muted);line-height:1.45;max-width:42ch;
+}
+.nl-consent input{margin-top:2px;width:18px;height:18px;flex:0 0 auto;accent-color:var(--fg)}
+.nl-consent a{color:var(--fg);text-decoration:underline;text-underline-offset:2px}
+
+/* ===================== FOOTER ===================== */
+.site-foot{background:var(--fg);color:var(--bg)}
+.foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr}
+.foot-cell{
+  padding:clamp(28px,4vw,52px) var(--gut);
+  border-left:var(--hair) solid rgba(255,255,255,.18);
+}
+.foot-cell:first-child{border-left:none}
+.foot-cell .big{
+  font-family:var(--display);font-feature-settings:var(--ss);
+  font-weight:900;font-size:clamp(2rem,5.5vw,4rem);line-height:.86;
+  letter-spacing:-.01em;text-transform:uppercase;
+}
+.foot-cell .eyebrow{opacity:.6;display:block;margin-bottom:16px}
+.foot-cell a{display:block;padding:5px 0;font-size:.9rem;opacity:.85;
+  text-transform:uppercase;letter-spacing:.04em;font-weight:500;}
+.foot-cell a:hover{opacity:1;text-decoration:underline;text-underline-offset:3px}
+.foot-cell .tk{
+  display:inline-flex;align-items:center;gap:8px;margin-top:10px;
+  opacity:1;font-weight:700;border-bottom:1px solid rgba(255,255,255,.5);padding-bottom:2px;
+}
+.foot-foot{
+  display:flex;justify-content:space-between;align-items:center;gap:16px;
+  padding:16px var(--gut);
+  border-top:var(--hair) solid rgba(255,255,255,.18);
+  font-size:.7rem;letter-spacing:.06em;opacity:.78;flex-wrap:wrap;
+  text-transform:uppercase;font-weight:600;
+}
+.foot-foot img{height:14px;width:auto;opacity:.9}
+.foot-foot .ll a{display:inline;margin-left:14px;opacity:.75}
+.foot-foot .ll a:hover{opacity:1}
+
+/* ===================== NOW PLAYING BAR ===================== */
+.np-bar{
+  position:fixed;left:0;right:0;bottom:0;z-index:80;height:var(--np-h);
+  background:var(--fg);color:var(--bg);
+  display:flex;align-items:center;
+  border-top:var(--hair) solid var(--fg);
+}
+.np-bar .np-id{
+  display:flex;align-items:center;gap:12px;padding:0 16px;flex:0 0 auto;
+  border-right:var(--hair) solid rgba(255,255,255,.4);height:100%;
+}
+.np-bar .np-cover{
+  width:32px;height:32px;flex:none;position:relative;overflow:hidden;
+  border:1px solid var(--bg);
+  background:repeating-linear-gradient(45deg,var(--bg) 0 3px,transparent 3px 6px);
+}
+.np-bar .np-eq{display:flex;align-items:flex-end;gap:2px;height:16px}
+.np-bar .np-eq i{width:3px;background:var(--bg);height:40%;animation:eq .9s ease-in-out infinite}
+.np-bar .np-eq i:nth-child(2){animation-delay:.2s}
+.np-bar .np-eq i:nth-child(3){animation-delay:.45s}
+.np-bar .np-eq i:nth-child(4){animation-delay:.1s}
+@keyframes eq{0%,100%{height:30%}50%{height:100%}}
+.np-bar .np-label{
+  font-family:var(--body);font-size:.62rem;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;white-space:nowrap;
+}
+.np-bar .np-feed{flex:1 1 auto;overflow:hidden;white-space:nowrap;height:100%;display:flex;align-items:center}
+.np-bar .np-feed .np-track{display:inline-flex;will-change:transform;animation:scroll-l 40s linear infinite}
+.np-bar:hover .np-feed .np-track{animation-play-state:paused}
+.np-bar .np-feed .np-track span{
+  font-family:var(--body);font-size:.78rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  padding:0 20px;display:inline-flex;align-items:center;gap:18px;white-space:nowrap;
+}
+.np-bar .np-feed .np-track .dot{opacity:.5}
+@keyframes scroll-l{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.np-bar .np-spotify{
+  flex:0 0 auto;padding:0 16px;height:100%;display:flex;align-items:center;gap:8px;
+  border-left:var(--hair) solid rgba(255,255,255,.4);
+  font-family:var(--body);font-size:.72rem;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;
+  transition:opacity .2s ease;
+}
+.np-bar .np-spotify:hover{opacity:.78}
+.np-bar .np-spotify .arr{font-family:var(--display);font-feature-settings:var(--ss);font-weight:900}
+.np-bar .np-spotify .sp-short{display:none}
+
+/* ===================== STICKY BOTTOM CTA (mobile only) ===================== */
+.sticky-cta{
+  display:none;
+  position:fixed;left:0;right:0;bottom:0;z-index:180;
+  background:var(--bg);
+  border-top:var(--hair) solid var(--fg);
+  padding:10px var(--gut) calc(10px + env(safe-area-inset-bottom));
+  gap:10px;
+}
+.sticky-cta a{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  min-height:50px;font-weight:700;font-size:.85rem;
+  text-transform:uppercase;letter-spacing:.08em;
+}
+.sticky-cta .sc-tickets{flex:1 1 auto;background:var(--fg);color:var(--bg)}
+.sticky-cta .sc-prog{
+  flex:0 0 auto;padding:0 20px;border:var(--hair) solid var(--fg);color:var(--fg);
+}
+.sticky-cta .arr{font-family:var(--display);font-feature-settings:var(--ss);font-weight:900}
+body.drawer-open .sticky-cta{display:none !important}
+
+/* ===================== RESPONSIVE ===================== */
+@media(min-width:761px){
+  /* desktop: leave room under fixed now-playing bar */
+  body{padding-bottom:var(--np-h)}
+}
+
+@media(max-width:920px){
+  .head-nav{display:none}
+  .head-spacer{display:none}
+  .head-burger{display:flex}
+  .cta-grid{grid-template-columns:1fr}
+  .cta-cell:first-child{border-right:none;border-bottom:var(--hair) solid var(--fg)}
+  .foot-grid{grid-template-columns:1fr}
+  .foot-cell{border-left:none;border-top:var(--hair) solid rgba(255,255,255,.18)}
+  .foot-cell:first-child{border-top:none}
+}
+
+@media(max-width:760px){
+  body{font-size:16px;padding-bottom:74px}
+  .sticky-cta{display:flex}
+
+  /* hero stacks: claim band on top (horizontal), then the dominant date column */
+  .hero{grid-template-columns:1fr}
+
+  .spine{
+    border-right:none;border-bottom:var(--hair) solid var(--fg);
+    flex-direction:column;
+    padding:16px var(--gut) 14px;
+    gap:8px;
+  }
+  .spine::after{display:none}
+  .spine-claim{display:block}
+  .spine-claim .ttl{text-align:left}
+  .spine-claim .l1{font-size:clamp(2.4rem,13vw,4rem)}
+  .spine-claim .l2{font-size:clamp(2.9rem,16vw,5rem)}
+  .spine .sp-row{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+
+  /* DATES: height from content, no flex stretch — kills the overlap bug */
+  .datecol .dc-head{padding-top:11px;padding-bottom:11px}
+  .dayrow{
+    flex:none;min-height:0;height:auto;
+    grid-template-columns:auto 1fr;
+    grid-template-areas:"num cta" "acts acts";
+    gap:8px 14px;
+    padding:14px var(--gut);
+    align-items:center;
+  }
+  .dr-num{grid-area:num}
+  .dr-cta{grid-area:cta;align-self:start}
+  .dr-acts{grid-area:acts;font-size:1.1rem;line-height:1.06}
+  .dr-day{font-size:clamp(2.6rem,15vw,4.2rem)}
+
+  /* lineup acts stack one per row */
+  .acts a{display:block}
+  .acts .sep{display:none}
+  .acts a:not(:last-child){margin-bottom:2px}
+
+  /* now-playing becomes a static strip just above the footer (not fixed) */
+  .np-bar{
+    position:static;height:auto;flex-wrap:wrap;
+    border-top:var(--hair) solid var(--fg);
+  }
+  .np-bar .np-id{width:100%;padding:10px 16px;border-right:none;border-bottom:var(--hair) solid rgba(255,255,255,.3)}
+  .np-bar .np-feed{width:auto;flex:1 1 auto;min-width:0;height:44px}
+  .np-bar .np-spotify .sp-full{display:none}
+  .np-bar .np-spotify .sp-short{display:inline}
+}
+
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .marquee-track,.p-track,.np-track{animation:none !important}
+  .marquee-track{flex-wrap:wrap;width:100%}
+  .marquee-track > *:nth-child(n+9){display:none}
+  .np-eq i{animation:none !important;height:60%}
+  .drawer{transition:none}
+}
+</style>
+</head>
+<body data-theme="light">
+
+<a class="skip" href="#main">Salta al contenuto</a>
+
+<!-- ===================== HEADER ===================== -->
+<header class="site-head">
+  <div class="head-row">
+    <a class="head-logo" href="/" aria-label="Sottosopra — home">
+      <img src="/brand/sottosopra-logo-black.png" alt="Sottosopra">
+    </a>
+    <nav class="head-nav" aria-label="Principale">
+      <a href="/programma">Programma</a>
+      <a href="/info">Info</a>
+      <a href="/about">About</a>
+      <a href="/news">News</a>
+    </nav>
+    <span class="head-spacer"></span>
+    <a class="btn-tickets" href="https://dice.fm/sottosopra?utm_source=sito&utm_medium=header" target="_blank" rel="noopener">Biglietti <span class="arr">↗</span></a>
+    <button class="head-burger" id="burger" aria-label="Apri menu" aria-expanded="false" aria-controls="drawer">
+      <svg class="ic-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="21" y2="17"/></svg>
+      <svg class="ic-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- mobile full-screen drawer -->
+<nav class="drawer" id="drawer" aria-label="Menu mobile">
+  <a class="dnav" href="/programma">Programma</a>
+  <a class="dnav" href="/info">Info</a>
+  <a class="dnav" href="/about">About</a>
+  <a class="dnav" href="/news">News</a>
+  <button class="dflip" id="dflip" type="button" aria-pressed="false">Capovolgi ⤓</button>
+  <div class="dmeta">
+    30 Lug — 2 Ago 2026<br>
+    <a href="/">Giardini del Castello · Castelfranco Veneto</a><br>
+    <a href="mailto:info@sottosopra.com">info@sottosopra.com</a>
+  </div>
+</nav>
+
+<main id="main">
+
+<!-- ===================== HERO — CLAIM SPINE + DATE COLUMN ===================== -->
+<section class="hero" aria-label="Edizione 2026">
+
+  <!-- LEFT: the claim, imposing but as a spine -->
+  <div class="spine">
+    <div class="sp-edition">8ª Edizione</div>
+    <div class="spine-claim">
+      <h1 class="ttl">
+        <span class="l1 flipS">SEMPRE</span>
+        <span class="l2 flipS">SOTTOSOPRA</span>
+      </h1>
+    </div>
+    <div class="sp-row">
+      <div class="sp-foot"><b>GIARDINI DEL CASTELLO</b><br>CASTELFRANCO VENETO</div>
+      <div class="sp-foot" style="text-align:right">CAMBIA<br>IL PUNTO<br>DI VISTA</div>
+    </div>
+  </div>
+
+  <!-- RIGHT: the 4 dates — MONSTER, dominant, each a ticket link -->
+  <div class="datecol">
+    <div class="dc-head">
+      <span class="eyebrow">4 Giornate · Biglietti</span>
+      <span class="tag">30 Lug — 2 Ago ’26</span>
+    </div>
+
+    <a class="dayrow" href="https://dice.fm/sottosopra-giovedi-free?utm_source=sito&utm_medium=home&utm_campaign=giovedi-free" target="_blank" rel="noopener" aria-label="Giovedì 30 luglio, gratis — iscriviti">
+      <span class="dr-num">
+        <span class="dr-dow">Gio</span>
+        <span class="dr-day flipS">30</span>
+        <span class="dr-mon">Luglio</span>
+      </span>
+      <span class="dr-acts">ADRIAN FARTADE <span class="sep">/</span> TALK</span>
+      <span class="dr-cta free">Free <span class="arr">↗</span></span>
+    </a>
+
+    <a class="dayrow" href="https://dice.fm/sottosopra?utm_source=sito&utm_medium=home&utm_campaign=venerdi" target="_blank" rel="noopener" aria-label="Venerdì 31 luglio — biglietti">
+      <span class="dr-num">
+        <span class="dr-dow">Ven</span>
+        <span class="dr-day flipS">31</span>
+        <span class="dr-mon">Luglio</span>
+      </span>
+      <span class="dr-acts">GENERIC ANIMAL <span class="sep">·</span> DEGHEIO <span class="sep">·</span> KRANO <span class="sep">·</span> CAVALLI MONGOLI</span>
+      <span class="dr-cta">Biglietti <span class="arr">↗</span></span>
+    </a>
+
+    <a class="dayrow" href="https://dice.fm/sottosopra?utm_source=sito&utm_medium=home&utm_campaign=sabato" target="_blank" rel="noopener" aria-label="Sabato 1 agosto — biglietti">
+      <span class="dr-num">
+        <span class="dr-dow">Sab</span>
+        <span class="dr-day flipS">01</span>
+        <span class="dr-mon">Agosto</span>
+      </span>
+      <span class="dr-acts">POPA <span class="sep">·</span> VENDREDI SUR MER <span class="sep">·</span> FACCIANUVOLA</span>
+      <span class="dr-cta">Biglietti <span class="arr">↗</span></span>
+    </a>
+
+    <a class="dayrow" href="https://dice.fm/sottosopra?utm_source=sito&utm_medium=home&utm_campaign=domenica" target="_blank" rel="noopener" aria-label="Domenica 2 agosto — biglietti">
+      <span class="dr-num">
+        <span class="dr-dow">Dom</span>
+        <span class="dr-day flipS">02</span>
+        <span class="dr-mon">Agosto</span>
+      </span>
+      <span class="dr-acts">JESSE THE FACCIO <span class="sep">·</span> AURORO BOREALO <span class="sep">·</span> EX-OTAGO</span>
+      <span class="dr-cta">Biglietti <span class="arr">↗</span></span>
+    </a>
+  </div>
+</section>
+
+<!-- ===================== MARQUEE (dritto) ===================== -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <span>SEMPRE SOTTOSOPRA</span><span class="dot">●</span>
+    <span>30 LUGLIO — 2 AGOSTO 2026</span><span class="dot">●</span>
+    <span>GIARDINI DEL CASTELLO</span><span class="dot">●</span>
+    <span>CASTELFRANCO VENETO</span><span class="dot">●</span>
+    <span>SEMPRE SOTTOSOPRA</span><span class="dot">●</span>
+    <span>30 LUGLIO — 2 AGOSTO 2026</span><span class="dot">●</span>
+    <span>GIARDINI DEL CASTELLO</span><span class="dot">●</span>
+    <span>CASTELFRANCO VENETO</span><span class="dot">●</span>
+  </div>
+</div>
+
+<!-- ===================== LINEUP TEASER ===================== -->
+<section class="lineup" aria-label="Lineup">
+  <div class="section-tag">
+    <span class="st-l flipS">LINEUP</span>
+    <span class="tag">4 Giornate · 2026</span>
+  </div>
+
+  <div class="day-block">
+    <div class="day-head"><span class="dh-day">Gio 30 · Free</span><span class="dh-tag">Talk</span></div>
+    <div class="acts">
+      <a class="flipS" href="/programma">ADRIAN FARTADE</a> <span class="role">talk</span>
+    </div>
+  </div>
+
+  <div class="day-block">
+    <div class="day-head"><span class="dh-day">Ven 31 Luglio</span><span class="dh-tag">Live</span></div>
+    <div class="acts">
+      <a class="flipS" href="/programma">GENERIC ANIMAL</a><span class="sep">·</span><a class="flipS" href="/programma">DEGHEIO</a><span class="sep">·</span><a class="flipS" href="/programma">KRANO</a><span class="sep">·</span><a class="flipS" href="/programma">CAVALLI MONGOLI</a>
+    </div>
+  </div>
+
+  <div class="day-block">
+    <div class="day-head"><span class="dh-day">Sab 1 Agosto</span><span class="dh-tag">Live</span></div>
+    <div class="acts">
+      <a class="flipS" href="/programma">POPA</a><span class="sep">·</span><a class="flipS" href="/programma">VENDREDI SUR MER</a><span class="sep">·</span><a class="flipS" href="/programma">FACCIANUVOLA</a>
+    </div>
+  </div>
+
+  <div class="day-block">
+    <div class="day-head"><span class="dh-day">Dom 2 Agosto</span><span class="dh-tag">Live</span></div>
+    <div class="acts">
+      <a class="flipS" href="/programma">JESSE THE FACCIO</a><span class="sep">·</span><a class="flipS" href="/programma">AURORO BOREALO</a><span class="sep">·</span><a class="flipS" href="/programma">EX-OTAGO</a>
+    </div>
+  </div>
+
+  <div class="lineup-more">
+    <a href="/programma">TUTTO IL PROGRAMMA ↗</a>
+  </div>
+</section>
+
+<!-- ===================== EXPERIENCES ===================== -->
+<div class="exp-row">
+  NON SOLO CONCERTI: <span class="dim">TALK, WORKSHOP, LIBRI, SPORT, SOFT CLUBBING.</span>
+</div>
+
+<!-- ===================== PARTNER — 3 overlapping marquees ===================== -->
+<section class="partners" aria-label="Partner">
+  <div class="p-head">
+    <span class="st-l flipS">PARTNER</span>
+    <span class="tag">Edizione 2026</span>
+  </div>
+
+  <!-- TIER 1 — MAIN PARTNER -->
+  <div class="p-tier">
+    <span class="p-label">Main partner</span>
+    <div class="p-flow">
+      <div class="p-track t1">
+        <a class="chip" href="#" rel="noopener">AZIMUT</a>
+        <a class="chip" href="#" rel="noopener">BANCA TERRE VENETE</a>
+        <a class="chip" href="#" rel="noopener">CECCATO</a>
+        <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">AZIMUT</a>
+        <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">BANCA TERRE VENETE</a>
+        <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">CECCATO</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIER 2 — PARTNER -->
+  <div class="p-tier">
+    <span class="p-label">Partner</span>
+    <div class="p-flow">
+      <div class="p-track t2">
+        <a class="chip" href="#" rel="noopener">PRODECO</a>
+        <a class="chip" href="#" rel="noopener">CNA</a>
+        <a class="chip" href="#" rel="noopener">ADRIATICA STRADE</a>
+        <a class="chip" href="#" rel="noopener">MERIEUX</a>
+        <a class="chip" href="#" rel="noopener">LIBRERIA ZABARELLA</a>
+        <a class="chip" href="#" rel="noopener">COOP L’INCONTRO</a>
+        <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">PRODECO</a>
+        <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">CNA</a>
+        <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">ADRIATICA STRADE</a>
+        <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">MERIEUX</a>
+        <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">LIBRERIA ZABARELLA</a>
+        <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">COOP L’INCONTRO</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIER 3 — SUPPORTER -->
+  <div class="p-tier">
+    <span class="p-label">Supporter</span>
+    <div class="p-flow">
+      <div class="p-track t3">
+        <a class="chip" href="#" rel="noopener">ATLANTIS</a>
+        <a class="chip" href="#" rel="noopener">EUREKA</a>
+        <a class="chip" href="#" rel="noopener">COMUNE DI CASTELFRANCO</a>
+        <a class="chip" href="#" rel="noopener">PRO LOCO</a>
+        <a class="chip" href="#" rel="noopener">AVIS CASTELFRANCO</a>
+        <a class="chip" href="#" rel="noopener">BIRRA ANTONIANA</a>
+        <a class="chip" href="#" rel="noopener">CAFFÈ DIEMME</a>
+        <a class="chip" href="#" rel="noopener">RADIO COMPANY</a>
+        <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">ATLANTIS</a>
+        <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">EUREKA</a>
+        <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">COMUNE DI CASTELFRANCO</a>
+        <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">PRO LOCO</a>
+        <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">AVIS CASTELFRANCO</a>
+        <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">BIRRA ANTONIANA</a>
+        <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">CAFFÈ DIEMME</a>
+        <a class="chip" href="#" aria-hidden="true" tabindex="-1" rel="noopener">RADIO COMPANY</a>
+      </div>
+    </div>
+  </div>
+
+  <p class="partners-foot">VUOI SOSTENERE L’EDIZIONE 2026? <a href="mailto:info@sottosopra.com">INFO@SOTTOSOPRA.COM</a></p>
+</section>
+
+<!-- ===================== PARTECIPA ===================== -->
+<section class="cta-grid" aria-label="Partecipa">
+  <div class="cta-cell">
+    <span class="eyebrow">Fai parte del festival</span>
+    <h3 class="flipS">VOLONTARI*</h3>
+    <p>IL FESTIVAL LO FACCIAMO IN OTTANTA — MANCHI SOLO TU*.</p>
+    <a class="cta-link" href="/about#volontari">DIVENTA VOLONTARI* <span class="arr">↗</span></a>
+  </div>
+  <div class="cta-cell">
+    <span class="eyebrow">Resta aggiornat*</span>
+    <h3 class="flipS">NEWSLETTER</h3>
+    <p>DATE, LINE-UP E BIGLIETTI PRIMA DI TUTTI. NIENTE SPAM.</p>
+    <form class="nl-form" onsubmit="return false">
+      <input type="email" placeholder="LA-TUA@EMAIL.IT" aria-label="La tua email" required>
+      <button type="submit">Iscriviti</button>
+    </form>
+    <label class="nl-consent">
+      <input type="checkbox" required>
+      <span>Acconsento al trattamento dei dati per ricevere la newsletter. <a href="/privacy">Privacy</a>.</span>
+    </label>
+  </div>
+</section>
+
+</main>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="site-foot">
+  <div class="foot-grid">
+    <div class="foot-cell">
+      <div class="big">30·07<br>— 2·08<br>’26</div>
+    </div>
+    <div class="foot-cell">
+      <span class="eyebrow">Naviga</span>
+      <a href="/programma">Programma</a>
+      <a href="/info">Info</a>
+      <a href="/about">About</a>
+      <a href="/news">News</a>
+    </div>
+    <div class="foot-cell">
+      <span class="eyebrow">Contatti</span>
+      <a href="mailto:info@sottosopra.com">info@sottosopra.com</a>
+      <a href="https://instagram.com/sottosoprafestival" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://facebook.com/sottosoprafestival" target="_blank" rel="noopener">Facebook</a>
+      <a class="tk" href="https://dice.fm/sottosopra?utm_source=sito&utm_medium=footer" target="_blank" rel="noopener">Biglietti ↗</a>
+    </div>
+  </div>
+  <div class="foot-foot">
+    <span>SOTTOSOPRA APS · CAMBIA IL PUNTO DI VISTA</span>
+    <span class="ll">
+      <img src="/brand/sottosopra-logo-white.png" alt="Sottosopra">
+      <a href="/privacy">Privacy</a><a href="/cookie">Cookie</a>
+    </span>
+  </div>
+</footer>
+
+<!-- ===================== NOW PLAYING (fixed desktop / static strip mobile) ===================== -->
+<aside class="np-bar" role="status" aria-label="Ora in cassa">
+  <div class="np-id">
+    <div class="np-cover" aria-hidden="true"></div>
+    <div class="np-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <span class="np-label">Now Playing</span>
+  </div>
+  <div class="np-feed" aria-hidden="true">
+    <div class="np-track">
+      <span>GENERIC ANIMAL — LIMONATA <span class="dot">●</span> VENDREDI SUR MER — ÉCOUTE CHÉRIE <span class="dot">●</span> EX-OTAGO — CINGHIALI <span class="dot">●</span> AURORO BOREALO — TUTTO BENE <span class="dot">●</span> KRANO — LIVE <span class="dot">●</span> POPA — SOUL <span class="dot">●</span> </span>
+      <span>GENERIC ANIMAL — LIMONATA <span class="dot">●</span> VENDREDI SUR MER — ÉCOUTE CHÉRIE <span class="dot">●</span> EX-OTAGO — CINGHIALI <span class="dot">●</span> AURORO BOREALO — TUTTO BENE <span class="dot">●</span> KRANO — LIVE <span class="dot">●</span> POPA — SOUL <span class="dot">●</span> </span>
+    </div>
+  </div>
+  <a class="np-spotify" href="https://open.spotify.com/" target="_blank" rel="noopener">
+    <span class="sp-full">Ascolta su Spotify</span><span class="sp-short">Spotify</span> <span class="arr">↗</span>
+  </a>
+</aside>
+
+<!-- ===================== STICKY BOTTOM CTA (mobile) ===================== -->
+<div class="sticky-cta" aria-label="Azioni rapide">
+  <a class="sc-tickets" href="https://dice.fm/sottosopra?utm_source=sito&utm_medium=sticky" target="_blank" rel="noopener">Biglietti <span class="arr">↗</span></a>
+  <a class="sc-prog" href="/programma">Programma</a>
+</div>
+
+<script>
+(function(){
+  var body=document.body;
+
+  /* ---- mobile drawer ---- */
+  var burger=document.getElementById("burger");
+  var drawer=document.getElementById("drawer");
+  function setDrawer(open){
+    drawer.classList.toggle("open",open);
+    body.classList.toggle("drawer-open",open);
+    burger.setAttribute("aria-expanded",open?"true":"false");
+    burger.setAttribute("aria-label",open?"Chiudi menu":"Apri menu");
+  }
+  if(burger&&drawer){
+    burger.addEventListener("click",function(){setDrawer(!drawer.classList.contains("open"))});
+    drawer.querySelectorAll("a").forEach(function(a){
+      a.addEventListener("click",function(){setDrawer(false)});
+    });
+    document.addEventListener("keydown",function(e){
+      if(e.key==="Escape"&&drawer.classList.contains("open"))setDrawer(false);
+    });
+    /* focus-trap: keep Tab within the open drawer */
+    drawer.addEventListener("keydown",function(e){
+      if(e.key!=="Tab"||!drawer.classList.contains("open"))return;
+      var f=drawer.querySelectorAll("a[href],button");
+      if(!f.length)return;
+      var first=f[0],last=f[f.length-1];
+      if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
+      else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
+    });
+  }
+
+  /* ---- capovolgi (palette invert) — easter egg: tasto S + voce drawer ---- */
+  var flipped=false;
+  var dflip=document.getElementById("dflip");
+  function invert(){
+    flipped=!flipped;
+    if(flipped){
+      body.style.setProperty("--bg","#000");
+      body.style.setProperty("--fg","#fff");
+      body.setAttribute("data-theme","dark");
+    }else{
+      body.style.setProperty("--bg","#fff");
+      body.style.setProperty("--fg","#000");
+      body.setAttribute("data-theme","light");
+    }
+    if(dflip)dflip.setAttribute("aria-pressed",flipped?"true":"false");
+  }
+  document.addEventListener("keydown",function(e){
+    if((e.key==="s"||e.key==="S")&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName)){
+      invert();
+    }
+  });
+  if(dflip)dflip.addEventListener("click",invert);
+})();
+</script>
+
+<!-- SCROLL-S-FLIP (verificato): default S dritta, scrollando -> scaleY(-1) rovesciata -->
+<style>
+.sflip{display:inline-block;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.sflip.is-flipped{transform:scaleY(-1)}
+@media(prefers-reduced-motion:reduce){.sflip{transition:none;transform:none!important}}
+</style>
+<script>
+(function(){
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  // avvolgi ogni "S" negli elementi .flipS (devono contenere SOLO testo UPPERCASE, niente tag figli)
+  document.querySelectorAll('.flipS').forEach(function(h){
+    h.innerHTML=h.innerHTML.replace(/S/g,'<span class="sflip">S</span>');
+  });
+  var L=[].slice.call(document.querySelectorAll('.sflip')),tick=false;
+  function upd(){tick=false;var line=innerHeight*0.5;
+    L.forEach(function(el){el.classList.toggle('is-flipped', el.getBoundingClientRect().top<line);});}
+  addEventListener('scroll',function(){if(!tick){tick=true;requestAnimationFrame(upd)}},{passive:true});
+  addEventListener('resize',upd);
+  setTimeout(upd,500); // hero: flip animato poco dopo il load, il resto scrollando
+})();
+</script>
+</body>
+</html>
