@@ -78,8 +78,11 @@ Via Verdi 3, 31033 Castelfranco Veneto (TV)<br data-astro-cid-sz7xmlte> <a href=
     var heroCta = document.querySelector('.hero-cta');
     if (!bar || !heroCta || !('IntersectionObserver' in window)) return;
     bar.classList.add('sb-parked');
+    bar.inert = true; /* parcheggiata (fuori schermo) → fuori da tab order e SR */
     new IntersectionObserver(function (entries) {
-      bar.classList.toggle('sb-parked', entries[0].isIntersecting);
+      var parked = entries[0].isIntersecting;
+      bar.classList.toggle('sb-parked', parked);
+      bar.inert = parked;
     }, { rootMargin: '-56px 0px 0px 0px' }).observe(heroCta);
   })();
 </script> <!-- GIUSTIFICAZIONE MANIFESTO — modello dei poster del grafico
