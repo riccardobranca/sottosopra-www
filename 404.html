@@ -7,8 +7,12 @@
     var burger = document.getElementById('burger');
     var drawer = document.getElementById('drawer');
     if (!burger || !drawer) return;
+    // NB: la .sticky-bar è esclusa apposta — il suo inert lo gestisce StickyCTA
+    // (parked = inert) e la CSS `body.drawer-open .sticky-bar{display:none}` la
+    // nasconde col drawer aperto; ripristinarla a inert=false qui la riattiverebbe
+    // anche quando è parcheggiata fuori schermo.
     var toInert = function () {
-      return [document.getElementById('main'), document.querySelector('footer'), document.querySelector('.sticky-bar')].filter(Boolean);
+      return [document.getElementById('main'), document.querySelector('footer')].filter(Boolean);
     };
     function setOpen(open) {
       drawer.hidden = !open;
@@ -20,7 +24,9 @@
       if (open) {
         var first = drawer.querySelector('a, button');
         if (first) first.focus();
-      } else {
+      } else if (burger.offsetParent !== null) {
+        /* riporta il focus al burger SOLO se è ancora visibile: chiudendo per
+           passaggio a desktop il burger è display:none → il focus andrebbe perso */
         burger.focus();
       }
     }
